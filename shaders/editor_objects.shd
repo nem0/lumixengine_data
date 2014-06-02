@@ -1,0 +1,21 @@
+{
+}
+
+//BEGIN
+
+void main( void )
+{
+	gl_TexCoord[0]	= gl_MultiTexCoord0;
+	vec4 position = gl_Vertex;
+	gl_Position = gl_ModelViewProjectionMatrix * position; 
+ 	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
+}
+
+//~VS
+uniform sampler2D	tDiffuse;
+
+void main( void )
+{
+	vec4 texel = texture2D(tDiffuse,gl_TexCoord[0].st).rgba;
+	gl_FragColor = texel;
+}

@@ -1,0 +1,116 @@
+{
+	"attributes" : ["bone_weights", "bone_indices"],
+	"shadowmap_required" : true
+}
+
+//BEGIN
+
+#version 120
+varying vec3 normals;
+varying vec4 position;
+uniform mat4 world_matrix;
+attribute vec4 bone_weights;
+attribute vec4 bone_indices;
+uniform mat4 bone_matrices[64];
+
+void main( void )
+{
+	// Move the normals back from the camera space to the world space
+	mat3 worldRotationInverse = transpose(mat3(world_matrix));
+	
+	//gl_Position		= gl_ModelViewProjectionMatrix * gl_Vertex;
+	gl_TexCoord[0]	= gl_MultiTexCoord0;
+	normals			= normalize(gl_Normal);
+	
+	position = bone_weights.x * (bone_matrices[int(bone_indices.x)] * gl_Vertex);
+	position = position + bone_weights.y * (bone_matrices[int(bone_indices.y)] * gl_Vertex);
+	position = position + bone_weights.z * (bone_matrices[int(bone_indices.z)] * gl_Vertex);
+	position = position + bone_weights.w * (bone_matrices[int(bone_indices.w)] * gl_Vertex);
+	position = (bone_matrices[int(bone_indices.w)] * gl_Vertex);
+	//position = gl_Vertex;
+	gl_Position = gl_ModelViewProjectionMatrix * position; 
+    //shadow_coord = shadowmap_matrix * world_matrix * position;
+    
+	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
+}
+
+//~VS
+#version 120
+varying vec4		position;
+varying vec3		normals;
+uniform sampler2D	tDiffuse;
+uniform sampler2D	shadowmap;
+uniform mat4 shadowmap_matrix0;
+uniform mat4 shadowmap_matrix1;
+uniform mat4 shadowmap_matrix2;
+uniform mat4 shadowmap_matrix3;
+uniform mat4 world_matrix;
+uniform vec3 light_dir;
+
+vec2 poissonDisk[4] = vec2[](
+  vec2( -0.94201624, -0.39906216 ),
+  vec2( 0.94558609, -0.76890725 ),
+  vec2( -0.094184101, -0.92938870 ),
+  vec2( 0.34495938, 0.29387760 )
+);
+
+void main( void )
+{
+	float visibility = 1.0;
+	vec3 shadow_coord[4] = vec3[](
+		vec3(shadowmap_matrix0 * world_matrix * position),
+		vec3(shadowmap_matrix1 * world_matrix * position),
+		vec3(shadowmap_matrix2 * world_matrix * position),
+		vec3(shadowmap_matrix3 * world_matrix * position)
+	);
+	vec2 tt[4] = vec2[](
+		vec2(shadow_coord[0].x, shadow_coord[0].y * 0.25),
+		vec2(shadow_coord[1].x, 0.25 + shadow_coord[1].y * 0.25),
+		vec2(shadow_coord[2].x, 0.50 + shadow_coord[2].y * 0.25),
+		vec2(shadow_coord[3].x, 0.75 + shadow_coord[3].y * 0.25)
+	);
+	float near = 0.1;
+	float far = 1000.0;
+	float depth = gl_FragCoord.z;
+	float linear_depth = (far - near) * (2.0 * near) / (far + near - depth * (far - near));
+	int split_index = 0;
+	if(shadow_coord[3].x < 0.99 && shadow_coord[3].x > 0.01
+		&& shadow_coord[3].y < 0.99 && shadow_coord[3].y > 0.01)
+		split_index = 3;
+	if(shadow_coord[2].x < 0.99 && shadow_coord[2].x > 0.01
+		&& shadow_coord[2].y < 0.99 && shadow_coord[2].y > 0.01)
+		split_index = 2;
+	if(shadow_coord[1].x < 0.99 && shadow_coord[1].x > 0.01
+		&& shadow_coord[1].y < 0.99 && shadow_coord[1].y > 0.01)
+		split_index = 1;
+	if(shadow_coord[0].x < 0.99 && shadow_coord[0].x > 0.01
+		&& shadow_coord[0].y < 0.99 && shadow_coord[0].y > 0.01)
+		split_index = 0;
+	
+/*	for (int i=0;i<4;i++)
+	{
+		if(texture2D(shadowmap, tt[split_index] + poissonDisk[i]/700.0).z < shadow_coord[split_index].z)
+			visibility -= 0.2;
+	}*/
+	if(texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z)
+		visibility -= 0.5;
+	visibility = max(0.2, visibility * max(0.2, dot(normals, -light_dir)));
+	vec4 colors[4] = vec4[](
+		vec4(1, 0, 0, 1),
+		vec4(0, 1, 0, 1),
+		vec4(0, 0, 1, 1),
+		vec4(1, 1, 0, 1)
+	);
+	//vec4 texel = colors[split_index]; 
+	vec4 texel = texture2D(tDiffuse, gl_TexCoord[0].st).rgba;
+	/*texel = (
+		vec4(texture2D(shadowmap, tt[0]).x, 0, 0, 1) 
+		//+ vec4(0, texture2D(shadowmap, tt[1]).x, 0, 1)
+		//+ vec4(0, 0, texture2D(shadowmap, tt[2]).x, 1) 
+		//+ vec4(texture2D(shadowmap, tt[3]).x, 1, 0, 1)
+	) * 1;/**/
+	//visibility = 1;
+	if(texel.a < 0.30)
+		discard;
+	gl_FragColor = texel * visibility;
+}

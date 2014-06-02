@@ -1,0 +1,17 @@
+{
+"frame_buffer_count" : 0,
+"frame_buffers" : 
+[
+],
+"shadowmap_width" : 800,
+"shadowmap_height" : 600,
+"command_count" : 5,
+"commands" : [
+	"render_shadowmap", 1,
+	"bind_shadowmap",
+	
+	"apply_camera", 0, 
+	"clear", "all",
+	"render_models", 1
+]
+}

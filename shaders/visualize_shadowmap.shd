@@ -1,0 +1,25 @@
+varying vec3 normals;
+varying vec4 position;
+uniform mat4 ModelMatrix;
+uniform mat4 world_matrix;
+attribute vec4 bone_weights;
+attribute vec4 bone_indices;
+uniform mat4 bone_matrices[64];
+
+void main( void )
+{
+	gl_TexCoord[0]	= gl_MultiTexCoord0;
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; 
+	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
+}
+
+//~VS
+varying vec4		position;
+varying vec3		normals;
+varying mat4		TBN;
+uniform sampler2D	tDiffuse;
+
+void main( void )
+{
+	gl_FragColor = texture2D(tDiffuse,gl_TexCoord[0].st).rgba;
+}

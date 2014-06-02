@@ -1,0 +1,3 @@
+{
+"texture" : "textures/number.tga",
+"shader" : "shaders/skinned.shd", "z_test" : true}

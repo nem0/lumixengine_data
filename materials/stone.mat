@@ -1,0 +1,3 @@
+{
+"texture" : "textures/stone.tga",
+"shader" : "shaders/new_renderer/skinned.shd", "z_test" : true}

@@ -74,13 +74,8 @@ void main( void )
 		&& shadow_coord[0].y < 0.99 && shadow_coord[0].y > 0.01)
 		split_index = 0;
 	
-/*	for (int i=0;i<4;i++)
-	{
-		if(texture2D(shadowmap, tt[split_index] + poissonDisk[i]/700.0).z < shadow_coord[split_index].z)
-			visibility -= 0.2;
-	}*/
-	if(texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z)
-		visibility -= 0.5;
+	//if(texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z)
+	//	visibility -= 0.5;
 	visibility = max(0.2, visibility * max(0.2, dot(normals, -light_dir)));
 	vec4 colors[4] = vec4[](
 		vec4(1, 0, 0, 1),
@@ -88,16 +83,9 @@ void main( void )
 		vec4(0, 0, 1, 1),
 		vec4(1, 1, 0, 1)
 	);
-	//vec4 texel = colors[split_index]; 
 	vec4 texel = texture2D(tDiffuse, gl_TexCoord[0].st).rgba;
-	/*texel = (
-		vec4(texture2D(shadowmap, tt[0]).x, 0, 0, 1) 
-		//+ vec4(0, texture2D(shadowmap, tt[1]).x, 0, 1)
-		//+ vec4(0, 0, texture2D(shadowmap, tt[2]).x, 1) 
-		//+ vec4(texture2D(shadowmap, tt[3]).x, 1, 0, 1)
-	) * 1;/**/
-	//visibility = 1;
 	if(texel.a < 0.30)
 		discard;
 	gl_FragColor = texel * visibility;
+	//gl_FragColor = vec4(light_dir, 1);
 }

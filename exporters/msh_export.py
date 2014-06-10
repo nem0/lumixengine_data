@@ -635,7 +635,7 @@ def export_material(base_path, material, shader):
 	path = base_path + "/" + material + ".mat"
 	print("Exporting material " + path)	
 	f_mat = open(path, "w")
-	f_mat.write("\"texture\" : \"textures/" + material + ".tga\", \"shader\" : \"shaders/new_renderer/" + shader + ".shd\"");
+	f_mat.write("\"texture\" : \"textures/" + material + ".dds\", \"shader\" : \"shaders/" + shader + ".shd\"");
 	f_mat.close();
 		
 def add_meshes(objs, o):
@@ -721,7 +721,7 @@ class ExportSomeData(Operator, ExportHelper):
 
 # Only needed if you want to add into a dynamic menu
 def menu_func_export(self, context):
-    self.layout.operator(ExportSomeData.bl_idname, text="Text Export Operator")
+    self.layout.operator(ExportSomeData.bl_idname, text="Lux Mesh exporter")
 
 
 def register():
@@ -733,9 +733,18 @@ def unregister():
     bpy.utils.unregister_class(ExportSomeData)
     bpy.types.INFO_MT_file_export.remove(menu_func_export)
 
+bl_info = {
+    "name": "Lux Mesh exporter",
+    "description": "Export mesh file in the Lux engine file format",
+    "author": "Mikulas Florek",
+    "version": (1, 0),
+    "blender": (2, 68, 0),
+    "location": "File > Export",
+    "warning": "", # used for warning icon and text in addons panel
+    "wiki_url": "http://wiki.blender.org/index.php/Extensions:2.5/Py/"
+                "Scripts/My_Script",
+    "category": "Import-Export"}
+	
 
 if __name__ == "__main__":
     register()
-
-    # test call
-    bpy.ops.export_test.some_data('INVOKE_DEFAULT')

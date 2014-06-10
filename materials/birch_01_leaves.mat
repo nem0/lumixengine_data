@@ -1,0 +1,4 @@
+{
+"texture" : "textures/trees/birch_01_leaves.dds",
+"shader" : "shaders/rigid.shd"
+}

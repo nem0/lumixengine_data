@@ -28,8 +28,8 @@ def write_some_data(context, filepath, use_some_setting):
 			p = mtx.translation;
 			
 			f.write(struct.pack("f", p.x))
-			f.write(struct.pack("f", p.y))
 			f.write(struct.pack("f", p.z))
+			f.write(struct.pack("f", p.y))
 			bone_idx = bone_idx + 1;
 	first_frame_q = {}
 	for frame in range(context.scene.frame_end + 1):
@@ -51,6 +51,7 @@ def write_some_data(context, filepath, use_some_setting):
 			f.write(struct.pack("f", q.y))
 			f.write(struct.pack("f", q.z))
 			f.write(struct.pack("f", q.w))
+			print(str(q.x) + " " + str(q.y) + " " + str(q.z) );
 			bone_idx = bone_idx + 1;	
 	return {'FINISHED'}
 

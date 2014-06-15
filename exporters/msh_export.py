@@ -356,8 +356,8 @@ def write_skeleton(f, armature):
 			mtx = armature.matrix_world * b.matrix_local;
 		p = mtx.translation;
 		f.write(struct.pack("f", round(p.x, 8)))
-		f.write(struct.pack("f", round(p.y, 8)))
 		f.write(struct.pack("f", round(p.z, 8)))
+		f.write(struct.pack("f", round(p.y, 8)))
 		q = mtx.to_quaternion()
 		f.write(struct.pack("f", round(q.x, 8)))
 		f.write(struct.pack("f", round(q.y, 8)))

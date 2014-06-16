@@ -2,6 +2,11 @@ import bpy
 import struct
 import mathutils
 import math
+from bpy_extras.io_utils import (ExportHelper,
+									axis_conversion,
+									)
+
+swap_y_z_matrix = axis_conversion('Y', 'Z', '-Z', 'Y').to_4x4()
 
 def write_str(f, str):
 	l = len(str)
@@ -22,14 +27,14 @@ def write_some_data(context, filepath, use_some_setting):
 		bone_idx = 0
 		for pose_bone in o.pose.bones:
 			if pose_bone.parent == None:
-				mtx = o.matrix_world * pose_bone.matrix;
+				mtx = swap_y_z_matrix * o.matrix_world * pose_bone.matrix;
 			else:
-				mtx = o.matrix_world * pose_bone.matrix;
+				mtx = swap_y_z_matrix * o.matrix_world * pose_bone.matrix;
 			p = mtx.translation;
 			
 			f.write(struct.pack("f", p.x))
-			f.write(struct.pack("f", p.z))
 			f.write(struct.pack("f", p.y))
+			f.write(struct.pack("f", p.z))
 			bone_idx = bone_idx + 1;
 	first_frame_q = {}
 	for frame in range(context.scene.frame_end + 1):
@@ -37,9 +42,9 @@ def write_some_data(context, filepath, use_some_setting):
 		bone_idx = 0
 		for pose_bone in o.pose.bones:
 			if pose_bone.parent == None:
-				mtx = o.matrix_world * pose_bone.matrix;
+				mtx = swap_y_z_matrix * o.matrix_world * pose_bone.matrix;
 			else:
-				mtx = o.matrix_world * pose_bone.matrix;
+				mtx = swap_y_z_matrix * o.matrix_world * pose_bone.matrix;
 			q = mtx.to_quaternion();
 			
 			if frame == 0:

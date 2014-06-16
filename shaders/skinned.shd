@@ -15,9 +15,6 @@ uniform mat4 bone_matrices[64];
 
 void main( void )
 {
-	// Move the normals back from the camera space to the world space
-	mat3 worldRotationInverse = transpose(mat3(world_matrix));
-	
 	//gl_Position		= gl_ModelViewProjectionMatrix * gl_Vertex;
 	gl_TexCoord[0]	= gl_MultiTexCoord0;
 	normals			= normalize(gl_Normal);
@@ -26,10 +23,9 @@ void main( void )
 	position = position + bone_weights.y * (bone_matrices[int(bone_indices.y)] * gl_Vertex);
 	position = position + bone_weights.z * (bone_matrices[int(bone_indices.z)] * gl_Vertex);
 	position = position + bone_weights.w * (bone_matrices[int(bone_indices.w)] * gl_Vertex);
-	position = (bone_matrices[int(bone_indices.w)] * gl_Vertex);
+	//position = (bone_matrices[int(bone_indices.x)] * gl_Vertex);
 	//position = gl_Vertex;
 	gl_Position = gl_ModelViewProjectionMatrix * position; 
-    //shadow_coord = shadowmap_matrix * world_matrix * position;
     
 	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
@@ -113,4 +109,5 @@ void main( void )
 	if(texel.a < 0.30)
 		discard;
 	gl_FragColor = texel * visibility;
+	//gl_FragColor = vec4(1, 0, 0, 1);
 }

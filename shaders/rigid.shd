@@ -13,7 +13,7 @@ uniform mat4 world_matrix;
 void main( void )
 {
 	gl_TexCoord[0]	= gl_MultiTexCoord0;
-	normals			= normalize(gl_Normal);
+	normals = normalize(gl_NormalMatrix * gl_Normal);
 	
 	position = gl_Vertex;
 	gl_Position = gl_ModelViewProjectionMatrix * position; 
@@ -88,4 +88,5 @@ void main( void )
 		discard;
 	gl_FragColor = texel * visibility;
 	//gl_FragColor = vec4(light_dir, 1);
+	//gl_FragColor = vec4(1, 0, 0, 1);
 }

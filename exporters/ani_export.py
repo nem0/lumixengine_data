@@ -14,7 +14,7 @@ def write_str(f, str):
 	f.write(bytes(str, "ascii"))
 	return
 
-def write_some_data(context, filepath, use_some_setting):
+def export_animation(context, filepath):
 
 	f = open(filepath, 'wb')
 	o = context.selected_objects[0]
@@ -29,7 +29,7 @@ def write_some_data(context, filepath, use_some_setting):
 			if pose_bone.parent == None:
 				mtx = swap_y_z_matrix * o.matrix_world * pose_bone.matrix;
 			else:
-				mtx = swap_y_z_matrix * o.matrix_world * pose_bone.matrix;
+				mtx = pose_bone.parent.matrix.inverted() * pose_bone.matrix
 			p = mtx.translation;
 			
 			f.write(struct.pack("f", p.x))
@@ -44,7 +44,7 @@ def write_some_data(context, filepath, use_some_setting):
 			if pose_bone.parent == None:
 				mtx = swap_y_z_matrix * o.matrix_world * pose_bone.matrix;
 			else:
-				mtx = swap_y_z_matrix * o.matrix_world * pose_bone.matrix;
+				mtx = pose_bone.parent.matrix.inverted() * pose_bone.matrix
 			q = mtx.to_quaternion();
 			
 			if frame == 0:
@@ -56,7 +56,6 @@ def write_some_data(context, filepath, use_some_setting):
 			f.write(struct.pack("f", q.y))
 			f.write(struct.pack("f", q.z))
 			f.write(struct.pack("f", q.w))
-			print(str(q.x) + " " + str(q.y) + " " + str(q.z) );
 			bone_idx = bone_idx + 1;	
 	return {'FINISHED'}
 
@@ -68,56 +67,54 @@ from bpy.props import StringProperty, BoolProperty, EnumProperty
 from bpy.types import Operator
 
 
-class ExportSomeData(Operator, ExportHelper):
-    """This appears in the tooltip of the operator and in the generated docs"""
-    bl_idname = "export_test.some_data"  # important since its how bpy.ops.import_test.some_data is constructed
-    bl_label = "Export Some Data"
+class LumixAnimExporter(Operator, ExportHelper):
+    bl_idname = "export_scene.lumix_ani"  # important since its how bpy.ops.import_test.some_data is constructed
+    bl_label = "Export Lumix Engine Animation"
 
     # ExportHelper mixin class uses this
     filename_ext = ".ani"
 
     filter_glob = StringProperty(
-            default="*.txt",
+            default="*.ani",
             options={'HIDDEN'},
             )
 
-    # List of operator properties, the attributes will be assigned
-    # to the class instance from the operator settings before calling.
-    use_setting = BoolProperty(
-            name="Example Boolean",
-            description="Example Tooltip",
-            default=True,
-            )
-
-    type = EnumProperty(
-            name="Example Enum",
-            description="Choose between two items",
-            items=(('OPT_A', "First Option", "Description one"),
-                   ('OPT_B', "Second Option", "Description two")),
-            default='OPT_A',
-            )
-
     def execute(self, context):
-        return write_some_data(context, self.filepath, self.use_setting)
+        return export_animation(context, self.filepath)
 
 
 # Only needed if you want to add into a dynamic menu
 def menu_func_export(self, context):
-    self.layout.operator(ExportSomeData.bl_idname, text="Text Export Operator")
+    self.layout.operator(LumixAnimExporter.bl_idname, text="Lumix Animation (*.ani)")
 
 
 def register():
-    bpy.utils.register_class(ExportSomeData)
+    bpy.utils.register_class(LumixAnimExporter)
     bpy.types.INFO_MT_file_export.append(menu_func_export)
 
 
 def unregister():
-    bpy.utils.unregister_class(ExportSomeData)
+    bpy.utils.unregister_class(LumixAnimExporter)
     bpy.types.INFO_MT_file_export.remove(menu_func_export)
 
 
+bl_info = {
+    "name": "Lumix Animation exporter",
+    "description": "Export animation file in the Lumix engine file format",
+    "author": "Mikulas Florek",
+    "version": (1, 0),
+    "blender": (2, 68, 0),
+    "location": "File > Export",
+    "warning": "", # used for warning icon and text in addons panel
+    "wiki_url": "http://wiki.blender.org/index.php/Extensions:2.5/Py/"
+                "Scripts/My_Script",
+    "category": "Import-Export"}
+	
+import sys
+	
 if __name__ == "__main__":
-    register()
-
-    # test call
-    bpy.ops.export_test.some_data('INVOKE_DEFAULT')
+	if(len(sys.argv) == 7):
+		export_animation(bpy.context, sys.argv[6]);
+	else:
+		register()
+	

@@ -509,6 +509,9 @@ bl_info = {
                 "Scripts/My_Script",
     "category": "Import-Export"}
 	
-
+import sys
 if __name__ == "__main__":
-    register()
+	if(len(sys.argv) == 7):
+		export_model(bpy.context, sys.argv[6], False);
+	else:
+		register()

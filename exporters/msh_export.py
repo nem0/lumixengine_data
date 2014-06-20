@@ -424,18 +424,27 @@ def add_meshes(objs, o):
 		if i.type == 'MESH':
 			objs.append(i)
 		
-def export_model(context, filepath, export_materials):
+def export_model(context, filepath, export_materials, export_selection):
 	print(filepath)
 	f = open(filepath, 'wb')
-	object_count = len(context.selected_objects);
-	armature = context.selected_objects[0].find_armature()
 	objs = []
-	for o in context.selected_objects:
-		if o.type == 'MESH':
-			objs.append(o)
-		else:
-			add_meshes(objs, o)
-	
+	if export_selection:
+		object_count = len(context.selected_objects);
+		armature = context.selected_objects[0].find_armature()
+		for o in context.selected_objects:
+			if o.type == 'MESH':
+				objs.append(o)
+			else:
+				add_meshes(objs, o)
+	else:
+		for o in context.scene.objects:
+			if o.type == 'MESH':
+				objs.append(o)
+			else:
+				add_meshes(objs, o)
+		object_count = len(objs)
+		armature = objs[0].find_armature()
+		
 	shader = "rigid"
 	if armature != None:
 		shader = "skinned"
@@ -481,7 +490,7 @@ class LumixExporter(Operator, ExportHelper):
 			)
 
 	def execute(self, context):
-		return export_model(context, self.filepath, self.export_materials)
+		return export_model(context, self.filepath, self.export_materials, True)
 
 
 def menu_func_export(self, context):
@@ -512,6 +521,6 @@ bl_info = {
 import sys
 if __name__ == "__main__":
 	if(len(sys.argv) == 7):
-		export_model(bpy.context, sys.argv[6], False);
+		export_model(bpy.context, sys.argv[6], False, False);
 	else:
 		register()

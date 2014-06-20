@@ -14,10 +14,17 @@ def write_str(f, str):
 	f.write(bytes(str, "ascii"))
 	return
 
-def export_animation(context, filepath):
+def export_animation(context, filepath, export_selection):
 
 	f = open(filepath, 'wb')
-	o = context.selected_objects[0]
+	o = None
+	if export_selection:
+		o = context.selected_objects[0]
+	else:
+		for i in context.scene.objects:
+			if i.find_armature() != None:
+				o = i.find_armature()
+				break;
 	f.write(struct.pack("I", 0x5f4c4146))
 	f.write(struct.pack("I", 1))
 	f.write(struct.pack("I", context.scene.frame_end + 1))
@@ -80,7 +87,7 @@ class LumixAnimExporter(Operator, ExportHelper):
             )
 
     def execute(self, context):
-        return export_animation(context, self.filepath)
+        return export_animation(context, self.filepath, True)
 
 
 # Only needed if you want to add into a dynamic menu
@@ -114,7 +121,7 @@ import sys
 	
 if __name__ == "__main__":
 	if(len(sys.argv) == 7):
-		export_animation(bpy.context, sys.argv[6]);
+		export_animation(bpy.context, sys.argv[6], False);
 	else:
 		register()
 	

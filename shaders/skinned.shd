@@ -17,7 +17,7 @@ void main( void )
 {
 	//gl_Position		= gl_ModelViewProjectionMatrix * gl_Vertex;
 	gl_TexCoord[0]	= gl_MultiTexCoord0;
-	normals			= normalize(gl_Normal);
+	normals			= normalize(mat3(world_matrix) * gl_Normal);
 	
 	position = bone_weights.x * (bone_matrices[int(bone_indices.x)] * gl_Vertex);
 	position = position + bone_weights.y * (bone_matrices[int(bone_indices.y)] * gl_Vertex);

@@ -13,7 +13,7 @@ uniform mat4 world_matrix;
 void main( void )
 {
 	gl_TexCoord[0]	= gl_MultiTexCoord0;
-	normals = normalize(gl_NormalMatrix * gl_Normal);
+	normals = normalize(mat3(world_matrix) * gl_Normal);
 	
 	position = gl_Vertex;
 	gl_Position = gl_ModelViewProjectionMatrix * position; 
@@ -74,8 +74,8 @@ void main( void )
 		&& shadow_coord[0].y < 0.99 && shadow_coord[0].y > 0.01)
 		split_index = 0;
 	
-	//if(texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z)
-	//	visibility -= 0.5;
+	if(texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z)
+		visibility -= 0.5;
 	visibility = max(0.2, visibility * max(0.2, dot(normals, -light_dir)));
 	vec4 colors[4] = vec4[](
 		vec4(1, 0, 0, 1),
@@ -87,6 +87,7 @@ void main( void )
 	if(texel.a < 0.30)
 		discard;
 	gl_FragColor = texel * visibility;
+	//gl_FragColor = vec4(normals, 1);
 	//gl_FragColor = vec4(light_dir, 1);
 	//gl_FragColor = vec4(1, 0, 0, 1);
 }

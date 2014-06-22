@@ -1,4 +1,11 @@
 {
 "texture" : "textures/trees/birch_01_leaves.dds",
-"shader" : "shaders/rigid.shd"
+"shader" : "shaders/tree.shd",
+"backface_culling" : false,
+"uniforms" : [
+		{
+			"name" : "time",
+			"time" : 1
+		}
+	]
 }

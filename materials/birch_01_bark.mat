@@ -1,4 +1,10 @@
 {
 "texture" : "textures/trees/birch_01_bark.dds",
-"shader" : "shaders/rigid.shd"
+"shader" : "shaders/tree.shd",
+"uniforms" : [
+{
+	"name" : "time",
+	"time" : 1
+}
+]
 }

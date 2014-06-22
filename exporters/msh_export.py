@@ -360,6 +360,7 @@ def write_rigid_model_indexed(context, f, objs_to_export):
 		m = o.to_mesh(context.scene, False, 'PREVIEW')
 		m.transform(swap_y_z_matrix * o.matrix_world)
 		m.calc_normals()
+		meshes.append(m)
 		tri_list = extract_triangles(m)
 		if m.tessface_uv_textures:
 			vert_array, uv_array, tri_list = remove_face_uv(m.vertices, tri_list)
@@ -392,7 +393,7 @@ def write_rigid_model_indexed(context, f, objs_to_export):
 	f.write(struct.pack("I", bone_count))  
 
 	index = 0
-	f.write(struct.pack("I", len(meshes)))   
+	f.write(struct.pack("I", len(objs_to_export)))   
 	for m in meshes:
 		if m == None:
 			material = ""
@@ -429,7 +430,6 @@ def export_model(context, filepath, export_materials, export_selection):
 	f = open(filepath, 'wb')
 	objs = []
 	if export_selection:
-		object_count = len(context.selected_objects);
 		armature = context.selected_objects[0].find_armature()
 		for o in context.selected_objects:
 			if o.type == 'MESH':
@@ -442,8 +442,10 @@ def export_model(context, filepath, export_materials, export_selection):
 				objs.append(o)
 			else:
 				add_meshes(objs, o)
-		object_count = len(objs)
 		armature = objs[0].find_armature()
+	object_count = len(objs)
+	print("object_count")
+	print(object_count)
 		
 	shader = "rigid"
 	if armature != None:
@@ -451,6 +453,7 @@ def export_model(context, filepath, export_materials, export_selection):
 		meshes = write_skinned_model_indexed(context, f, armature, objs)
 	else:
 		meshes = write_rigid_model_indexed(context, f, objs)
+	print("shader " + shader)
 	
 	base_path = os.path.dirname(filepath)
 	if export_materials:

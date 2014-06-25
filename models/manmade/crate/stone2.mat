@@ -1,0 +1,3 @@
+{
+"texture" : "crate.tga",
+"shader" : "shaders/rigid.shd", "z_test" : true}

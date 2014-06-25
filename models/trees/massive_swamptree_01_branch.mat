@@ -1,1 +1,1 @@
-{"texture" : "textures/trees/massive_swamptree_01_branch.dds", "shader" : "shaders/rigid.shd", "backface_culling" : false}
+{"texture" : "massive_swamptree_01_branch.dds", "shader" : "shaders/rigid.shd", "backface_culling" : false}

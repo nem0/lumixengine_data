@@ -1,3 +1,0 @@
-{
-"texture" : "textures/crate.tga",
-"shader" : "shaders/new_renderer/skinned.shd", "z_test" : true}

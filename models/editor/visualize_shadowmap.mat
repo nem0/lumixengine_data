@@ -1,0 +1,3 @@
+{
+"texture" : "", 
+"shader" : "shaders/new_renderer/visualize_shadowmap.shd", "z_test" : true}

@@ -1,0 +1,4 @@
+{
+	"texture" : "dvere.tga",
+	"shader" : "shaders/rigid.shd"
+}

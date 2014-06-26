@@ -1,0 +1,4 @@
+{
+	"texture" : "gizmo.tga",
+	"shader" : "shaders/editor_objects.shd"
+}

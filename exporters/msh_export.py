@@ -417,7 +417,7 @@ def export_material(base_path, material, shader):
 	path = base_path + "/" + material + ".mat"
 	print("Exporting material " + path)	
 	f_mat = open(path, "w")
-	f_mat.write("\"texture\" : \"textures/" + material + ".dds\", \"shader\" : \"shaders/" + shader + ".shd\"");
+	f_mat.write("{ \"texture\" : \"" + material + ".dds\", \"shader\" : \"shaders/" + shader + ".shd\" }");
 	f_mat.close();
 		
 def add_meshes(objs, o):

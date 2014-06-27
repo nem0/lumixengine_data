@@ -1,0 +1,97 @@
+{
+	"attributes" : ["tc2"],
+	"shadowmap_required" : true
+}
+
+//BEGIN
+
+#version 120
+varying vec3 normals;
+varying vec4 position;
+uniform mat4 world_matrix;
+attribute vec2 tc2;
+
+void main( void )
+{
+	gl_TexCoord[0]	= gl_MultiTexCoord0;
+	gl_TexCoord[1] = vec4(tc2.x, tc2.y, 0, 1);
+	normals = normalize(mat3(world_matrix) * gl_Normal);
+	
+	position = gl_Vertex;
+	gl_Position = gl_ModelViewProjectionMatrix * position; 
+	
+	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
+}
+
+//~VS
+#version 120
+varying vec4		position;
+varying vec3		normals;
+uniform sampler2D	t1;
+uniform sampler2D	t2;
+uniform sampler2D	t3;
+uniform sampler2D	t4;
+uniform sampler2D	splat_texture;
+uniform sampler2D	shadowmap;
+uniform mat4 shadowmap_matrix0;
+uniform mat4 shadowmap_matrix1;
+uniform mat4 shadowmap_matrix2;
+uniform mat4 shadowmap_matrix3;
+uniform mat4 world_matrix;
+uniform vec3 light_dir;
+
+vec2 poissonDisk[4] = vec2[](
+  vec2( -0.94201624, -0.39906216 ),
+  vec2( 0.94558609, -0.76890725 ),
+  vec2( -0.094184101, -0.92938870 ),
+  vec2( 0.34495938, 0.29387760 )
+);
+
+void main( void )
+{
+	float visibility = 1.0;
+	vec3 shadow_coord[4] = vec3[](
+		vec3(shadowmap_matrix0 * world_matrix * position),
+		vec3(shadowmap_matrix1 * world_matrix * position),
+		vec3(shadowmap_matrix2 * world_matrix * position),
+		vec3(shadowmap_matrix3 * world_matrix * position)
+	);
+	vec2 tt[4] = vec2[](
+		vec2(shadow_coord[0].x, shadow_coord[0].y * 0.25),
+		vec2(shadow_coord[1].x, 0.25 + shadow_coord[1].y * 0.25),
+		vec2(shadow_coord[2].x, 0.50 + shadow_coord[2].y * 0.25),
+		vec2(shadow_coord[3].x, 0.75 + shadow_coord[3].y * 0.25)
+	);
+	float near = 0.1;
+	float far = 1000.0;
+	float depth = gl_FragCoord.z;
+	float linear_depth = (far - near) * (2.0 * near) / (far + near - depth * (far - near));
+	int split_index = 0;
+	if(shadow_coord[3].x < 0.99 && shadow_coord[3].x > 0.01
+		&& shadow_coord[3].y < 0.99 && shadow_coord[3].y > 0.01)
+		split_index = 3;
+	if(shadow_coord[2].x < 0.99 && shadow_coord[2].x > 0.01
+		&& shadow_coord[2].y < 0.99 && shadow_coord[2].y > 0.01)
+		split_index = 2;
+	if(shadow_coord[1].x < 0.99 && shadow_coord[1].x > 0.01
+		&& shadow_coord[1].y < 0.99 && shadow_coord[1].y > 0.01)
+		split_index = 1;
+	if(shadow_coord[0].x < 0.99 && shadow_coord[0].x > 0.01
+		&& shadow_coord[0].y < 0.99 && shadow_coord[0].y > 0.01)
+		split_index = 0;
+	
+	if(texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z)
+		visibility -= 0.5;
+	visibility = max(0.2, visibility * max(0.2, dot(normals, -light_dir)));
+	vec4 splat = texture2D(splat_texture, gl_TexCoord[0].st).rgba;
+	vec4 texel = 
+		texture2D(t1, gl_TexCoord[1].st).rgba * splat.x
+		+ texture2D(t2, gl_TexCoord[1].st).rgba * splat.y
+		+ texture2D(t3, gl_TexCoord[1].st).rgba * splat.z;
+//	if(texel.a < 0.30)
+		//discard;
+	gl_FragColor = texel; //* visibility;
+	//gl_FragColor = vec4(normals, 1);
+	//gl_FragColor = vec4(light_dir, 1);
+	//gl_FragColor = vec4(1, 0, 0, 1);
+}

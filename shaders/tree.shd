@@ -16,7 +16,7 @@ void main( void )
 	vec4 wind = vec4(1, 0, 0, 0);
 	gl_TexCoord[0]	= gl_MultiTexCoord0;
 	normals = normalize(mat3(world_matrix) * gl_Normal);
-	
+
 	position = gl_Vertex;
 	position = position + position.y * 0.01 * sin(3*time+world_matrix[3].x*0.3) * wind;
 	gl_Position = gl_ModelViewProjectionMatrix * position;

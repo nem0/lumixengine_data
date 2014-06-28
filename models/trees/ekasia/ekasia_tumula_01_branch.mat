@@ -1,1 +1,11 @@
-{ "texture" : "ekasia_tumula_01_branch.dds", "shader" : "shaders/rigid.shd" }
+{ "texture" : "ekasia_tumula_01_branch.dds", 
+
+"shader" : "shaders/tree.shd",
+"backface_culling" : false,
+"uniforms" : [
+		{
+			"name" : "time",
+			"time" : 1
+		}
+	]
+}

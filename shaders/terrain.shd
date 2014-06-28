@@ -84,13 +84,15 @@ void main( void )
 		visibility -= 0.5;
 	visibility = max(0.2, visibility * max(0.2, dot(normals, -light_dir)));
 	vec4 splat = texture2D(splat_texture, gl_TexCoord[0].st).rgba;
+	//splat = normalize(splat);
 	vec4 texel = 
 		texture2D(t1, gl_TexCoord[1].st).rgba * splat.x
 		+ texture2D(t2, gl_TexCoord[1].st).rgba * splat.y
-		+ texture2D(t3, gl_TexCoord[1].st).rgba * splat.z;
+		+ texture2D(t3, gl_TexCoord[1].st).rgba * splat.z
+		+ texture2D(t4, gl_TexCoord[1].st).rgba * splat.w;
 //	if(texel.a < 0.30)
 		//discard;
-	gl_FragColor = texel; //* visibility;
+	gl_FragColor = texel * visibility;
 	//gl_FragColor = vec4(normals, 1);
 	//gl_FragColor = vec4(light_dir, 1);
 	//gl_FragColor = vec4(1, 0, 0, 1);

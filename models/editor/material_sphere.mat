@@ -1,4 +1,4 @@
 {
-	"texture" : "dvere.tga",
+	"texture" : "icon.tga",
 	"shader" : "shaders/rigid.shd"
 }

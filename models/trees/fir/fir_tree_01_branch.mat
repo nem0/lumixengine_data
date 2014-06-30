@@ -1,1 +1,9 @@
-{ "texture" : "fir_tree_01_branch.dds", "shader" : "shaders/rigid.shd"}
+{ "texture" : "fir_tree_01_branch.dds", "shader" : "shaders/tree.shd",
+"backface_culling" : false,
+"uniforms" : [
+		{
+			"name" : "time",
+			"time" : 1
+		}
+	]
+}

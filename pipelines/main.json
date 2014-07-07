@@ -1,20 +1,21 @@
 {
 "frame_buffer_count" : 0,
-"frame_buffers" : 
-[
-],
+"frame_buffers" : [],
 "shadowmap_width" : 2048,
 "shadowmap_height" : 2048,
-"command_count" : 8,
 "commands" : [
 	"render_shadowmap", 1, "editor",
 	"bind_shadowmap",
 	
 	"apply_camera", "editor", 
 	"clear", "all",
+	"polygon_mode", true,
 	"render_models", 1,
+
 	"clear", "depth",
 	"render_models", 2,
 	"render_debug_lines"
-]
+
+	"render_models", 1,
+	]
 }

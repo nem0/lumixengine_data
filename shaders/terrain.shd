@@ -16,29 +16,50 @@ uniform vec3 quad_min;
 uniform vec3 camera_pos;
 uniform vec3 morph_const;
 
+float getRadius(float size)
+{
+	float r = 0;
+	if(size > 17)
+		r = 2 * sqrt(2 * size*size) + size * 0.25f;
+	else
+		r = sqrt(2 * size*size) + size * 0.25f;
+	return r;
+}
+
+float getRadius2(float size)
+{
+	return getRadius(size/2) + sqrt(2 * size / 2 * size / 2);
+}
+
 void main( void )
 {
 	normals = normalize(mat3(world_matrix) * gl_Normal);
 	
-	float w = 0;
-	vec3 cp = camera_pos;
-	cp.y = 0;
-	vec4 pp = gl_Vertex * quad_size;
-	pp.y = 0;
-	//w = (distance(cp, quad_min + pp.xyz)) / (quad_size / 2);
-	
-	float dist = distance(cp, quad_min + pp.xyz);
-	w = (dist - morph_const.x * 1.4142) * morph_const.y / 2;
-	
-	w = clamp(w, 0, 1);
-	//w = 0.0;
+	float m = quad_size / 8;
 	position = gl_Vertex;  
 	position.x *= quad_size;
 	position.z *= quad_size;
 	
-	float m = quad_size / 8;
 	float frx = fract(position.x / m) * m;
 	float frz = fract(position.z / m) * m;
+
+	float w = 0;
+	vec3 cp = camera_pos;
+	cp.y = 0;
+	vec4 pp = position;
+	pp.x -= frx;
+	pp.z -= frz;
+	pp.y = 0;
+	//w = (distance(cp, quad_min + pp.xyz)) / (quad_size / 2);
+	
+	//float dist = abs(cp.x - quad_min.x - pp.x) + abs(cp.z - quad_min.z - pp.z);
+	float dist = distance(cp, quad_min + pp.xyz);
+
+	float r = getRadius(quad_size);
+	float r2 = getRadius2(quad_size);
+	w = (dist - r2) / (r - r2);
+	w =  clamp(w, 0, 1);
+	//w = 0.0;
 	position.x = position.x - w * frx;
 	position.z = position.z - w * frz;
 	
@@ -48,12 +69,11 @@ void main( void )
 
 	vec2 uv = position.xz / map_size;
 	position.y = 60 * texture2D(hm_texture, uv).z;
-
+	//position.y = 0;
+	
 	gl_Position = gl_ModelViewProjectionMatrix * position; 
 	gl_TexCoord[0] = vec4(uv, 0, 0);
 
-	 
-	
 	gl_FrontColor = vec4(0, w, 0, 1.0);
 }
 

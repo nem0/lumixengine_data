@@ -5,7 +5,7 @@
 
 //BEGIN
 
-#version 130
+#version 330 compatibility
 varying vec4 position;
 uniform float quad_size;
 uniform float map_size;
@@ -14,6 +14,7 @@ uniform sampler2D hm_texture;
 uniform vec3 quad_min;
 uniform vec3 camera_pos;
 uniform vec3 morph_const;
+uniform vec3 terrain_scale;
 
 void main( void )
 {
@@ -39,15 +40,17 @@ void main( void )
 	position += vec4(quad_min, 0);
 
 	vec2 uv = position.xz / map_size;
-	position.y = 60 * texture2D(hm_texture, uv).z;
-	
+	position.y = terrain_scale.y * float(texture2D(hm_texture, uv).x);
+	position.x *= terrain_scale.x;
+	position.z *= terrain_scale.z;
 
-	gl_Position = gl_ModelViewProjectionMatrix * position; 
+	gl_Position = gl_ModelViewProjectionMatrix * world_matrix * position; 
 	gl_TexCoord[0] = vec4(uv, 0, 0);
+	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
 
 //~VS
-#version 130
+#version 330 compatibility
 varying vec4		position;
 uniform sampler2D	t1;
 uniform sampler2D	t2;
@@ -56,6 +59,7 @@ uniform sampler2D	t4;
 uniform sampler2D	splat_texture;
 uniform sampler2D	shadowmap;
 uniform sampler2D hm_texture;
+uniform sampler2D satellite_map;
 uniform mat4 shadowmap_matrix0;
 uniform mat4 shadowmap_matrix1;
 uniform mat4 shadowmap_matrix2;
@@ -89,7 +93,7 @@ void main( void )
 	
 	vec2 tex_coord = gl_TexCoord[0].st;
 	vec4 wave = texture2D(hm_texture, tex_coord);
-	const vec2 size = vec2(0.05,0.0);
+	const vec2 size = vec2(0.005,0.0);
 	const ivec3 off = ivec3(-1,0,1);
     float s11 = wave.x;
     float s01 = textureOffset(hm_texture, tex_coord, off.xy).x;
@@ -128,5 +132,12 @@ void main( void )
 		+ texture2D(t2, gl_TexCoord[1].st).rgba * splat.y
 		+ texture2D(t3, gl_TexCoord[1].st).rgba * splat.z
 		+ texture2D(t4, gl_TexCoord[1].st).rgba * splat.w;
-	gl_FragColor = texel * visibility;
+	texel = visibility * vec4(1, 1, 1, 1); //texture2D(satellite_map, gl_TexCoord[0].st).rgba;
+	texel = visibility * texture2D(satellite_map, gl_TexCoord[0].st).rgba;		
+		gl_FragColor = texel;
+	//gl_FragColor = vec4(bump.xyz, 1.0);
+	/*if(texture2D(hm_texture, gl_TexCoord[0].st).x > uint(0))
+	{
+		gl_FragColor = vec4(1, 0, 0, 1);
+	}*/
 }

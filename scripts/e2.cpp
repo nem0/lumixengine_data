@@ -14,16 +14,16 @@
 #include <Windows.h>
 
 
-class MyScript : public Lux::BaseScript
+class MyScript : public Lumix::BaseScript
 {
 	public:
-		virtual void create(Lux::ScriptSystem& ctx, Lux::Entity entity) override
+		virtual void create(Lumix::ScriptSystem& ctx, Lumix::Entity entity) override
 		{
 			m_e = entity;
-			/*Lux::Component animable = m_e.getComponent(crc32("animable"));
+			/*Lumix::Component animable = m_e.getComponent(crc32("animable"));
 			if(animable.isValid())
 			{
-				Lux::AnimationSystem* sys = static_cast<Lux::AnimationSystem*>(animable.system);
+				Lumix::AnimationSystem* sys = static_cast<Lumix::AnimationSystem*>(animable.system);
 				sys->playAnimation(animable, "models/horse.ani");
 			}*/
 		}
@@ -31,24 +31,24 @@ class MyScript : public Lux::BaseScript
 		virtual void update(float dt) override
 		{
 			if(GetAsyncKeyState(VK_UP) >> 8)
-				m_e.setPosition(m_e.getPosition() + Lux::Vec3(0, 0, -10 * dt));
+				m_e.setPosition(m_e.getPosition() + Lumix::Vec3(0, 0, -10 * dt));
 			if(GetAsyncKeyState(VK_DOWN) >> 8)
-				m_e.setPosition(m_e.getPosition() + Lux::Vec3(0, 0, 10 * dt));
-			//Lux::Component renderable = m_e.getComponent(crc32("renderable"))
-			/*Lux::Vec3 pos;
-			static_cast<Lux::Renderer*>(m_renderables[0].system)->getBonePosition(m_renderables[0], "HRigPelvis", &pos);
-			Lux::Matrix mtx;
-			Lux::Matrix::setIdentity(mtx);
+				m_e.setPosition(m_e.getPosition() + Lumix::Vec3(0, 0, 10 * dt));
+			//Lumix::Component renderable = m_e.getComponent(crc32("renderable"))
+			/*Lumix::Vec3 pos;
+			static_cast<Lumix::Renderer*>(m_renderables[0].system)->getBonePosition(m_renderables[0], "HRigPelvis", &pos);
+			Lumix::Matrix mtx;
+			Lumix::Matrix::setIdentity(mtx);
 			
-			Lux::Vec3 v(pos.x, pos.y - 10, pos.z);
+			Lumix::Vec3 v(pos.x, pos.y - 10, pos.z);
 			v.normalize();
 			mtx.m31 = -v.x;
 			mtx.m32 = -v.y;
 			mtx.m33 = -v.z;
 		
-			Lux::Vec3 up(0, 1, 0); 
-			Lux::Vec3 right = Lux::crossProduct(v, up);
-			up = Lux::crossProduct(right, v);
+			Lumix::Vec3 up(0, 1, 0); 
+			Lumix::Vec3 right = Lumix::crossProduct(v, up);
+			up = Lumix::crossProduct(right, v);
 
 			mtx.m21 = up.x;
 			mtx.m22 = up.y;
@@ -57,25 +57,25 @@ class MyScript : public Lux::BaseScript
 			mtx.m11 = right.x;
 			mtx.m12 = right.y;
 			mtx.m13 = right.z;
-			mtx.setTranslation(Lux::Vec3(0, 10, 0));
+			mtx.setTranslation(Lumix::Vec3(0, 10, 0));
 
-			static_cast<Lux::Renderer*>(m_renderables[0].system)->setCameraMatrix(mtx);
+			static_cast<Lumix::Renderer*>(m_renderables[0].system)->setCameraMatrix(mtx);
 			*/
 		}
 
-		virtual void visit(Lux::ScriptVisitor& visitor) override
+		virtual void visit(Lumix::ScriptVisitor& visitor) override
 		{
 		}
 
-		Lux::Entity m_e;
+		Lumix::Entity m_e;
 };
 
-extern "C" DLL_EXPORT Lux::BaseScript* createScript()
+extern "C" DLL_EXPORT Lumix::BaseScript* createScript()
 {
 	return new MyScript();
 }
 
-extern "C" DLL_EXPORT void destroyScript(Lux::BaseScript* scr)
+extern "C" DLL_EXPORT void destroyScript(Lumix::BaseScript* scr)
 {
 	delete scr;
 }

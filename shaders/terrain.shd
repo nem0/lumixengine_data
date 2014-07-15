@@ -39,7 +39,7 @@ void main( void )
 	position.z = position.z - weight * fraction_z;
 	position += vec4(quad_min, 0);
 
-	vec2 uv = position.xz / map_size;
+	vec2 uv = position.xz / (map_size - 1);
 	position.y = terrain_scale.y * float(texture2D(hm_texture, uv).x);
 	position.x *= terrain_scale.x;
 	position.z *= terrain_scale.z;

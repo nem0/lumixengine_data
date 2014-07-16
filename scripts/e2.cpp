@@ -27,10 +27,25 @@ class MyScript : public Lumix::BaseScript
 
 		virtual void update(float dt) override
 		{
+			Lumix::Vec3 forward = m_e.getMatrix().getZVector();
+			float speed = 1;
+			if (GetAsyncKeyState(VK_SHIFT) >> 8)
+				speed = 10;
 			if (GetAsyncKeyState(VK_UP) >> 8)
-				m_phy_scene->moveController(m_phy_controller, Lumix::Vec3(0, 0, -0.01f), dt);
+				m_phy_scene->moveController(m_phy_controller, forward * -0.01f * speed, dt);
 			if (GetAsyncKeyState(VK_DOWN) >> 8)
-				m_phy_scene->moveController(m_phy_controller, Lumix::Vec3(0, 0, 0.01f), dt);
+				m_phy_scene->moveController(m_phy_controller, forward * 0.01f * speed, dt);
+			Lumix::Quat q = m_e.getRotation();
+			if (GetAsyncKeyState(VK_LEFT) >> 8)
+			{
+				q = q * Lumix::Quat(Lumix::Vec3(0, 1, 0), dt * 1.0f);
+				m_e.setRotation(q);
+			}
+			else if (GetAsyncKeyState(VK_RIGHT) >> 8)
+			{
+				q = q * Lumix::Quat(Lumix::Vec3(0, 1, 0), dt * -1.0f);
+				m_e.setRotation(q);
+			}
 		}
 
 		virtual void visit(Lumix::ScriptVisitor& visitor) override

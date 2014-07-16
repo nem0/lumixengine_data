@@ -7,6 +7,7 @@
 
 #version 330 compatibility
 varying vec4 position;
+varying float cam_dist;
 uniform float quad_size;
 uniform float map_size;
 uniform mat4 world_matrix;
@@ -46,12 +47,15 @@ void main( void )
 
 	gl_Position = gl_ModelViewProjectionMatrix * world_matrix * position; 
 	gl_TexCoord[0] = vec4(uv, 0, 0);
+	gl_TexCoord[1] = gl_MultiTexCoord0 * m;
 	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
+	cam_dist = dist;
 }
 
 //~VS
 #version 330 compatibility
 varying vec4		position;
+varying float 		cam_dist;
 uniform sampler2D	t1;
 uniform sampler2D	t2;
 uniform sampler2D	t3;
@@ -132,12 +136,9 @@ void main( void )
 		+ texture2D(t2, gl_TexCoord[1].st).rgba * splat.y
 		+ texture2D(t3, gl_TexCoord[1].st).rgba * splat.z
 		+ texture2D(t4, gl_TexCoord[1].st).rgba * splat.w;
-	texel = visibility * vec4(1, 1, 1, 1); //texture2D(satellite_map, gl_TexCoord[0].st).rgba;
-	texel = visibility * texture2D(satellite_map, gl_TexCoord[0].st).rgba;		
-		gl_FragColor = texel;
-	//gl_FragColor = vec4(bump.xyz, 1.0);
-	/*if(texture2D(hm_texture, gl_TexCoord[0].st).x > uint(0))
-	{
-		gl_FragColor = vec4(1, 0, 0, 1);
-	}*/
+	vec4 texel2 = visibility * texture2D(satellite_map, gl_TexCoord[0].st).rgba;
+	float t = (cam_dist - 20) / 20;
+	t = clamp(t, 0, 1);
+	texel = texel * (1 - t) + texel2 * t;
+	gl_FragColor = texel;
 }

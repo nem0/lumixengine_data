@@ -1,0 +1,4 @@
+{
+	"texture" : "phy_controller_icon.tga",
+	"shader" : "shaders/editor_objects.shd"
+}

@@ -1,1 +1,1 @@
-{ "texture" : "skybox.tga", "shader" : "shaders/skybox.shd", "backface_culling" : false }
+{ "texture" : "skybox.tga", "shader" : "shaders/skybox.shd", "backface_culling" : false, "depth_func" : "lequal" }

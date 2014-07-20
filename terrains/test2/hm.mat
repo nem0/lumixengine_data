@@ -7,7 +7,7 @@
 	{ "name" : "splat_texture", "int_value" : 4 },
 	{ "name" : "hm_texture", "int_value" : 0 }
 ],
-"texture" : "hm.tga",
+"heightmap" : "hm.tga",
 "texture" : "grass_mixed_medium_base.dds",
 "texture" : "soil_bigstones_base.dds",
 "texture" : "rock_brown_cracks_base.dds",

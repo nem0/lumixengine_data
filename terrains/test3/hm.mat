@@ -8,7 +8,7 @@
 	{ "name" : "satellite_map", "int_value" : 6 },
 	{ "name" : "splat_texture", "int_value" : 4 }
 ],
-"texture" : "hm.raw",
+"heightmap" : "hm.raw",
 "texture" : "soil_bigstones_base.dds",
 "texture" : "rock_brown_cracks_base.dds",
 "texture" : "gravel_ground_colorful_base.dds",

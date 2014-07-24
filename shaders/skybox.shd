@@ -5,11 +5,11 @@
 
 //BEGIN
 
-#version 120
+#version 130
 
 void main( void )
 {
-	gl_TexCoord[0]	= gl_MultiTexCoord0;
+	gl_TexCoord[0]	= vec4(gl_Vertex.x, -gl_Vertex.y, -gl_Vertex.z, 0);
 
 	mat4 mtx = gl_ModelViewMatrix;
 	mtx[3] = vec4(0, 0, 0, 1);
@@ -19,12 +19,12 @@ void main( void )
 }
 
 //~VS
-#version 120
-uniform sampler2D	tDiffuse;
+#version 130
+uniform samplerCube tDiffuse;
 
 void main( void )
 {
-	vec4 texel = texture2D(tDiffuse, gl_TexCoord[0].st).rgba;
+	vec4 texel = texture(tDiffuse, gl_TexCoord[0].xyz).rgba;
 	gl_FragColor = texel;
 	//gl_FragColor = vec4(1, 0, 0, 1);
 }

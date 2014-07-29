@@ -2,6 +2,7 @@ import bpy
 import struct
 import mathutils
 import math
+import binascii
 from bpy_extras.io_utils import (ExportHelper,
 									axis_conversion,
 									)
@@ -64,6 +65,8 @@ def export_animation(context, filepath, export_selection):
 			f.write(struct.pack("f", q.z))
 			f.write(struct.pack("f", q.w))
 			bone_idx = bone_idx + 1;	
+	for pose_bone in o.pose.bones:
+		f.write(struct.pack("I", binascii.crc32(bytes(pose_bone.name, 'ascii'))))
 	return {'FINISHED'}
 
 

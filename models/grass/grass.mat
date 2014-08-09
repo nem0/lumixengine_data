@@ -3,5 +3,6 @@
 		{ "name" : "tDiffuse", "int_value" : 0 }
 	],
 	"texture" : "grass.dds", 
-	"shader" : "shaders/grass.shd"
+	"shader" : "shaders/grass.shd",
+	"backface_culling" : false
 }

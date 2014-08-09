@@ -1,10 +1,10 @@
 {
 "uniforms" : [
-	{ "name" : "t1", "int_value" : 5 },
-	{ "name" : "t2", "int_value" : 1 },
-	{ "name" : "t3", "int_value" : 2 },
-	{ "name" : "t4", "int_value" : 3 },
-	{ "name" : "splat_texture", "int_value" : 4 },
+	{ "name" : "t1", "int_value" : 1 },
+	{ "name" : "t2", "int_value" : 2 },
+	{ "name" : "t3", "int_value" : 3 },
+	{ "name" : "t4", "int_value" : 4 },
+	{ "name" : "splat_texture", "int_value" : 5 },
 	{ "name" : "hm_texture", "int_value" : 0 }
 ],
 "heightmap" : "hm.tga",

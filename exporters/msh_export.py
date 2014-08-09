@@ -345,12 +345,17 @@ def write_skinned_model_indexed(context, f, armature, objs_to_export):
 		index = index + 1
 	return meshes
 				
-def write_rigid_model_indexed(context, f, objs_to_export):
+def write_rigid_model_indexed(context, f, objs_to_export, is_grass):
 	meshes = []
 	face_counts = []
 	face_count = 0
-	f.write(struct.pack("I", 3))
-	f.write(bytes("pnt", "ascii"))
+	if is_grass:
+		f.write(struct.pack("I", 5))
+		f.write(bytes("pnti1", "ascii"))
+	else:
+		f.write(struct.pack("I", 3))
+		f.write(bytes("pnt", "ascii"))
+	
 	indices = []
 	vertices = []
 	uvs = []
@@ -388,6 +393,8 @@ def write_rigid_model_indexed(context, f, objs_to_export):
 		f.write(struct.pack("f", v.nz))
 		f.write(struct.pack("f", uv.uv[0]))
 		f.write(struct.pack("f", uv.uv[1]))
+		if is_grass:
+			f.write(struct.pack("I", 1)) # just a placeholder
 
 	bone_count = 0
 	f.write(struct.pack("I", bone_count))  
@@ -425,7 +432,7 @@ def add_meshes(objs, o):
 		if i.type == 'MESH':
 			objs.append(i)
 		
-def export_model(context, filepath, export_materials, export_selection):
+def export_model(context, filepath, export_materials, is_grass, export_selection):
 	print(filepath)
 	f = open(filepath, 'wb')
 	objs = []
@@ -452,7 +459,7 @@ def export_model(context, filepath, export_materials, export_selection):
 		shader = "skinned"
 		meshes = write_skinned_model_indexed(context, f, armature, objs)
 	else:
-		meshes = write_rigid_model_indexed(context, f, objs)
+		meshes = write_rigid_model_indexed(context, f, objs, is_grass)
 	print("shader " + shader)
 	
 	base_path = os.path.dirname(filepath)
@@ -486,6 +493,12 @@ class LumixExporter(Operator, ExportHelper):
 	filename_ext = ".msh"
 	filter_glob = StringProperty(default="*.msh", options={'HIDDEN'})
 
+	is_grass = BoolProperty(
+		name="Is mesh grass",
+		description="Export mesh in grass format",
+		default=False,
+		)
+	
 	export_materials = BoolProperty(
 			name="Export Materials",
 			description="Export Materials",
@@ -493,7 +506,7 @@ class LumixExporter(Operator, ExportHelper):
 			)
 
 	def execute(self, context):
-		return export_model(context, self.filepath, self.export_materials, True)
+		return export_model(context, self.filepath, self.export_materials, self.is_grass, True)
 
 
 def menu_func_export(self, context):
@@ -524,6 +537,6 @@ bl_info = {
 import sys
 if __name__ == "__main__":
 	if(len(sys.argv) == 7):
-		export_model(bpy.context, sys.argv[6], False, False);
+		export_model(bpy.context, sys.argv[6], False, False, False);
 	else:
 		register()

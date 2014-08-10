@@ -1,6 +1,7 @@
 { 
 	"uniforms" : [
-		{ "name" : "tDiffuse", "int_value" : 0 }
+		{ "name" : "tDiffuse", "int_value" : 0 },
+		{ "name" : "time",	"time" : 1 }
 	],
 	"texture" : "grass.dds", 
 	"shader" : "shaders/grass.shd",

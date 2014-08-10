@@ -10,14 +10,16 @@ varying vec3 normals;
 varying vec4 position;
 attribute float matrix_index;
 uniform mat4 grass_matrices[50];
+uniform float time;
 
 void main( void )
 {
+	vec4 wind = vec4(1, 0, 0, 0);
 	mat4 world_matrix = grass_matrices[int(matrix_index)];
 	gl_TexCoord[0]	= gl_MultiTexCoord0;
 	normals = normalize(mat3(world_matrix) * gl_Normal);
 	
-	position = gl_Vertex;
+	position = gl_Vertex + gl_Vertex.y * 0.05 * sin(3*time+world_matrix[3].x*0.3) * wind;
 	position = gl_ProjectionMatrix * (gl_ModelViewMatrix * world_matrix) * position; 
 	gl_Position = position;
 	
@@ -32,7 +34,7 @@ uniform vec3 light_dir;
 void main( void )
 {
 	vec4 texel = texture2D(tDiffuse, gl_TexCoord[0].st).rgba;
-	if(texel.a < 0.30)
+	if(texel.a < 0.2)
 		discard;
 	gl_FragColor = texel; 
 	//gl_FragColor = vec4(normals, 1);

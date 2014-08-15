@@ -6,5 +6,5 @@
 	"texture" : "grass.dds", 
 	"shader" : "shaders/grass.shd",
 	"backface_culling" : false,
-	"alpha_to_coverage" : true
+	"alpha_to_coverage" : false
 }

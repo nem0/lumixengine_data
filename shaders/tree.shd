@@ -76,7 +76,7 @@ void main( void )
 		&& shadow_coord[0].y < 0.99 && shadow_coord[0].y > 0.01)
 		split_index = 0;
 	
-	if(texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z)
+	if(texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z - 0.0005)
 		visibility -= 0.5;
 	visibility = max(0.2, visibility * max(0.2, dot(normals, -light_dir)));
 	vec4 colors[4] = vec4[](

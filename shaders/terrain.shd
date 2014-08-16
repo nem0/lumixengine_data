@@ -84,11 +84,11 @@ vec2 poissonDisk[4] = vec2[](
 void main( void )
 {
 	float visibility = 1.0;
-	vec3 shadow_coord[4] = vec3[](
-		vec3(shadowmap_matrix0 * world_matrix * position),
-		vec3(shadowmap_matrix1 * world_matrix * position),
-		vec3(shadowmap_matrix2 * world_matrix * position),
-		vec3(shadowmap_matrix3 * world_matrix * position)
+	vec4 shadow_coord[4] = vec4[](
+		shadowmap_matrix0 * world_matrix * position,
+		shadowmap_matrix1 * world_matrix * position,
+		shadowmap_matrix2 * world_matrix * position,
+		shadowmap_matrix3 * world_matrix * position
 	);
 	vec2 tt[4] = vec2[](
 		vec2(shadow_coord[0].x, shadow_coord[0].y * 0.25),
@@ -99,7 +99,7 @@ void main( void )
 	
 	vec2 tex_coord = gl_TexCoord[0].st;
 	vec4 wave = texture2D(hm_texture, tex_coord);
-	const vec2 size = vec2(0.005,0.0);
+	const vec2 size = vec2(0.03, 0.0);
 	const ivec3 off = ivec3(-1,0,1);
     float s11 = wave.x;
     float s01 = textureOffset(hm_texture, tex_coord, off.xy).x;
@@ -110,10 +110,10 @@ void main( void )
     vec3 vb = normalize(vec3(size.yx, s12 - s10));
 	vec4 bump = vec4( cross(va, vb).xzy, s11 );
 	
-	float near = 0.1;
-	float far = 1000.0;
+//	float near = 0.1;
+//	float far = 1000.0;
+//	float linear_depth = (far - near) * (2.0 * near) / (far + near - depth * (far - near));
 	float depth = gl_FragCoord.z;
-	float linear_depth = (far - near) * (2.0 * near) / (far + near - depth * (far - near));
 	int split_index = 0;
 	if(shadow_coord[3].x < 0.99 && shadow_coord[3].x > 0.01
 		&& shadow_coord[3].y < 0.99 && shadow_coord[3].y > 0.01)
@@ -128,8 +128,10 @@ void main( void )
 		&& shadow_coord[0].y < 0.99 && shadow_coord[0].y > 0.01)
 		split_index = 0;
 	
-	if(texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z)
-		visibility -= 0.5;
+	if(shadow_coord[split_index].w > 0)
+	{
+	//	visibility -= texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z ? 0.5 : 0.0;
+	}
 	visibility = max(0.2, visibility * max(0.2, dot(bump.xyz, -light_dir)));
 	vec4 splat = texture2D(splat_texture, gl_TexCoord[0].st).rgba;
 	//splat = normalize(splat);
@@ -138,9 +140,13 @@ void main( void )
 		+ texture2D(t2, gl_TexCoord[1].st).rgba * splat.y
 		+ texture2D(t3, gl_TexCoord[1].st).rgba * splat.z
 		+ texture2D(t4, gl_TexCoord[1].st).rgba * splat.w;
+	texel = visibility * texel;
 	vec4 texel2 = visibility * texture2D(satellite_map, gl_TexCoord[0].st).rgba;
 	float t = (cam_dist - 20) / 20;
 	t = clamp(t, 0, 1);
+	t = 0;
 	texel = texel * (1 - t) + texel2 * t;
+	//texel = vec4(texture2D(shadowmap, tt[split_index]).z, shadow_coord[split_index].z, 0, 1);
+	//texel = vec4(tt[3].x, 0, 0, 1);
 	gl_FragColor = texel;
 }

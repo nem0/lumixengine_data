@@ -9,20 +9,21 @@
 varying vec3 normals;
 varying vec4 position;
 attribute float matrix_index;
-uniform mat4 grass_matrices[50];
+uniform mat4 grass_matrices[64];
 uniform float time;
+varying float matrix_index_varying;
 
 void main( void )
 {
 	vec4 wind = vec4(1, 0, 0, 0);
-	mat4 world_matrix = grass_matrices[int(matrix_index)];
+	mat4 grass_mtx = grass_matrices[int(matrix_index)];
 	gl_TexCoord[0]	= gl_MultiTexCoord0;
-	normals = normalize(mat3(world_matrix) * gl_Normal);
+	normals = normalize(mat3(grass_mtx) * gl_Normal);
 	
-	position = gl_Vertex + gl_Vertex.y * 0.05 * sin(3*time+world_matrix[3].x*0.3) * wind;
-	position = gl_ProjectionMatrix * (gl_ModelViewMatrix * world_matrix) * position; 
-	gl_Position = position;
-	
+	position = gl_Vertex + gl_Vertex.y * 0.05 * sin(3*time+grass_mtx[3].x*0.3) * wind;
+	vec4 p = gl_ProjectionMatrix * (gl_ModelViewMatrix * grass_mtx) * position; 
+	gl_Position = p;
+	matrix_index_varying = matrix_index;
 	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
 
@@ -30,12 +31,57 @@ void main( void )
 #version 120
 uniform sampler2D	tDiffuse;
 uniform vec3 light_dir;
+uniform mat4 shadowmap_matrix0;
+uniform mat4 shadowmap_matrix1;
+uniform mat4 shadowmap_matrix2;
+uniform mat4 shadowmap_matrix3;
+uniform sampler2D	shadowmap;
+uniform mat4 grass_mtx;
+varying vec4 position;
+varying float matrix_index_varying;
+uniform mat4 grass_matrices[64];
+
 
 void main( void )
 {
+	mat4 grass_mtx = grass_matrices[int(matrix_index_varying)];
+
+	float visibility = 1.0;
+	vec4 world_pos = grass_mtx * position;
+	vec4 shadow_coord[4] = vec4[](
+		shadowmap_matrix0 * world_pos,
+		shadowmap_matrix1 * world_pos,
+		shadowmap_matrix2 * world_pos,
+		shadowmap_matrix3 * world_pos
+	);
+	vec2 tt[4] = vec2[](
+		vec2(shadow_coord[0].x, shadow_coord[0].y * 0.25),
+		vec2(shadow_coord[1].x, 0.25 + shadow_coord[1].y * 0.25),
+		vec2(shadow_coord[2].x, 0.50 + shadow_coord[2].y * 0.25),
+		vec2(shadow_coord[3].x, 0.75 + shadow_coord[3].y * 0.25)
+	);
+	
+	int split_index = 0;
+	if(shadow_coord[3].x < 0.99 && shadow_coord[3].x > 0.01
+		&& shadow_coord[3].y < 0.99 && shadow_coord[3].y > 0.01)
+		split_index = 3;
+	if(shadow_coord[2].x < 0.99 && shadow_coord[2].x > 0.01
+		&& shadow_coord[2].y < 0.99 && shadow_coord[2].y > 0.01)
+		split_index = 2;
+	if(shadow_coord[1].x < 0.99 && shadow_coord[1].x > 0.01
+		&& shadow_coord[1].y < 0.99 && shadow_coord[1].y > 0.01)
+		split_index = 1;
+	if(shadow_coord[0].x < 0.99 && shadow_coord[0].x > 0.01
+		&& shadow_coord[0].y < 0.99 && shadow_coord[0].y > 0.01)
+		split_index = 0;
+	
+//	if(shadow_coord[split_index].w > 0)
+		visibility -= texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z - 0.005 ? 0.5 : 0.0;
+
 	vec4 texel = texture2D(tDiffuse, gl_TexCoord[0].st).rgba;
 	if(texel.a < 0.2)
 		discard;
+	texel = visibility * texel;
 	gl_FragColor = texel; 
 	//gl_FragColor = vec4(normals, 1);
 	//gl_FragColor = vec4(light_dir, 1);

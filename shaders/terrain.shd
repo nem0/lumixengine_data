@@ -144,7 +144,7 @@ void main( void )
 	vec4 texel2 = visibility * texture2D(satellite_map, gl_TexCoord[0].st).rgba;
 	float t = (cam_dist - 20) / 20;
 	t = clamp(t, 0, 1);
-	t = 0;
+	//t = 0;
 	texel = texel * (1 - t) + texel2 * t;
 	//texel = vec4(texture2D(shadowmap, tt[split_index]).z, shadow_coord[split_index].z, 0, 1);
 	//texel = vec4(tt[3].x, 0, 0, 1);

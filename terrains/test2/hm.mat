@@ -12,6 +12,6 @@
 "texture" : "soil_bigstones_base.dds",
 "texture" : "rock_brown_cracks_base.dds",
 "texture" : "gravel_ground_colorful_base.dds",
-"texture" : "splat.tga",
+"splatmap" : "splat.tga",
 "shader" : "shaders/terrain.shd"
 }

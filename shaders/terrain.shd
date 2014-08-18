@@ -73,6 +73,8 @@ uniform mat4 shadowmap_matrix3;
 uniform mat4 world_matrix;
 uniform vec3 light_dir;
 uniform float quad_size;
+uniform vec3 brush_position;
+uniform float brush_size;
 
 vec2 poissonDisk[4] = vec2[](
   vec2( -0.94201624, -0.39906216 ),
@@ -141,6 +143,7 @@ void main( void )
 	vec4 texel2 = visibility * texture2D(satellite_map, gl_TexCoord[0].st).rgba;
 	float t = (cam_dist - 20) / 20;
 	t = clamp(t, 0, 1);
-	texel = texel * (1 - t) + texel2 * t;
+	vec4 brush_color = vec4(0, 0, 1, 1) * clamp(1 - distance(vec4(brush_position, 1), world_matrix * position) / brush_size, 0, 1);
+	texel = (texel * (1 - t) + texel2 * t) + brush_color;
 	gl_FragColor = texel;
 }

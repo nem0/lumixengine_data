@@ -18,8 +18,8 @@ void main( void )
 	//normals = vec3(0, 1, 0);
 	position = gl_Vertex;
 	position = position + position.y * 0.01 * sin(3*time+world_matrix[3].x*0.3) * wind;
-	gl_Position = gl_ModelViewProjectionMatrix * position;
 	position = world_matrix * position;
+	gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * position; 
 	
 	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
 }

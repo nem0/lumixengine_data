@@ -140,10 +140,10 @@ void main( void )
 		+ texture2D(t2, gl_TexCoord[1].st).rgba * splat.y
 		+ texture2D(t3, gl_TexCoord[1].st).rgba * splat.z
 		+ texture2D(t4, gl_TexCoord[1].st).rgba * splat.w;
-	vec4 texel2 = visibility * texture2D(satellite_map, gl_TexCoord[0].st).rgba;
+	vec4 texel2 = texture2D(satellite_map, gl_TexCoord[0].st).rgba;
 	float t = (cam_dist - 20) / 20;
 	t = clamp(t, 0, 1);
 	vec4 brush_color = vec4(0, 0, 1, 1) * clamp(1 - distance(vec4(brush_position, 1), world_matrix * position) / brush_size, 0, 1);
-	texel = (texel * (1 - t) + texel2 * t) + brush_color;
+	texel = visibility * (texel * (1 - t) + texel2 * t) + brush_color;
 	gl_FragColor = texel;
 }

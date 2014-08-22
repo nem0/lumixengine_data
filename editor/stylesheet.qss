@@ -1019,6 +1019,11 @@ QTableCornerButton::section {
     border-radius: 0px;
 }
 
+#notification
+{
+    border: 1px solid #3A3939;
+}
+
 QToolBox::tab {
     background-color: QLinearGradient(x1:0, y1:0, x2:0, y2:1,
         stop:1 #302F2F, stop:0 #5A5959);

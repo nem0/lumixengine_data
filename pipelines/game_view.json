@@ -1,11 +1,8 @@
 {
 "frame_buffer_count" : 0,
-"frame_buffers" : 
-[
-],
+"frame_buffers" : [],
 "shadowmap_width" : 2048,
 "shadowmap_height" : 2048,
-"command_count" : 7,
 "commands" : [
 	"render_shadowmap", 1, "main",
 	"bind_shadowmap",

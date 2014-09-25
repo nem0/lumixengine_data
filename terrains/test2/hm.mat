@@ -6,7 +6,7 @@
 	{ "name" : "t4", "int_value" : 4 },
 	{ "name" : "splat_texture", "int_value" : 5 },
 	{ "name" : "hm_texture", "int_value" : 0 },
-	{ "name" : "detail_texture_distance", "float_value" : 20 }
+	{ "name" : "detail_texture_distance", "float_value" : 990 }
 ],
 "heightmap" : "hm.tga",
 "texture" : "grass_mixed_medium_base.dds",

@@ -43,11 +43,14 @@ uniform mat4 shadowmap_matrix3;
 uniform sampler2D	shadowmap;
 varying vec4 position;
 uniform mat4 grass_matrices[64];
-
+uniform vec4 ambient_color;
+uniform float ambient_intensity;
+uniform vec4 diffuse_color;
+uniform float diffuse_intensity;
 
 void main( void )
 {
-	float visibility = 1.0;
+	float shadow = 1.0;
 	vec4 world_pos = position;
 	vec4 shadow_coord[4] = vec4[](
 		shadowmap_matrix0 * world_pos,
@@ -77,13 +80,17 @@ void main( void )
 		split_index = 0;
 	
 	if(shadow_coord[split_index].z <= 1)
-		visibility -= (texture2D(shadowmap, tt[split_index]).z < (shadow_coord[split_index].z - 0.0005)) ? 0.5 : 0;
+		shadow -= (texture2D(shadowmap, tt[split_index]).z < (shadow_coord[split_index].z - 0.0005)) ? 1 : 0;
 
-	vec4 texel = texture2D(tDiffuse, gl_TexCoord[0].st).rgba;
-	if(texel.a < 0.2)
+	vec4 surface = texture2D(tDiffuse, gl_TexCoord[0].st).rgba;
+	if(surface.a < 0.2)
 		discard;
-	texel = visibility * texel;
-	gl_FragColor = texel; 
+
+	vec4 ambient = 			ambient_intensity * surface * ambient_color;
+	vec4 diffuse = shadow * diffuse_intensity * surface * diffuse_color;
+
+	gl_FragColor = ambient + diffuse; 
+	
 	//gl_FragColor = vec4(texture2D(shadowmap, tt[split_index]).rgb, 1);
 	//gl_FragColor = vec4(light_dir, 1);
 	//gl_FragColor = vec4(1, 0, 0, 1);

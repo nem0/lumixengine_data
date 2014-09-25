@@ -75,6 +75,11 @@ uniform vec3 light_dir;
 uniform float quad_size;
 uniform vec3 brush_position;
 uniform float brush_size;
+uniform float detail_texture_distance;
+uniform vec4 ambient_color;
+uniform float ambient_intensity;
+uniform vec4 diffuse_color;
+uniform float diffuse_intensity;
 
 vec2 poissonDisk[4] = vec2[](
   vec2( -0.94201624, -0.39906216 ),
@@ -85,7 +90,21 @@ vec2 poissonDisk[4] = vec2[](
 
 void main( void )
 {
-	float visibility = 1.0;
+	// calc normal
+	vec2 tex_coord = gl_TexCoord[0].st;
+	vec4 wave = texture2D(hm_texture, tex_coord);
+	const vec2 size = vec2(0.005,0.0);
+	const ivec3 off = ivec3(-1,0,1);
+    float s11 = wave.x;
+    float s01 = textureOffset(hm_texture, tex_coord, off.xy).x;
+    float s21 = textureOffset(hm_texture, tex_coord, off.zy).x;
+    float s10 = textureOffset(hm_texture, tex_coord, off.yx).x;
+    float s12 = textureOffset(hm_texture, tex_coord, off.yz).x;
+    vec3 va = normalize(vec3(size.xy, s21 - s01));
+    vec3 vb = normalize(vec3(size.yx, s12 - s10));
+	vec4 normal = vec4( cross(va, vb).xzy, s11 );
+	
+	// shadow
 	vec3 shadow_coord[4] = vec3[](
 		vec3(shadowmap_matrix0 * world_matrix * position),
 		vec3(shadowmap_matrix1 * world_matrix * position),
@@ -98,19 +117,6 @@ void main( void )
 		vec2(shadow_coord[2].x, 0.50 + shadow_coord[2].y * 0.25),
 		vec2(shadow_coord[3].x, 0.75 + shadow_coord[3].y * 0.25)
 	);
-	
-	vec2 tex_coord = gl_TexCoord[0].st;
-	vec4 wave = texture2D(hm_texture, tex_coord);
-	const vec2 size = vec2(0.005,0.0);
-	const ivec3 off = ivec3(-1,0,1);
-    float s11 = wave.x;
-    float s01 = textureOffset(hm_texture, tex_coord, off.xy).x;
-    float s21 = textureOffset(hm_texture, tex_coord, off.zy).x;
-    float s10 = textureOffset(hm_texture, tex_coord, off.yx).x;
-    float s12 = textureOffset(hm_texture, tex_coord, off.yz).x;
-    vec3 va = normalize(vec3(size.xy, s21 - s01));
-    vec3 vb = normalize(vec3(size.yx, s12 - s10));
-	vec4 bump = vec4( cross(va, vb).xzy, s11 );
 	
 	int split_index = 0;
 	if(shadow_coord[3].x < 0.99 && shadow_coord[3].x > 0.01
@@ -125,22 +131,29 @@ void main( void )
 	if(shadow_coord[0].x < 0.99 && shadow_coord[0].x > 0.01
 		&& shadow_coord[0].y < 0.99 && shadow_coord[0].y > 0.01)
 		split_index = 0;
-	
+
+	float shadow = 1.0;
 	if(shadow_coord[split_index].z <= 1	&& texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z)
-		visibility -= 0.5;
-	visibility = max(0.2, visibility * max(0.2, dot(bump.xyz, -light_dir)));
+		shadow -= 0.5;
+	shadow = max(0.2, shadow * max(0.2, dot(normal.xyz, -light_dir)));
+	
+	// surface
 	vec4 splat = texture2D(splat_texture, gl_TexCoord[0].st).rgba;
 	//splat = normalize(splat);
-	vec4 texel = 
+	vec4 surface = 
 		texture2D(t1, gl_TexCoord[1].st).rgba * splat.x
 		+ texture2D(t2, gl_TexCoord[1].st).rgba * splat.y
 		+ texture2D(t3, gl_TexCoord[1].st).rgba * splat.z
 		+ texture2D(t4, gl_TexCoord[1].st).rgba * splat.w;
-	vec4 texel2 = texture2D(satellite_map, gl_TexCoord[0].st).rgba;
-	float t = (cam_dist - 20) / 20;
+	vec4 surface2 = texture2D(satellite_map, gl_TexCoord[0].st).rgba;
+	float t = (cam_dist - detail_texture_distance) / detail_texture_distance;
 	t = clamp(t, 0, 1);
-	t = 0;
-	vec4 brush_color = vec4(0, 0, 1, 1) * clamp(1 - distance(vec4(brush_position, 1), world_matrix * position) / brush_size, 0, 1);
-	texel = visibility * (texel * (1 - t) + texel2 * t) + brush_color;
-	gl_FragColor = texel;
+	vec4 brush_color = vec4(0, 0, 1, 1) * (abs(distance(vec4(brush_position, 1), world_matrix * position) - brush_size) < 0.1 ? 1 : 0);
+	surface = (surface * (1 - t) + surface2 * t) + brush_color;
+
+	// result
+	vec4 ambient = 			ambient_intensity * surface * ambient_color;
+	vec4 diffuse = shadow * diffuse_intensity * surface * diffuse_color;
+
+	gl_FragColor = ambient + diffuse;
 }

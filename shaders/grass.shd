@@ -22,9 +22,10 @@ void main( void )
 	
 	position = gl_Vertex + gl_Vertex.y * 0.05 * sin(3*time+grass_mtx[3].x*0.3) * wind;
 	vec4 pp = (grass_mtx) * position;
-	position.x = position.x * clamp(1.0 - (length(camera_pos - pp.xyz) - 20) / 4.0, 0.0, 1.0);
-	position.y = position.y * clamp(1.0 - (length(camera_pos - pp.xyz) - 20) / 4.0, 0.0, 1.0);
-	position.z = position.z * clamp(1.0 - (length(camera_pos - pp.xyz) - 20) / 4.0, 0.0, 1.0);
+	float max_grass_distance = 100;
+
+	position = position * clamp(1.0 - (length(camera_pos - pp.xyz) - max_grass_distance) / 4.0, 0.0, 1.0);
+	
 	pp = (gl_ModelViewMatrix * grass_mtx) * position;
 	vec4 p = gl_ProjectionMatrix * pp; 
 	position = grass_mtx * position;

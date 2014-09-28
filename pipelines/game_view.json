@@ -11,6 +11,6 @@
 	"clear", "all",
 	"render_models", 1,
 	"clear", "depth",
-	"render_models", 2,
+	"render_models", 2
 ]
 }

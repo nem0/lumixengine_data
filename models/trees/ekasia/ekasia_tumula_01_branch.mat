@@ -1,4 +1,4 @@
-{ "texture" : "ekasia_tumula_01_branch.dds", 
+{ "texture" : { "source" : "ekasia_tumula_01_branch.dds" }, 
 
 "shader" : "shaders/tree.shd",
 "backface_culling" : false,

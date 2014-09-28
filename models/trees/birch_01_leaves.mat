@@ -1,5 +1,5 @@
 {
-"texture" : "birch_01_leaves.dds",
+"texture" : { "source" : "birch_01_leaves.dds" },
 "shader" : "shaders/tree.shd",
 "backface_culling" : false,
 "uniforms" : [

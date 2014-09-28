@@ -1,39 +1,51 @@
+error todo attributes
 {
-	"attributes" : ["bone_weights", "bone_indices"],
+	"attributes" : ["in_position", "in_normal", "in_tex_coords", "bone_weights", "bone_indices"],
 	"shadowmap_required" : true
 }
 
 //BEGIN
 
-#version 120
-varying vec3 normals;
-varying vec4 position;
+#version 330
+
+in vec3 in_position;
+in vec3 in_normal;
+in vec4 bone_weights;
+in vec4 bone_indices;
+in vec2 in_tex_coords;
+
+out vec3 normals;
+out vec4 position;
+out vec2 tex_coords;
+
 uniform mat4 world_matrix;
-attribute vec4 bone_weights;
-attribute vec4 bone_indices;
+uniform mat4 view_matrix;
+uniform mat4 projection_matrix;
 uniform mat4 bone_matrices[64];
 
 void main( void )
 {
-	//gl_Position		= gl_ModelViewProjectionMatrix * gl_Vertex;
-	gl_TexCoord[0]	= gl_MultiTexCoord0;
-	normals			= normalize(mat3(world_matrix) * gl_Normal);
+	vec4 p = vec4(in_position, 1);
+	tex_coords	= in_tex_coords;
+	normals		= normalize(mat3(world_matrix) * in_normal);
 	
-	position = bone_weights.x * (bone_matrices[int(bone_indices.x)] * gl_Vertex);
-	position = position + bone_weights.y * (bone_matrices[int(bone_indices.y)] * gl_Vertex);
-	position = position + bone_weights.z * (bone_matrices[int(bone_indices.z)] * gl_Vertex);
-	position = position + bone_weights.w * (bone_matrices[int(bone_indices.w)] * gl_Vertex);
-	//position = (bone_matrices[int(bone_indices.x)] * gl_Vertex);
-	//position = gl_Vertex;
-	gl_Position = gl_ModelViewProjectionMatrix * position; 
+	position = bone_weights.x * (bone_matrices[int(bone_indices.x)] * p);
+	position = position + bone_weights.y * (bone_matrices[int(bone_indices.y)] * p);
+	position = position + bone_weights.z * (bone_matrices[int(bone_indices.z)] * p);
+	position = position + bone_weights.w * (bone_matrices[int(bone_indices.w)] * p);
+	//position = (bone_matrices[int(bone_indices.x)] * p);
+	//position = p;
+	gl_Position = projection_matrix * view_matrix * world_matrix * position; 
     
 	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
 
 //~VS
-#version 120
-varying vec4		position;
-varying vec3		normals;
+#version 330
+
+in vec4		position;
+in vec3		normals;
+
 uniform sampler2D	tDiffuse;
 uniform sampler2D	shadowmap;
 uniform mat4 shadowmap_matrix0;
@@ -98,7 +110,7 @@ void main( void )
 		vec4(1, 1, 0, 1)
 	);
 	//vec4 texel = colors[split_index]; 
-	vec4 texel = texture2D(tDiffuse, gl_TexCoord[0].st).rgba;
+	vec4 texel = texture2D(tDiffuse, tex_coords).rgba;
 	/*texel = (
 		vec4(texture2D(shadowmap, tt[0]).x, 0, 0, 1) 
 		//+ vec4(0, texture2D(shadowmap, tt[1]).x, 0, 1)

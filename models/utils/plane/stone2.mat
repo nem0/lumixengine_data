@@ -1,3 +1,3 @@
 {
-"texture" : "beton.tga",
+"texture" : { "source" : "beton.tga" },
 "shader" : "shaders/rigid.shd", "z_test" : true}

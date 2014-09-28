@@ -1,4 +1,4 @@
-{ "texture" : "ekasia_tumula_01_bark.dds", "shader" : "shaders/tree.shd",
+{ "texture" : { "source" : "ekasia_tumula_01_bark.dds" }, "shader" : "shaders/tree.shd",
 "uniforms" : [
 		{
 			"name" : "time",

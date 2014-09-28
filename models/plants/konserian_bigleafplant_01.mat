@@ -1,1 +1,1 @@
-{"texture" : "bigleafplant_01.dds", "shader" : "shaders/rigid.shd","backface_culling" : false}
+{"texture" : { "source" : "bigleafplant_01.dds" }, "shader" : "shaders/rigid.shd","backface_culling" : false}

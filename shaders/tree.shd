@@ -1,32 +1,46 @@
 {
-	"shadowmap_required" : true
+	"shadowmap_required" : true,
+	"attributes" : ["in_position", "in_normal", "in_tex_coords"]
 }
 
 //BEGIN
 
-#version 120
-varying vec3 normals;
-varying vec4 position;
+#version 330
+
+in vec3 in_position;
+in vec2 in_tex_coords;
+in vec3 in_normal;
+
+out vec3 normals;
+out vec4 position;
+out vec2 tex_coords;
+
 uniform mat4 world_matrix;
 uniform float time;
+uniform mat4 view_matrix;
+uniform mat4 projection_matrix;
 
 void main( void )
 {
 	vec4 wind = vec4(1, 0, 0, 0);
-	gl_TexCoord[0]	= gl_MultiTexCoord0;
+	tex_coords = in_tex_coords;
 	normals = normalize(mat3(world_matrix) * vec3(0, 1, 0));
-	position = gl_Vertex;
+	position = vec4(in_position, 1);
 	position = position + position.y * 0.01 * sin(3*time+world_matrix[3].x*0.3) * wind;
 	position = world_matrix * position;
-	gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * position; 
+	gl_Position = projection_matrix * view_matrix * position; 
 	
 	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
 
 //~VS
-#version 120
-varying vec4		position;
-varying vec3		normals;
+
+#version 330
+
+in vec4		position;
+in vec3		normals;
+in vec2 	tex_coords;
+
 uniform sampler2D	tDiffuse;
 uniform sampler2D	shadowmap;
 uniform mat4 shadowmap_matrix0;
@@ -34,6 +48,7 @@ uniform mat4 shadowmap_matrix1;
 uniform mat4 shadowmap_matrix2;
 uniform mat4 shadowmap_matrix3;
 uniform mat4 world_matrix;
+uniform mat4 view_matrix;
 uniform vec3 light_dir;
 uniform vec4 ambient_color;
 uniform float ambient_intensity;
@@ -41,13 +56,6 @@ uniform vec4 diffuse_color;
 uniform float diffuse_intensity;
 uniform vec4 fog_color;
 uniform float fog_density;
-
-vec2 poissonDisk[4] = vec2[](
-  vec2( -0.94201624, -0.39906216 ),
-  vec2( 0.94558609, -0.76890725 ),
-  vec2( -0.094184101, -0.92938870 ),
-  vec2( 0.34495938, 0.29387760 )
-);
 
 float getFogFactor(float fFogCoord) 
 { 
@@ -98,14 +106,14 @@ void main( void )
 		vec4(0, 0, 1, 1),
 		vec4(1, 1, 0, 1)
 	);
-	vec4 surface = texture2D(tDiffuse, gl_TexCoord[0].st).rgba;
+	vec4 surface = texture2D(tDiffuse, tex_coords).rgba;
 	if(surface.a < 0.30)
 		discard;
 
 	vec4 ambient = 			ambient_intensity * surface * ambient_color;
 	vec4 diffuse = shadow * diffuse_intensity * surface * diffuse_color;
 
-	vec4 p = gl_ModelViewMatrix * position;
+	vec4 p = view_matrix * position;
 	gl_FragColor = mix(ambient + diffuse, fog_color, getFogFactor(p.z / p.w));
 	//gl_FragColor = vec4(normals, 1);
 	//gl_FragColor = vec4(light_dir, 1);

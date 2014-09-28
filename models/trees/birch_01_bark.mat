@@ -1,5 +1,5 @@
 {
-"texture" : "birch_01_bark.dds",
+"texture" : { "source" : "birch_01_bark.dds" },
 "shader" : "shaders/tree.shd",
 "uniforms" : [
 {

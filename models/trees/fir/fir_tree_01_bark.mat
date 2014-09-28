@@ -1,1 +1,1 @@
-{ "texture" : "fir_tree_01_bark.dds", "shader" : "shaders/rigid.shd" }
+{ "texture" : { "source" : "fir_tree_01_bark.dds" }, "shader" : "shaders/rigid.shd" }

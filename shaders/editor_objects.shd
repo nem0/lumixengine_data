@@ -1,21 +1,39 @@
 {
+	"attributes" : ["in_position", "in_normals", "in_tex_coords"]
 }
 
 //BEGIN
 
+#version 330
+
+in vec3 in_position;
+in vec2 in_tex_coords;
+in vec3 in_normals;
+
+out vec2 tex_coords;
+
+uniform mat4 world_matrix;
+uniform mat4 view_matrix;
+uniform mat4 projection_matrix;
+
 void main( void )
 {
-	gl_TexCoord[0]	= gl_MultiTexCoord0;
-	vec4 position = gl_Vertex;
-	gl_Position = gl_ModelViewProjectionMatrix * position; 
+	tex_coords = in_tex_coords;
+	vec4 position = vec4(in_position, 1);
+	gl_Position = projection_matrix * view_matrix * world_matrix * position; 
  	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
 
 //~VS
+
+#version 330
+
+in vec2 tex_coords;
+
 uniform sampler2D	tDiffuse;
 
 void main( void )
 {
-	vec4 texel = texture2D(tDiffuse,gl_TexCoord[0].st).rgba;
+	vec4 texel = texture2D(tDiffuse, tex_coords).rgba;
 	gl_FragColor = texel;
 }

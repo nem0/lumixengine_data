@@ -1,2 +1,2 @@
 {"shader" : "shaders/tree.shd",
-"texture" : "massive_swamptree_01_bark.dds"}
+"texture" : { "source" : "massive_swamptree_01_bark.dds" }}

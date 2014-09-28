@@ -24,7 +24,9 @@ void main( void )
 {
 	vec4 wind = vec4(1, 0, 0, 0);
 	tex_coords = in_tex_coords;
-	normals = normalize(mat3(world_matrix) * vec3(0, 1, 0));
+	normals = normalize(mat3(world_matrix) * in_position);
+	normals.y = 0.0;
+	normals = normalize(normals);
 	position = vec4(in_position, 1);
 	position = position + position.y * 0.01 * sin(3*time+world_matrix[3].x*0.3) * wind;
 	position = world_matrix * position;
@@ -99,15 +101,9 @@ void main( void )
 		&& shadow_coord[0].y < 0.99 && shadow_coord[0].y > 0.01)
 		split_index = 0;
 	
-	if(shadow_coord[split_index].z <= 1.0 && texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z - 0.005)
+	if(texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z - 0.00005)
 		shadow = 0;
-	shadow = max(0.2, shadow * max(0.2, dot(normals, -light_dir)));
-	vec4 colors[4] = vec4[](
-		vec4(1, 0, 0, 1),
-		vec4(0, 1, 0, 1),
-		vec4(0, 0, 1, 1),
-		vec4(1, 1, 0, 1)
-	);
+	shadow = shadow * max(0, dot(normals, -light_dir));
 	vec4 surface = texture2D(tDiffuse, tex_coords).rgba;
 	if(surface.a < 0.30)
 		discard;
@@ -117,7 +113,7 @@ void main( void )
 
 	vec4 p = view_matrix * position;
 	out_color = mix(ambient + diffuse, fog_color, getFogFactor(p.z / p.w));
-	//gl_FragColor = vec4(normals, 1);
+	//out_color = vec4(normals.x, 0, 0, 1);
 	//gl_FragColor = vec4(light_dir, 1);
 	//gl_FragColor = vec4(1, 0, 0, 1);
 }

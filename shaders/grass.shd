@@ -21,25 +21,21 @@ uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
 uniform float time;
 uniform vec3 camera_pos;
+uniform float max_grass_distance = 10;
 
 void main( void )
 {
+	
 	vec4 wind = vec4(1, 0, 0, 0);
 	mat4 grass_mtx = grass_matrices[int(in_matrix_index)];
 	tex_coords	= in_tex_coords;
 	normals = normalize(mat3(grass_mtx) * in_normal);
 	
-	position = vec4(in_position, 1) + in_position.y * 0.05 * sin(3*time+grass_mtx[3].x*0.3) * wind;
-	vec4 pp = (grass_mtx) * position;
-	float max_grass_distance = 10;
-
-	position = position * clamp(1.0 - (length(camera_pos - pp.xyz) - max_grass_distance) / max_grass_distance, 0.0, 1.0);
+	float scale = clamp(1.0 - (length(camera_pos - grass_mtx[3].xyz) - max_grass_distance) / max_grass_distance, 0.0, 1.0);
+	position = vec4(in_position * scale, 1) + in_position.y * scale * 0.05 * sin(3*time+grass_mtx[3].x*0.3) * wind;
 	
-	pp = (view_matrix * grass_mtx) * position;
-	vec4 p = projection_matrix * pp; 
 	position = grass_mtx * position;
-	gl_Position = p;
-	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
+	gl_Position = projection_matrix * view_matrix * position;
 }
 
 //~VS

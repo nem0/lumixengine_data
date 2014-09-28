@@ -70,6 +70,8 @@ in float 			cam_dist;
 in vec2 			tex_coords;
 in vec2 			global_uv;
 
+out vec4			out_color;
+
 uniform sampler2D	t1;
 uniform sampler2D	t2;
 uniform sampler2D	t3;
@@ -180,5 +182,5 @@ void main( void )
 	vec4 diffuse = shadow * diffuse_intensity * surface * diffuse_color;
 
 	p = view_matrix * p;
-	gl_FragColor = mix(diffuse + ambient, fog_color, getFogFactor(p.z / p.w));
+	out_color = mix(diffuse + ambient, fog_color, getFogFactor(p.z / p.w));
 }

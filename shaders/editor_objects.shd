@@ -30,10 +30,12 @@ void main( void )
 
 in vec2 tex_coords;
 
+out vec4			out_color;
+
 uniform sampler2D	tDiffuse;
 
 void main( void )
 {
 	vec4 texel = texture2D(tDiffuse, tex_coords).rgba;
-	gl_FragColor = texel;
+	out_color = texel;
 }

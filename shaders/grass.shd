@@ -48,6 +48,8 @@ void main( void )
 in vec4 position;
 in vec2 tex_coords;
 
+out vec4			out_color;
+
 uniform sampler2D	tDiffuse;
 uniform vec3 light_dir;
 uniform mat4 shadowmap_matrix0;
@@ -102,7 +104,7 @@ void main( void )
 	vec4 ambient = 			ambient_intensity * surface * ambient_color;
 	vec4 diffuse = shadow * diffuse_intensity * surface * diffuse_color;
 
-	gl_FragColor = ambient + diffuse; 
+	out_color = ambient + diffuse; 
 	
 	//gl_FragColor = vec4(texture2D(shadowmap, tt[split_index]).rgb, 1);
 	//gl_FragColor = vec4(light_dir, 1);

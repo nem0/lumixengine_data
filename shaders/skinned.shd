@@ -46,6 +46,8 @@ void main( void )
 in vec4		position;
 in vec3		normals;
 
+out vec4			out_color;
+
 uniform sampler2D	tDiffuse;
 uniform sampler2D	shadowmap;
 uniform mat4 shadowmap_matrix0;
@@ -120,6 +122,6 @@ void main( void )
 	//visibility = 1;
 	if(texel.a < 0.30)
 		discard;
-	gl_FragColor = texel * visibility;
+	out_color = texel * visibility;
 	//gl_FragColor = vec4(1, 0, 0, 1);
 }

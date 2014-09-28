@@ -34,11 +34,13 @@ void main( void )
 
 in vec3 tex_coords;
 
+out vec4			out_color;
+
 uniform samplerCube tDiffuse;
 
 void main( void )
 {
 	vec4 texel = texture(tDiffuse, tex_coords).rgba;
-	gl_FragColor = texel;
+	out_color = texel;
 	//gl_FragColor = vec4(1, 0, 0, 1);
 }

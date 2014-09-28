@@ -37,6 +37,8 @@ in vec4		position;
 in vec3		normals;
 in vec2 		tex_coords;
 
+out vec4			out_color;
+
 uniform sampler2D	tDiffuse;
 uniform sampler2D	shadowmap;
 uniform mat4 shadowmap_matrix0;
@@ -98,7 +100,7 @@ void main( void )
 	vec4 texel = texture2D(tDiffuse, tex_coords).rgba;
 	if(texel.a < 0.30)
 		discard;
-	gl_FragColor = texel * visibility;
+	out_color = texel * visibility;
 	//gl_FragColor = vec4(normals, 1);
 	//gl_FragColor = vec4(light_dir, 1);
 	//gl_FragColor = vec4(1, 0, 0, 1);

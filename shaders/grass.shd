@@ -31,9 +31,9 @@ void main( void )
 	
 	position = vec4(in_position, 1) + in_position.y * 0.05 * sin(3*time+grass_mtx[3].x*0.3) * wind;
 	vec4 pp = (grass_mtx) * position;
-	float max_grass_distance = 100;
+	float max_grass_distance = 10;
 
-	position = position * clamp(1.0 - (length(camera_pos - pp.xyz) - max_grass_distance) / 4.0, 0.0, 1.0);
+	position = position * clamp(1.0 - (length(camera_pos - pp.xyz) - max_grass_distance) / max_grass_distance, 0.0, 1.0);
 	
 	pp = (view_matrix * grass_mtx) * position;
 	vec4 p = projection_matrix * pp; 

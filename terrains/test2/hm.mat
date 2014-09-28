@@ -1,6 +1,6 @@
 {
 "uniforms" : [
-	{ "name" : "detail_texture_distance", "float_value" : 90 }
+	{ "name" : "detail_texture_distance", "float_value" : 50 }
 ],
 "texture" : { "source" : "grass_mixed_medium_base.dds", "uniform" : "t1" },
 "texture" : { "source" : "soil_bigstones_base.dds", "uniform" : "t2" },

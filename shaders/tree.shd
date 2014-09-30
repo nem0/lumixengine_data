@@ -83,10 +83,6 @@ void main( void )
 		vec2(shadow_coord[2].x, 0.50 + shadow_coord[2].y * 0.25),
 		vec2(shadow_coord[3].x, 0.75 + shadow_coord[3].y * 0.25)
 	);
-	float near = 0.1;
-	float far = 1000.0;
-	float depth = gl_FragCoord.z;
-	float linear_depth = (far - near) * (2.0 * near) / (far + near - depth * (far - near));
 	int split_index = 0;
 	if(shadow_coord[3].x < 0.99 && shadow_coord[3].x > 0.01
 		&& shadow_coord[3].y < 0.99 && shadow_coord[3].y > 0.01)

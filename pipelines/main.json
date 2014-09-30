@@ -11,9 +11,10 @@
 	"clear", "all",
 	"polygon_mode", true,
 	"render_models", 1,
-
+	"render_debug_lines",
+	
 	"clear", "depth",
-	"render_models", 2,
-	"render_debug_lines"
+	"render_models", 2
+	
 	]
 }

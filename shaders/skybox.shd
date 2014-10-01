@@ -1,8 +1,7 @@
 {
-	"attributes" : ["in_position"],
+	"attributes" : ["in_position", "in_normal", "in_tex_coords"],
 	"shadowmap_required" : true
 }
-
 //BEGIN
 
 #version 330

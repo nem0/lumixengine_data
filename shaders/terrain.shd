@@ -1,5 +1,5 @@
 {
-	"attributes" : ["in_position"],
+	"attributes" : ["in_position", "in_tex_coords"],
 	"shadowmap_required" : true
 }
 
@@ -8,6 +8,7 @@
 #version 330
 
 in vec3 in_position;
+in vec2 in_tex_coords;
 
 out vec4 position;
 out vec2 tex_coords;
@@ -24,6 +25,7 @@ uniform vec3 quad_min;
 uniform vec3 camera_pos;
 uniform vec3 morph_const;
 uniform vec3 terrain_scale;
+
 
 void main( void )
 {

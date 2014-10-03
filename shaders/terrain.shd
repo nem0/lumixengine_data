@@ -25,6 +25,7 @@ uniform vec3 quad_min;
 uniform vec3 camera_pos;
 uniform vec3 morph_const;
 uniform vec3 terrain_scale;
+uniform float texture_scale = 1;
 
 
 void main( void )
@@ -51,15 +52,15 @@ void main( void )
 	position += vec4(quad_min, 0);
 
 	vec2 uv = position.xz / (map_size);
-	uv.x += 0.5/map_size;
-	uv.y += 0.5/map_size;
+	//uv += 0.5/map_size;
+	//uv.y += 0.5/map_size;
 	position.y = terrain_scale.y * texture2D(hm_texture, uv).x;
 	position.x *= terrain_scale.x;
 	position.z *= terrain_scale.z;
 
 	gl_Position = projection_matrix * view_matrix * world_matrix * position; 
 	global_uv = uv;
-	tex_coords = uv * m * map_size;
+	tex_coords = uv * m * map_size * texture_scale;
 	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
 	cam_dist = dist;
 }

@@ -22,7 +22,7 @@ uniform mat4 projection_matrix;
 void main( void )
 {
 	tex_coords = in_tex_coords;
-	normals = (world_matrix * vec4(in_normal, 0)).xyz;
+	normals = mat3(world_matrix) * in_normal;
 	
 	position = world_matrix * vec4(in_position, 1);
 	gl_Position = projection_matrix * (view_matrix * position); 
@@ -35,7 +35,7 @@ void main( void )
 
 in vec4		position;
 in vec3		normals;
-in vec2 		tex_coords;
+in vec2 	tex_coords;
 
 out vec4			out_color;
 
@@ -46,7 +46,15 @@ uniform mat4 shadowmap_matrix1;
 uniform mat4 shadowmap_matrix2;
 uniform mat4 shadowmap_matrix3;
 uniform mat4 world_matrix;
+uniform mat4 view_matrix;
 uniform vec3 light_dir;
+uniform vec4 ambient_color;
+uniform float ambient_intensity;
+uniform vec4 diffuse_color;
+uniform float diffuse_intensity;
+uniform vec4 fog_color;
+uniform float fog_density;
+
 
 vec2 poissonDisk[4] = vec2[](
   vec2( -0.94201624, -0.39906216 ),
@@ -55,9 +63,16 @@ vec2 poissonDisk[4] = vec2[](
   vec2( 0.34495938, 0.29387760 )
 );
 
+
+float getFogFactor(float fFogCoord) 
+{ 
+	float fResult = exp(-pow(fog_density * fFogCoord, 2.0)); 
+	fResult = 1.0-clamp(fResult, 0.0, 1.0); 
+	return fResult;
+}
+
 void main( void )
 {
-	float visibility = 1.0;
 	vec3 shadow_coord[4] = vec3[](
 		vec3(shadowmap_matrix0 * position),
 		vec3(shadowmap_matrix1 * position),
@@ -88,20 +103,27 @@ void main( void )
 		&& shadow_coord[0].y < 0.99 && shadow_coord[0].y > 0.01)
 		split_index = 0;
 	
-	if(texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z)
-		visibility -= 0.5;
-	visibility = max(0.2, visibility * max(0.2, dot(normals, -light_dir)));
+	float shadow = 1.0;
+	if(texture2D(shadowmap, tt[split_index]).z < shadow_coord[split_index].z - 0.0001)
+		shadow -= 0.5;
+	shadow = shadow * max(0.0, dot(normals, -light_dir));
 	vec4 colors[4] = vec4[](
 		vec4(1, 0, 0, 1),
 		vec4(0, 1, 0, 1),
 		vec4(0, 0, 1, 1),
 		vec4(1, 1, 0, 1)
 	);
-	vec4 texel = texture2D(tDiffuse, tex_coords).rgba;
-	if(texel.a < 0.30)
+	vec4 surface = texture2D(tDiffuse, tex_coords).rgba;
+	if(surface.a < 0.30)
 		discard;
-	out_color = texel * visibility;
-	//gl_FragColor = vec4(normals, 1);
+
+	vec4 ambient = 			ambient_intensity * surface * ambient_color;
+	vec4 diffuse = shadow * diffuse_intensity * surface * diffuse_color;
+
+	vec4 p = view_matrix * position;
+	out_color = mix(diffuse + ambient, fog_color, getFogFactor(p.z / p.w));
+	
+	//out_color = vec4(normals, 1);
 	//gl_FragColor = vec4(light_dir, 1);
 	//gl_FragColor = vec4(1, 0, 0, 1);
 }

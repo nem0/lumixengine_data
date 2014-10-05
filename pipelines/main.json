@@ -14,7 +14,7 @@
 	"render_debug_lines",
 	
 	"clear", "depth",
-	"render_models", 2
-	
+	"render_models", 2,
+	"custom", "render_gizmos"
 	]
 }

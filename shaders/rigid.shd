@@ -6,6 +6,7 @@
 //BEGIN
 
 #version 330
+#ifdef VERTEX_SHADER
 
 in vec3 in_position;
 in vec2 in_tex_coords;
@@ -30,8 +31,8 @@ void main( void )
 	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
 
-//~VS
-#version 330
+#endif
+#ifdef FRAGMENT_SHADER
 
 in vec4		position;
 in vec3		normals;
@@ -141,3 +142,4 @@ void main( void )
 	vec4 p = view_matrix * position;
 	out_color = mix(diffuse + ambient, fog_color, getFogFactor(p.z / p.w));
 }
+#endif

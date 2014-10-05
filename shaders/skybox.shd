@@ -5,6 +5,7 @@
 //BEGIN
 
 #version 330
+#ifdef VERTEX_SHADER
 
 in vec3 in_position;
 
@@ -28,8 +29,9 @@ void main( void )
 	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
 
-//~VS
-#version 330
+#endif
+
+#ifdef FRAGMENT_SHADER
 
 in vec3 tex_coords;
 
@@ -43,3 +45,5 @@ void main( void )
 	out_color = texel;
 	//gl_FragColor = vec4(1, 0, 0, 1);
 }
+
+#endif

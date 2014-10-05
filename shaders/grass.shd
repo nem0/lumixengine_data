@@ -6,6 +6,7 @@
 //BEGIN
 
 #version 330
+#ifdef VERTEX_SHADER
 
 in vec3 in_position;
 in vec2 in_tex_coords;
@@ -38,8 +39,10 @@ void main( void )
 	gl_Position = projection_matrix * view_matrix * position;
 }
 
-//~VS
-#version 330
+#endif
+
+
+#ifdef FRAGMENT_SHADER
 
 in vec4 position;
 in vec2 tex_coords;
@@ -133,3 +136,5 @@ void main( void )
 	//gl_FragColor = vec4(light_dir, 1);
 	//gl_FragColor = vec4(1, 0, 0, 1);
 }
+
+#endif

@@ -3,9 +3,11 @@
 	"shadowmap_required" : true
 }
 
-//BEGIN
+//
 
 #version 330
+
+#ifdef VERTEX_SHADER
 
 in vec3 in_position;
 in vec2 in_tex_coords;
@@ -64,9 +66,9 @@ void main( void )
 	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
 	cam_dist = dist;
 }
+#endif
 
-//~VS
-#version 330
+#ifdef FRAGMENT_SHADER
 
 in vec4				position;
 in float 			cam_dist;
@@ -213,3 +215,4 @@ void main( void )
 	p = view_matrix * p;
 	out_color = mix(diffuse + ambient, fog_color, getFogFactor(p.z / p.w));
 }
+#endif

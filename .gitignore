@@ -1,2 +1,7 @@
 *.blend1
 *.blend2
+scripts/*.exp
+scripts/*.ilk
+scripts/*.obj
+scripts/*.lib
+scripts/*.pdb

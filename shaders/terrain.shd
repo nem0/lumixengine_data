@@ -1,4 +1,5 @@
 {
+	"passes" : ["MAIN", "SHADOW"],
 	"attributes" : ["in_position", "in_tex_coords"],
 	"shadowmap_required" : true
 }
@@ -70,160 +71,171 @@ void main( void )
 
 #ifdef FRAGMENT_SHADER
 
-in vec4				position;
-in float 			cam_dist;
-in vec2 			tex_coords;
-in vec2 			global_uv;
+	#ifdef SHADOW_PASS
 
-out vec4			out_color;
+		out vec4			out_color;
+		void main( void )
+		{
+			out_color = vec4(1, 1, 1, 1);
+		}
 
-uniform sampler2D	t1;
-uniform sampler2D	t2;
-uniform sampler2D	t3;
-uniform sampler2D	t4;
-uniform sampler2D	splat_texture;
-uniform sampler2D	shadowmap;
-uniform sampler2D hm_texture;
-uniform sampler2D satellite_map;
-uniform mat4 shadowmap_matrix0;
-uniform mat4 shadowmap_matrix1;
-uniform mat4 shadowmap_matrix2;
-uniform mat4 shadowmap_matrix3;
-uniform mat4 world_matrix;
-uniform mat4 view_matrix;
-uniform vec3 light_dir;
-uniform float quad_size;
-uniform vec3 brush_position;
-uniform float brush_size;
-uniform float detail_texture_distance;
-uniform vec4 ambient_color;
-uniform float ambient_intensity;
-uniform vec4 diffuse_color;
-uniform float diffuse_intensity;
-uniform vec4 fog_color;
-uniform float fog_density;
-
-vec2 poissonDisk[4] = vec2[](
-  vec2( -0.94201624, -0.39906216 ),
-  vec2( 0.94558609, -0.76890725 ),
-  vec2( -0.094184101, -0.92938870 ),
-  vec2( 0.34495938, 0.29387760 )
-);
-
-float getFogFactor(float fFogCoord) 
-{ 
-	float fResult = exp(-pow(fog_density * fFogCoord, 2.0)); 
-	fResult = 1.0-clamp(fResult, 0.0, 1.0); 
-	return fResult;
-}
-
-float texture2DCompare(sampler2D depths, vec2 uv, ivec2 offset, float compare){
-    float depth = textureOffset(depths, uv, offset).r;
-    return step(compare, depth);
-}
-
-float PCF(sampler2D depths, vec2 size, vec2 uv, float compare){
-    float result = 0.0;
-    for(int x=-1; x<=1; x++){
-        for(int y=-1; y<=1; y++){
-            ivec2 off = ivec2(x,y);
-            result += texture2DCompare(depths, uv, off, compare);
-        }
-    }
-    return result/9.0;
-}
-
-float texture2DShadowLerp(sampler2D depths, vec2 size, vec2 uv, float compare){
-    vec2 texelSize = vec2(1.0)/size;
-    vec2 f = fract(uv*size+0.5);
-    vec2 centroidUV = floor(uv*size+0.5)/size;
-
-    float lb = texture2DCompare(depths, centroidUV, ivec2(0, 0), compare);
-    float lt = texture2DCompare(depths, centroidUV, ivec2(0, 1), compare);
-    float rb = texture2DCompare(depths, centroidUV, ivec2(1, 0), compare);
-    float rt = texture2DCompare(depths, centroidUV, ivec2(1, 1), compare);
-    float a = mix(lb, lt, f.y);
-    float b = mix(rb, rt, f.y);
-    float c = mix(a, b, f.x);
-    return c;
-}
-
-void main( void )
-{
-	vec4 p = world_matrix * position;
-
-	#ifdef SHADOW_RECEIVER
-		// calc normal
-		vec2 tex_coord = global_uv;
-		vec4 wave = texture2D(hm_texture, tex_coord);
-		const vec2 size = vec2(0.005,0.0);
-		const ivec3 off = ivec3(-1,0,1);
-		float s11 = wave.x;
-		float s01 = textureOffset(hm_texture, tex_coord, off.xy).x;
-		float s21 = textureOffset(hm_texture, tex_coord, off.zy).x;
-		float s10 = textureOffset(hm_texture, tex_coord, off.yx).x;
-		float s12 = textureOffset(hm_texture, tex_coord, off.yz).x;
-		vec3 va = normalize(vec3(size.xy, s21 - s01));
-		vec3 vb = normalize(vec3(size.yx, s12 - s10));
-		vec4 normal = vec4( cross(va, vb).xzy, s11 );
-		
-		// shadow
-		vec3 shadow_coord[4] = vec3[](
-			vec3(shadowmap_matrix0 * p),
-			vec3(shadowmap_matrix1 * p),
-			vec3(shadowmap_matrix2 * p),
-			vec3(shadowmap_matrix3 * p)
-		);
-		vec2 tt[4] = vec2[](
-			vec2(shadow_coord[0].x * 0.5, shadow_coord[0].y * 0.5),
-			vec2(0.5 + shadow_coord[1].x * 0.5, shadow_coord[1].y * 0.5),
-			vec2(shadow_coord[2].x * 0.5, 0.50 + shadow_coord[2].y * 0.5),
-			vec2(0.5 + shadow_coord[3].x * 0.5, 0.5 + shadow_coord[3].y * 0.5)
-		);
-		
-		int split_index = 3;
-		if(step(shadow_coord[0].x, 0.99) * step(shadow_coord[0].y, 0.99)
-			* step(0.01, shadow_coord[0].x)	* step(0.01, shadow_coord[0].y) > 0)
-			split_index = 0;
-		else if(step(shadow_coord[1].x, 0.99) * step(shadow_coord[1].y, 0.99)
-			* step(0.01, shadow_coord[1].x)	* step(0.01, shadow_coord[1].y) > 0)
-			split_index = 1;
-		else if(step(shadow_coord[2].x, 0.99) * step(shadow_coord[2].y, 0.99)
-			* step(0.01, shadow_coord[2].x)	* step(0.01, shadow_coord[2].y) > 0)
-			split_index = 2;
-
-		float shadow = step(shadow_coord[split_index].z, 1) * texture2DShadowLerp(shadowmap, textureSize(shadowmap, 0), tt[split_index], shadow_coord[split_index].z);
-		//shadow = max(0.2, shadow * max(0.2, dot(normal.xyz, light_dir)));
-	#endif
-	
-	// surface
-	vec4 splat = texture2D(splat_texture, global_uv).rgba;
-	//splat = normalize(splat);
-	vec4 surface = 
-		texture2D(t1, tex_coords).rgba * splat.x
-		+ texture2D(t2, tex_coords).rgba * splat.y
-		+ texture2D(t3, tex_coords).rgba * splat.z
-		+ texture2D(t4, tex_coords).rgba * splat.w;
-	vec4 surface2 = texture2D(satellite_map, global_uv).rgba;
-	float t = (cam_dist - detail_texture_distance) / detail_texture_distance;
-	t = clamp(t, 0, 1);
-	vec4 brush_color = vec4(0, 0, 1, 1) * (abs(distance(vec4(brush_position, 1), world_matrix * position) - brush_size) < 0.1 ? 1 : 0);
-	surface = (surface * (1 - t) + surface2 * t) + brush_color;
-
-	#ifdef ALPHA_CUTOUT
-		if(surface.a < 0.3)
-			discard;
-	#endif
-	
-	// result
-	vec4 ambient = 			ambient_intensity * surface * ambient_color;
-	#ifdef SHADOW_RECEIVER
-		vec4 diffuse = shadow * diffuse_intensity * surface * diffuse_color;
 	#else
-		vec4 diffuse = diffuse_intensity * surface * diffuse_color;
-	#endif
-	
-	p = view_matrix * p;
-	out_color = mix(diffuse + ambient, fog_color, getFogFactor(p.z / p.w));
-}
-#endif
+
+		in vec4				position;
+		in float 			cam_dist;
+		in vec2 			tex_coords;
+		in vec2 			global_uv;
+
+		out vec4			out_color;
+
+		uniform sampler2D	t1;
+		uniform sampler2D	t2;
+		uniform sampler2D	t3;
+		uniform sampler2D	t4;
+		uniform sampler2D	splat_texture;
+		uniform sampler2D	shadowmap;
+		uniform sampler2D hm_texture;
+		uniform sampler2D satellite_map;
+		uniform mat4 shadowmap_matrix0;
+		uniform mat4 shadowmap_matrix1;
+		uniform mat4 shadowmap_matrix2;
+		uniform mat4 shadowmap_matrix3;
+		uniform mat4 world_matrix;
+		uniform mat4 view_matrix;
+		uniform vec3 light_dir;
+		uniform float quad_size;
+		uniform vec3 brush_position;
+		uniform float brush_size;
+		uniform float detail_texture_distance;
+		uniform vec4 ambient_color;
+		uniform float ambient_intensity;
+		uniform vec4 diffuse_color;
+		uniform float diffuse_intensity;
+		uniform vec4 fog_color;
+		uniform float fog_density;
+
+		vec2 poissonDisk[4] = vec2[](
+		  vec2( -0.94201624, -0.39906216 ),
+		  vec2( 0.94558609, -0.76890725 ),
+		  vec2( -0.094184101, -0.92938870 ),
+		  vec2( 0.34495938, 0.29387760 )
+		);
+
+		float getFogFactor(float fFogCoord) 
+		{ 
+			float fResult = exp(-pow(fog_density * fFogCoord, 2.0)); 
+			fResult = 1.0-clamp(fResult, 0.0, 1.0); 
+			return fResult;
+		}
+
+		float texture2DCompare(sampler2D depths, vec2 uv, ivec2 offset, float compare){
+			float depth = textureOffset(depths, uv, offset).r;
+			return step(compare, depth);
+		}
+
+		float PCF(sampler2D depths, vec2 size, vec2 uv, float compare){
+			float result = 0.0;
+			for(int x=-1; x<=1; x++){
+				for(int y=-1; y<=1; y++){
+					ivec2 off = ivec2(x,y);
+					result += texture2DCompare(depths, uv, off, compare);
+				}
+			}
+			return result/9.0;
+		}
+
+		float texture2DShadowLerp(sampler2D depths, vec2 size, vec2 uv, float compare){
+			vec2 texelSize = vec2(1.0)/size;
+			vec2 f = fract(uv*size+0.5);
+			vec2 centroidUV = floor(uv*size+0.5)/size;
+
+			float lb = texture2DCompare(depths, centroidUV, ivec2(0, 0), compare);
+			float lt = texture2DCompare(depths, centroidUV, ivec2(0, 1), compare);
+			float rb = texture2DCompare(depths, centroidUV, ivec2(1, 0), compare);
+			float rt = texture2DCompare(depths, centroidUV, ivec2(1, 1), compare);
+			float a = mix(lb, lt, f.y);
+			float b = mix(rb, rt, f.y);
+			float c = mix(a, b, f.x);
+			return c;
+		}
+
+		void main( void )
+		{
+			vec4 p = world_matrix * position;
+
+			#ifdef SHADOW_RECEIVER
+				// calc normal
+				vec2 tex_coord = global_uv;
+				vec4 wave = texture2D(hm_texture, tex_coord);
+				const vec2 size = vec2(0.005,0.0);
+				const ivec3 off = ivec3(-1,0,1);
+				float s11 = wave.x;
+				float s01 = textureOffset(hm_texture, tex_coord, off.xy).x;
+				float s21 = textureOffset(hm_texture, tex_coord, off.zy).x;
+				float s10 = textureOffset(hm_texture, tex_coord, off.yx).x;
+				float s12 = textureOffset(hm_texture, tex_coord, off.yz).x;
+				vec3 va = normalize(vec3(size.xy, s21 - s01));
+				vec3 vb = normalize(vec3(size.yx, s12 - s10));
+				vec4 normal = vec4( cross(va, vb).xzy, s11 );
+				
+				// shadow
+				vec3 shadow_coord[4] = vec3[](
+					vec3(shadowmap_matrix0 * p),
+					vec3(shadowmap_matrix1 * p),
+					vec3(shadowmap_matrix2 * p),
+					vec3(shadowmap_matrix3 * p)
+				);
+				vec2 tt[4] = vec2[](
+					vec2(shadow_coord[0].x * 0.5, shadow_coord[0].y * 0.5),
+					vec2(0.5 + shadow_coord[1].x * 0.5, shadow_coord[1].y * 0.5),
+					vec2(shadow_coord[2].x * 0.5, 0.50 + shadow_coord[2].y * 0.5),
+					vec2(0.5 + shadow_coord[3].x * 0.5, 0.5 + shadow_coord[3].y * 0.5)
+				);
+				
+				int split_index = 3;
+				if(step(shadow_coord[0].x, 0.99) * step(shadow_coord[0].y, 0.99)
+					* step(0.01, shadow_coord[0].x)	* step(0.01, shadow_coord[0].y) > 0)
+					split_index = 0;
+				else if(step(shadow_coord[1].x, 0.99) * step(shadow_coord[1].y, 0.99)
+					* step(0.01, shadow_coord[1].x)	* step(0.01, shadow_coord[1].y) > 0)
+					split_index = 1;
+				else if(step(shadow_coord[2].x, 0.99) * step(shadow_coord[2].y, 0.99)
+					* step(0.01, shadow_coord[2].x)	* step(0.01, shadow_coord[2].y) > 0)
+					split_index = 2;
+
+				float shadow = step(shadow_coord[split_index].z, 1) * texture2DShadowLerp(shadowmap, textureSize(shadowmap, 0), tt[split_index], shadow_coord[split_index].z);
+				//shadow = max(0.2, shadow * max(0.2, dot(normal.xyz, light_dir)));
+			#endif
+			
+			// surface
+			vec4 splat = texture2D(splat_texture, global_uv).rgba;
+			//splat = normalize(splat);
+			vec4 surface = 
+				texture2D(t1, tex_coords).rgba * splat.x
+				+ texture2D(t2, tex_coords).rgba * splat.y
+				+ texture2D(t3, tex_coords).rgba * splat.z
+				+ texture2D(t4, tex_coords).rgba * splat.w;
+			vec4 surface2 = texture2D(satellite_map, global_uv).rgba;
+			float t = (cam_dist - detail_texture_distance) / detail_texture_distance;
+			t = clamp(t, 0, 1);
+			vec4 brush_color = vec4(0, 0, 1, 1) * (abs(distance(vec4(brush_position, 1), world_matrix * position) - brush_size) < 0.1 ? 1 : 0);
+			surface = (surface * (1 - t) + surface2 * t) + brush_color;
+
+			#ifdef ALPHA_CUTOUT
+				if(surface.a < 0.3)
+					discard;
+			#endif
+			
+			// result
+			vec4 ambient = 			ambient_intensity * surface * ambient_color;
+			#ifdef SHADOW_RECEIVER
+				vec4 diffuse = shadow * diffuse_intensity * surface * diffuse_color;
+			#else
+				vec4 diffuse = diffuse_intensity * surface * diffuse_color;
+			#endif
+			
+			p = view_matrix * p;
+			out_color = mix(diffuse + ambient, fog_color, getFogFactor(p.z / p.w));
+		}
+	#endif // if SHADOW_PASS else
+#endif // FRAGMENT_SHADER

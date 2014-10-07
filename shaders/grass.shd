@@ -1,4 +1,5 @@
 {
+	"passes" : ["MAIN"],
 	"attributes" : ["in_position", "in_normal", "in_tex_coords", "in_matrix_index"],
 	"shadowmap_required" : true
 }

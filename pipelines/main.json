@@ -4,9 +4,11 @@
 "shadowmap_width" : 2048,
 "shadowmap_height" : 2048,
 "commands" : [
+	"set_pass", "SHADOW",
 	"render_shadowmap", 1, "editor",
 	"bind_shadowmap",
-	
+
+	"set_pass", "MAIN",
 	"apply_camera", "editor", 
 	"clear", "all",
 	"polygon_mode", true,

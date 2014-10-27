@@ -6,7 +6,6 @@
 
 //BEGIN
 
-#version 330
 #ifdef VERTEX_SHADER
 
 in vec3 in_position;
@@ -95,6 +94,7 @@ void main( void )
 			return fResult;
 		}
 
+		#ifdef SHADOW_RECEIVER
 		float texture2DCompare(sampler2D depths, vec2 uv, ivec2 offset, float compare){
 			float depth = textureOffset(depths, uv, offset).r;
 			return step(compare, depth);
@@ -125,7 +125,8 @@ void main( void )
 			float c = mix(a, b, f.x);
 			return c;
 		}
-
+		#endif
+		
 		void main( void )
 		{
 			#ifdef SHADOW_RECEIVER

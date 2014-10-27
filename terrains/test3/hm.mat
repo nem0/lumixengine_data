@@ -1,19 +1,14 @@
 {
 "uniforms" : [
-	{ "name" : "hm_texture", "int_value" : 0 },
-	{ "name" : "t1", "int_value" : 1 },
-	{ "name" : "t2", "int_value" : 2 },
-	{ "name" : "t3", "int_value" : 3 },
-	{ "name" : "t4", "int_value" : 4 },
-	{ "name" : "satellite_map", "int_value" : 5 },
-	{ "name" : "splat_texture", "int_value" : 6 }
+	{ "name" : "detail_texture_distance", "float_value" : 50, "is_editable" : true },
+	{ "name" : "texture_scale", "float_value" : 1, "is_editable" : true }
 ],
-"heightmap" : "hm.raw",
-"texture" : "soil_bigstones_base.dds",
-"texture" : "rock_brown_cracks_base.dds",
-"texture" : "gravel_ground_colorful_base.dds",
-"texture" : "grass_mixed_medium_base.dds",
-"texture" : "map.dds",
-"splatmap" : "splat.tga",
+"texture" : { "source" : "grass_mixed_medium_base.dds", "uniform" : "t1" },
+"texture" : { "source" : "soil_bigstones_base.dds", "uniform" : "t2" },
+"texture" : { "source" : "rock_brown_cracks_base.dds", "uniform" : "t3" },
+"texture" : { "source" : "gravel_ground_colorful_base.dds", "uniform" : "t4" },
+"texture" : { "source" : "hm.raw", "keep_data" : true, "uniform" : "hm_texture" },
+"texture" : { "source" : "splat.tga", "keep_data" : true, "uniform" : "splat_texture" },
+"texture" : { "source" : "map.dds", "uniform" : "satellite_map" },
 "shader" : "shaders/terrain.shd"
 }

@@ -6,8 +6,6 @@
 
 //
 
-#version 330
-
 #ifdef VERTEX_SHADER
 
 in vec3 in_position;

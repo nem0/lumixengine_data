@@ -1,0 +1,4 @@
+{
+	"texture" : { "source" : "directional_light_icon.dds" },
+	"shader" : "shaders/editor_objects.shd"
+}

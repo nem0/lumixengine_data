@@ -1,0 +1,4 @@
+{
+	"texture" : { "source" : "camera_icon.dds" },
+	"shader" : "shaders/editor_objects.shd"
+}

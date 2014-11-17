@@ -10,6 +10,9 @@
 #include "graphics/renderer.h"
 #include "universe/universe.h"
 #include "physics/physics_scene.h"
+#include "script/script_system.h"
+#include "engine/engine.h"
+#include "engine/plugin_manager.h"
 
 #define DLL_EXPORT  __declspec(dllexport)
 #include <Windows.h>
@@ -17,12 +20,14 @@
 
 class MyScript : public Lumix::BaseScript
 {
+
 	public:
 		virtual void create(Lumix::ScriptScene& ctx, Lumix::Entity entity) override
 		{
 			m_e = entity;
-			m_phy_controller = entity.getComponent(crc32("physical_controller"));
-			m_phy_scene = static_cast<Lumix::PhysicsScene*>(m_phy_controller.scene);
+			Lumix::IPlugin* physics = ctx.getEngine().getPluginManager().getPlugin("physics");
+			m_phy_scene = static_cast<Lumix::PhysicsScene*>(ctx.getEngine().getScene(crc32("physics")));
+			m_phy_controller = m_phy_scene->getController(entity);
 		}
 		
 		virtual void update(float dt) override

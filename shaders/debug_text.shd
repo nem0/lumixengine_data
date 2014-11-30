@@ -1,0 +1,38 @@
+{
+	"passes" : ["MAIN"],
+	"attributes" : ["in_position", "in_uv"]
+}
+
+//BEGIN
+
+#ifdef VERTEX_SHADER
+
+in vec2 in_position;
+in vec2 in_uv;
+
+out vec2 uv;
+
+uniform mat4 view_matrix;
+uniform mat4 projection_matrix;
+
+void main( void )
+{
+	uv = in_uv;
+	vec4 position = vec4(in_position, 0, 1);
+	gl_Position = projection_matrix * view_matrix * position; 
+}
+
+//~VS
+#endif
+
+
+#ifdef FRAGMENT_SHADER
+in vec2 			uv;
+out vec4			out_color;
+uniform sampler2D	diffuse;
+
+void main( void )
+{
+	out_color = texture2D(diffuse, uv).rgba;
+}
+#endif

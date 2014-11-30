@@ -1,6 +1,6 @@
 {
 	"passes" : ["MAIN", "SHADOW"],
-	"attributes" : ["in_position", "in_normal", "in_tex_coords", "bone_weights", "bone_indices"],
+	"attributes" : ["in_position", "in_tex_coords", "bone_weights", "bone_indices"],
 	"shadowmap_required" : true
 }
 

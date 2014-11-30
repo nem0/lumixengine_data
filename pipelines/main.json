@@ -17,6 +17,7 @@
 	
 	"clear", "depth",
 	"render_models", 2,
-	"custom", "render_gizmos"
+	"custom", "render_gizmos",
+	"render_debug_texts"
 	]
 }

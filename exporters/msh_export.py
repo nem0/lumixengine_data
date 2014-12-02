@@ -346,21 +346,23 @@ def write_skinned_model_indexed(context, f, armature, objs_to_export):
 	return meshes
 				
 def write_rigid_model_indexed(context, f, objs_to_export, is_grass):
+	f.write(bytes("OML_", "ascii"))
+	f.write(struct.pack("I", 1))
 	meshes = []
 	face_counts = []
+	face_counts.append(0)
 	face_count = 0
+	vertex_size = 32
 	if is_grass:
-		f.write(struct.pack("I", 5))
-		f.write(bytes("pnti1", "ascii"))
-	else:
-		f.write(struct.pack("I", 3))
-		f.write(bytes("pnt", "ascii"))
-	
+		vertex_size = 36
 	indices = []
 	vertices = []
+	vertex_attributes_offsets = []
+	vertex_attributes_offsets.append(0)
 	uvs = []
 	index_base = 0
 	max_idx = 0;
+	attr_offset = 0;
 	for o in objs_to_export:
 		m = o.to_mesh(context.scene, False, 'PREVIEW')
 		m.transform(swap_y_z_matrix * o.matrix_world)
@@ -376,14 +378,49 @@ def write_rigid_model_indexed(context, f, objs_to_export, is_grass):
 			indices += [tri.vertex_index[0] + index_base, tri.vertex_index[1] + index_base, tri.vertex_index[2] + index_base]
 		face_count += len(tri_list)
 		face_counts.append(face_count)
+		attr_offset += len(vert_array) * vertex_size
+		vertex_attributes_offsets.append(attr_offset)
 		vertices += vert_array
 		uvs += uv_array
 		index_base = len(vertices)	
+		index_base = 0
+	
+	index = 0
+	f.write(struct.pack("I", len(objs_to_export)))   
+	for m in meshes:
+		if m == None:
+			material = ""
+			f.write(struct.pack("I", len(material)))
+			f.write(bytes(material, "ascii"))
+		else:
+			material = m.materials[0].name
+			f.write(struct.pack("I", len(material)))
+			f.write(bytes(material, "ascii"))
+
+		f.write(struct.pack("I", vertex_attributes_offsets[index]))
+		f.write(struct.pack("I", vertex_attributes_offsets[index + 1] - vertex_attributes_offsets[index]))
+		f.write(struct.pack("I", face_counts[index] * 3))
+		if index == 0:
+			f.write(struct.pack("I", face_counts[index + 1]))
+		else:
+			f.write(struct.pack("I", face_counts[index + 1] - face_counts[index]))
+		f.write(struct.pack("I", len(objs_to_export[index].name)))
+		f.write(bytes(objs_to_export[index].name, "ascii"))
+		index = index + 1
+	
+		if is_grass:
+			f.write(struct.pack("I", 5))
+			f.write(bytes("pnti1", "ascii"))
+		else:
+			f.write(struct.pack("I", 3))
+			f.write(bytes("pnt", "ascii"))
 	
 	f.write(struct.pack("I", len(indices)))
 	for i in indices:
 		f.write(struct.pack("I", i))
-	f.write(struct.pack("I", len(vertices)))
+	
+	f.write(struct.pack("I", len(vertices) * vertex_size))
+		
 	for v, uv in zip(vertices, uvs):
 		f.write(struct.pack("f", v.x))
 		f.write(struct.pack("f", v.y))
@@ -398,26 +435,7 @@ def write_rigid_model_indexed(context, f, objs_to_export, is_grass):
 
 	bone_count = 0
 	f.write(struct.pack("I", bone_count))  
-
-	index = 0
-	f.write(struct.pack("I", len(objs_to_export)))   
-	for m in meshes:
-		if m == None:
-			material = ""
-			f.write(struct.pack("I", len(material)))
-			f.write(bytes(material, "ascii"))
-		else:
-			material = m.materials[0].name
-			f.write(struct.pack("I", len(material)))
-			f.write(bytes(material, "ascii"))
-			
-		if index == 0:
-			f.write(struct.pack("I", face_counts[index]))
-		else:
-			f.write(struct.pack("I", face_counts[index] - face_counts[index - 1]))
-		f.write(struct.pack("I", len(objs_to_export[index].name)))
-		f.write(bytes(objs_to_export[index].name, "ascii"))
-		index = index + 1
+	
 	return meshes
 
 def export_material(base_path, material, shader):

@@ -1,4 +1,0 @@
-{
-"texture" : { "source" : "boulder_granite_grey_01.dds" },
-"shader" : "shaders/rigid.shd"
-}

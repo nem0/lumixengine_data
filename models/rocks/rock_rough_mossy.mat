@@ -1,4 +1,0 @@
-{
-"texture" : { "source" : "rock_rough_mossy.dds" },
-"shader" : "shaders/rigid.shd"
-}

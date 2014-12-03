@@ -1,4 +1,0 @@
-{
-	"texture" : { "source" : "icon.tga" },
-	"shader" : "shaders/rigid.shd"
-}

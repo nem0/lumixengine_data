@@ -53,8 +53,8 @@ void main( void )
 	position += vec4(quad_min, 0);
 
 	vec2 uv = position.xz / (map_size);
-	//uv += 0.5/map_size;
-	//uv.y += 0.5/map_size;
+	uv.x += 0.5/map_size;
+	uv.y += 0.5/map_size;
 	position.y = terrain_scale.y * texture2D(hm_texture, uv).x;
 	position.x *= terrain_scale.x;
 	position.z *= terrain_scale.z;

@@ -4,13 +4,13 @@
 "shadowmap_width" : 2048,
 "shadowmap_height" : 2048,
 "commands" : [
+	"set_pass", "SHADOW",
 	"render_shadowmap", 1, "main",
 	"bind_shadowmap",
 	
+	"set_pass", "MAIN",
 	"apply_camera", "main", 
 	"clear", "all",
 	"render_models", 1,
-	"clear", "depth",
-	"render_models", 2
 ]
 }

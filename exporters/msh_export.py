@@ -459,7 +459,7 @@ def write_rigid_model_indexed(context, f, objs_to_export, is_grass):
 	
 	lod_count = 1
 	f.write(struct.pack("I", lod_count))
-	to_mesh = -1
+	to_mesh = len(meshes) - 1
 	f.write(struct.pack("i", to_mesh))
 	f.write(struct.pack("f", sys.float_info.max))
 	
@@ -583,6 +583,6 @@ bl_info = {
 import sys
 if __name__ == "__main__":
 	if(len(sys.argv) == 7):
-		export_model(bpy.context, sys.argv[6], False, False, False);
+		export_model(bpy.context, sys.argv[6], False, False, True);
 	else:
 		register()

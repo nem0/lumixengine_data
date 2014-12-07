@@ -368,7 +368,7 @@ def write_skinned_model_indexed(context, f, armature, objs_to_export):
 
 	
 def write_rigid_model_indexed(context, f, objs_to_export, is_grass):
-	writeModelHeader(f)
+	write_model_header(f)
 	meshes = []
 	face_counts = []
 	face_counts.append(0)
@@ -457,6 +457,12 @@ def write_rigid_model_indexed(context, f, objs_to_export, is_grass):
 	bone_count = 0
 	f.write(struct.pack("I", bone_count))  
 	
+	lod_count = 1
+	f.write(struct.pack("I", lod_count))
+	to_mesh = -1
+	f.write(struct.pack("i", to_mesh))
+	f.write(struct.pack("f", sys.float_info.max))
+	
 	return meshes
 
 def export_material(base_path, material, shader):
@@ -493,6 +499,7 @@ def export_model(context, filepath, export_materials, is_grass, export_selection
 	print("object_count")
 	print(object_count)
 		
+	objs = sorted(objs, key = lambda x: x.name[x.name.find('_LOD') + 4])
 	shader = "rigid"
 	if armature != None:
 		shader = "skinned"

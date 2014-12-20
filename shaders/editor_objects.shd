@@ -19,7 +19,7 @@ uniform mat4 projection_matrix;
 
 void main( void )
 {
-	tex_coords = in_tex_coords;
+	tex_coords = in_tex_coords / 2048;
 	vec4 position = vec4(in_position, 1);
 	gl_Position = projection_matrix * view_matrix * world_matrix * position; 
  	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);

@@ -24,7 +24,7 @@ uniform mat4 projection_matrix;
 void main( void )
 {
 	vec4 wind = vec4(1, 0, 0, 0);
-	tex_coords = in_tex_coords;
+	tex_coords = in_tex_coords / 2048;
 	normals = normalize(mat3(world_matrix) * in_position);
 	normals.y = 0.0;
 	normals = normalize(normals);

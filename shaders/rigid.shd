@@ -22,7 +22,7 @@ uniform mat4 projection_matrix;
 
 void main( void )
 {
-	tex_coords = in_tex_coords;
+	tex_coords = in_tex_coords / 2048;
 	normals = mat3(world_matrix) * vec3(in_normal.x / 127, in_normal.y / 127, in_normal.z / 127);
 	
 	position = world_matrix * vec4(in_position, 1);

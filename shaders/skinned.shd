@@ -26,7 +26,7 @@ uniform mat4 bone_matrices[64];
 void main( void )
 {
 	vec4 p = vec4(in_position, 1);
-	tex_coords	= in_tex_coords;
+	tex_coords	= in_tex_coords / 2048;
 	normals		= normalize(mat3(world_matrix) * in_normal);
 	
 	position = bone_weights.x * (bone_matrices[int(bone_indices.x)] * p);

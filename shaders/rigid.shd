@@ -1,6 +1,6 @@
 {
 	"passes" : ["MAIN", "SHADOW"],
-	"attributes" : ["in_position", "in_normal", "in_tex_coords"],
+	"attributes" : ["in_position", "in_normal", "in_tangents", "in_tex_coords"],
 	"shadowmap_required" : true
 }
 
@@ -11,6 +11,7 @@
 in vec3 in_position;
 in vec2 in_tex_coords;
 in vec3 in_normal;
+in vec3 in_tangents;
 
 out vec3 normals;
 out vec2 tex_coords;

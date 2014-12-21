@@ -1,6 +1,6 @@
 {
 	"passes" : ["MAIN"],
-	"attributes" : ["in_position", "in_normals", "in_tex_coords"]
+	"attributes" : ["in_position", "in_normals", "in_tangets", "in_tex_coords"]
 }
 
 //BEGIN
@@ -10,6 +10,7 @@
 in vec3 in_position;
 in vec2 in_tex_coords;
 in vec3 in_normals;
+in vec3 in_tangents;
 
 out vec2 tex_coords;
 

@@ -1,6 +1,6 @@
 {
 	"passes" : ["MAIN", "SHADOW"],
-	"attributes" : ["bone_weights", "bone_indices", "in_position", "in_normal", "in_tex_coords"],
+	"attributes" : ["bone_weights", "bone_indices", "in_position", "in_normal", "in_tangents", "in_tex_coords"],
 	"shadowmap_required" : true
 }
 
@@ -10,6 +10,7 @@
 
 in vec3 in_position;
 in vec3 in_normal;
+in vec3 in_tangents;
 in vec4 bone_weights;
 in vec4 bone_indices;
 in vec2 in_tex_coords;

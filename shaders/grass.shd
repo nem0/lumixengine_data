@@ -1,6 +1,6 @@
 {
 	"passes" : ["MAIN"],
-	"attributes" : ["in_position", "in_normal", "in_tex_coords", "in_matrix_index"],
+	"attributes" : ["in_position", "in_normal", "in_tex_coords", "in_indices"],
 	"shadowmap_required" : true
 }
 
@@ -11,7 +11,7 @@
 in vec3 in_position;
 in vec2 in_tex_coords;
 in vec3 in_normal;
-in float in_matrix_index;
+in float in_indices;
 
 out vec3 normals;
 out vec4 position;
@@ -28,7 +28,7 @@ void main( void )
 {
 	
 	vec4 wind = vec4(1, 0, 0, 0);
-	mat4 grass_mtx = grass_matrices[int(in_matrix_index)];
+	mat4 grass_mtx = grass_matrices[int(in_indices)];
 	tex_coords	= in_tex_coords;
 	normals = normalize(mat3(grass_mtx) * in_normal);
 	

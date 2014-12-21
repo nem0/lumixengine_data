@@ -1,6 +1,6 @@
 {
 	"passes" : ["MAIN"],
-	"attributes" : ["in_position", "in_uv"]
+	"attributes" : ["in_position", "in_tex_coords"]
 }
 
 //BEGIN
@@ -8,7 +8,7 @@
 #ifdef VERTEX_SHADER
 
 in vec2 in_position;
-in vec2 in_uv;
+in vec2 in_tex_coords;
 
 out vec2 uv;
 
@@ -17,7 +17,7 @@ uniform mat4 projection_matrix;
 
 void main( void )
 {
-	uv = in_uv;
+	uv = in_tex_coords;
 	vec4 position = vec4(in_position, 0, 1);
 	gl_Position = projection_matrix * view_matrix * position; 
 }

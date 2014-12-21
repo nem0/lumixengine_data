@@ -11,6 +11,19 @@ SZ_SHORT = 2
 SZ_INT = 4
 SZ_FLOAT = 4
 
+POSITION = 0 
+FLOAT1 = 1
+FLOAT2 = 2
+FLOAT3 = 3
+FLOAT4 = 4
+INT1 = 5
+INT2 = 6
+INT3 = 7
+INT4 = 8
+SHORT2 = 9
+SHORT4 = 10
+BYTE4 = 11
+
 swap_y_z_matrix = axis_conversion('Y', 'Z', '-Z', 'Y').to_4x4()
 
 class TriWrapper(object):
@@ -370,8 +383,20 @@ def write_skinned_model_indexed(context, f, armature, objs_to_export):
         f.write(bytes(objs_to_export[index].name, "ascii"))
         index = index + 1
     
-        f.write(struct.pack("I", 11))
-        f.write(bytes("f4i4pb4b4s2", "ascii"))
+        ATTRIBUTE_COUNT = 6
+        f.write(struct.pack("I", ATTRIBUTE_COUNT))
+        write_str(f, "in_weights");
+        f.write(struct.pack("I", FLOAT4))
+        write_str(f, "in_indices");
+        f.write(struct.pack("I", INT4))
+        write_str(f, "in_position");
+        f.write(struct.pack("I", POSITION))
+        write_str(f, "in_normal");
+        f.write(struct.pack("I", BYTE4))
+        write_str(f, "in_tangents");
+        f.write(struct.pack("I", BYTE4))
+        write_str(f, "in_tex_coords");
+        f.write(struct.pack("I", SHORT2))
     
     f.write(struct.pack("I", len(indices)))
     for i in indices:
@@ -469,12 +494,22 @@ def write_rigid_model_indexed(context, f, objs_to_export, is_grass):
         f.write(bytes(objs_to_export[index].name, "ascii"))
         index = index + 1
     
+        ATTRIBUTE_COUNT = 4
         if is_grass:
-            f.write(struct.pack("I", 9))
-            f.write(bytes("pb4b4s2i1", "ascii"))
-        else:
-            f.write(struct.pack("I", 7))
-            f.write(bytes("pb4b4s2", "ascii"))
+            ATTRIBUTE_COUNT = 5
+        f.write(struct.pack("I", ATTRIBUTE_COUNT))
+        write_str(f, "in_position");
+        f.write(struct.pack("I", POSITION))
+        write_str(f, "in_normal");
+        f.write(struct.pack("I", BYTE4))
+        write_str(f, "in_tangents");
+        f.write(struct.pack("I", BYTE4))
+        write_str(f, "in_tex_coords");
+        f.write(struct.pack("I", SHORT2))
+        
+        if is_grass:
+            write_str(f, "in_indices");
+            f.write(struct.pack("I", INT1))
     
     f.write(struct.pack("I", len(indices)))
     for i in indices:

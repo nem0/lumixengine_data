@@ -17,16 +17,16 @@ out vec3 normals;
 out vec2 tex_coords;
 out vec4 position;
 
-uniform mat4 world_matrix;
+uniform mat4 world_matrix[64];
 uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
 
 void main( void )
 {
 	tex_coords = in_tex_coords / 2048;
-	normals = mat3(world_matrix) * vec3(in_normal.x / 127, in_normal.y / 127, in_normal.z / 127);
+	normals = mat3(world_matrix[gl_InstanceID]) * vec3(in_normal.x / 127, in_normal.y / 127, in_normal.z / 127);
 	
-	position = world_matrix * vec4(in_position, 1);
+	position = world_matrix[gl_InstanceID] * vec4(in_position, 1);
 	gl_Position = projection_matrix * (view_matrix * position); 
 	
 	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
@@ -69,7 +69,6 @@ void main( void )
 		uniform mat4 shadowmap_matrix1;
 		uniform mat4 shadowmap_matrix2;
 		uniform mat4 shadowmap_matrix3;
-		uniform mat4 world_matrix;
 		uniform mat4 view_matrix;
 		uniform vec3 light_dir;
 		uniform vec4 ambient_color;

@@ -1,5 +1,5 @@
 {
-	"passes" : ["MAIN"],
+	"passes" : ["MAIN", "DEFERRED"],
 	"attributes" : ["in_position", "in_color"]
 }
 

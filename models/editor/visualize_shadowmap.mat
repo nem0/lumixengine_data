@@ -1,3 +1,18 @@
 {
-"texture" : { "source" : "" }, 
-"shader" : "shaders/new_renderer/visualize_shadowmap.shd", "z_test" : true}
+"shader" : "shaders/visualize_shadowmap.shd", 
+"z_test" : true,
+"uniforms" : [
+{
+	"name" : "tDiffuse",
+	"int_value" : 1
+},
+{
+	"name" : "tNormal",
+	"int_value" : 2
+},
+{
+	"name" : "tPosition",
+	"int_value" : 3
+}
+]
+}

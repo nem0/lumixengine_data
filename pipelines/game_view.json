@@ -1,8 +1,13 @@
 {
-"frame_buffer_count" : 0,
-"frame_buffers" : [],
-"shadowmap_width" : 2048,
-"shadowmap_height" : 2048,
+"frame_buffers" : [
+	{
+		"name" : "shadowmap",
+		"width" : 2048,
+		"height" : 2048,
+		"color_buffers_count" : 0,
+		"is_depth_buffer" : true
+	}
+],
 "commands" : [
 	"set_pass", "SHADOW",
 	"render_shadowmap", 1, "main",

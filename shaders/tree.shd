@@ -1,5 +1,5 @@
 {
-	"passes" : ["MAIN", "SHADOW"],
+	"passes" : ["MAIN", "SHADOW", "DEFERRED"],
 	"shadowmap_required" : true,
 	"attributes" : ["in_position", "in_normal", "in_tangents", "in_tex_coords"]
 }
@@ -59,6 +59,26 @@ void main( void )
 			#endif
 		}
 
+	#elif defined DEFERRED_PASS
+		
+		layout (location = 0) out vec4			out_color;
+		layout (location = 1) out vec4			out_normal;
+		layout (location = 2) out vec4			out_position;
+		uniform sampler2D	tDiffuse;
+		in vec4				position;
+		in vec3				normals;
+		in vec2 			tex_coords;
+		
+		void main(void)
+		{
+			vec4 surface = texture2D(tDiffuse, tex_coords).rgba;
+			if(surface.a < 0.3)
+				discard;
+			out_position = position;
+			out_normal = vec4(normals, 1);
+			out_color = surface;
+		}
+		
 	#else
 	
 		#if __VERSION__ < 330

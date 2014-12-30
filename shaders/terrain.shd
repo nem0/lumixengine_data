@@ -1,5 +1,5 @@
 {
-	"passes" : ["MAIN", "SHADOW"],
+	"passes" : ["MAIN", "SHADOW", "DEFERRED"],
 	"attributes" : ["in_position", "in_tex_coords"],
 	"shadowmap_required" : true
 }
@@ -77,6 +77,66 @@ void main( void )
 			out_color = vec4(1, 1, 1, 1);
 		}
 
+	#elif defined DEFERRED_PASS
+		
+		layout (location = 0) out vec4			out_color;
+		layout (location = 1) out vec4			out_normal;
+		layout (location = 2) out vec4			out_position;
+		uniform sampler2D	t1;
+		uniform sampler2D	t2;
+		uniform sampler2D	t3;
+		uniform sampler2D	t4;
+		uniform sampler2D	splat_texture;
+		uniform float 		detail_texture_distance;
+		uniform sampler2D 	hm_texture;
+		uniform sampler2D 	satellite_map;
+		uniform vec3 		brush_position;
+		uniform float 		brush_size;
+		uniform mat4 		world_matrix;
+		in vec4				position;
+		in float 			cam_dist;
+		in vec2 			tex_coords;
+		in vec2 			global_uv;
+		
+		vec4 computeSurface()
+		{
+			vec4 splat = texture2D(splat_texture, global_uv).rgba;
+			//splat = normalize(splat);
+			vec4 surface = 
+				texture2D(t1, tex_coords).rgba * splat.x
+				+ texture2D(t2, tex_coords).rgba * splat.y
+				+ texture2D(t3, tex_coords).rgba * splat.z
+				+ texture2D(t4, tex_coords).rgba * splat.w;
+			vec4 surface2 = texture2D(satellite_map, global_uv).rgba;
+			float t = (cam_dist - detail_texture_distance) / detail_texture_distance;
+			t = clamp(t, 0, 1);
+			vec4 brush_color = vec4(0, 0, 1, 1) * (abs(distance(vec4(brush_position, 1), world_matrix * position) - brush_size) < 0.1 ? 1 : 0);
+			return (surface * (1 - t) + surface2 * t) + brush_color;
+		}
+		
+		vec4 computeNormal()
+		{
+			vec2 tex_coord = global_uv;
+			vec4 wave = texture2D(hm_texture, tex_coord);
+			const vec2 size = vec2(0.005,0.0);
+			const ivec3 off = ivec3(-1,0,1);
+			float s11 = wave.x;
+			float s01 = textureOffset(hm_texture, tex_coord, off.xy).x;
+			float s21 = textureOffset(hm_texture, tex_coord, off.zy).x;
+			float s10 = textureOffset(hm_texture, tex_coord, off.yx).x;
+			float s12 = textureOffset(hm_texture, tex_coord, off.yz).x;
+			vec3 va = normalize(vec3(size.xy, s21 - s01));
+			vec3 vb = normalize(vec3(size.yx, s12 - s10));
+			return vec4( cross(va, vb).xzy, s11 );
+		}
+		
+		void main( void )
+		{
+			out_position = world_matrix * position;
+			out_normal = computeNormal();
+			out_color = computeSurface();
+		}
+		
 	#else
 
 		in vec4				position;

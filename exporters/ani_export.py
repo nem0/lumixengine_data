@@ -28,6 +28,8 @@ def export_animation(context, filepath, export_selection):
 				break;
 	f.write(struct.pack("I", 0x5f4c4146))
 	f.write(struct.pack("I", 1))
+	fps = 30
+	f.write(struct.pack("I", fps)) 
 	f.write(struct.pack("I", context.scene.frame_end + 1))
 	f.write(struct.pack("I", len(o.data.bones)))
 	for frame in range(context.scene.frame_end + 1):

@@ -37,8 +37,6 @@ void main( void )
 	//position = (bone_matrices[int(bone_indices.x)] * p);
 	//position = p;
 	gl_Position = projection_matrix * view_matrix * world_matrix * position; 
-    
-	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
 
 #endif // VERTEX_SHADER

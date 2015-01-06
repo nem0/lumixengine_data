@@ -62,7 +62,6 @@ void main( void )
 	gl_Position = projection_matrix * view_matrix * world_matrix * position; 
 	global_uv = uv;
 	tex_coords = uv * m * map_size * texture_scale;
-	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
 	cam_dist = dist;
 }
 #endif

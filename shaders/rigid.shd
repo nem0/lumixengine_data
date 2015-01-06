@@ -28,8 +28,6 @@ void main( void )
 	
 	position = world_matrix[gl_InstanceID] * vec4(in_position, 1);
 	gl_Position = projection_matrix * (view_matrix * position); 
-	
-	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
 
 #endif // VERTEX_SHADER

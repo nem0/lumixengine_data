@@ -1,6 +1,6 @@
 {
 	"passes" : ["MAIN"],
-	"attributes" : ["in_position", "in_normal", "in_tex_coords", "in_indices"],
+	"attributes" : ["in_position", "in_normal", "in_tangents", "in_tex_coords", "in_indices"],
 	"shadowmap_required" : true
 }
 
@@ -29,7 +29,7 @@ void main( void )
 	
 	vec4 wind = vec4(1, 0, 0, 0);
 	mat4 grass_mtx = grass_matrices[int(in_indices)];
-	tex_coords	= in_tex_coords;
+	tex_coords	= in_tex_coords / 2048;
 	normals = normalize(mat3(grass_mtx) * in_normal);
 	
 	float scale = clamp(1.0 - (length(camera_pos - grass_mtx[3].xyz) - max_grass_distance) / max_grass_distance, 0.0, 1.0);
@@ -148,6 +148,7 @@ void main( void )
 			
 		out_color = ambient + diffuse; 
 		
+	
 		//gl_FragColor = vec4(texture2D(shadowmap, tt[split_index]).rgb, 1);
 		//gl_FragColor = vec4(light_dir, 1);
 		//gl_FragColor = vec4(1, 0, 0, 1);

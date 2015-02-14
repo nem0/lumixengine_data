@@ -17,11 +17,16 @@
 	"apply_camera", "editor", 
 	"clear", "all",
 	"polygon_mode", true,
-	"render_models", 1,
+	"render_models", 1, false,
 	"render_debug_lines",
+
+	"set_pass", "POINT_LIGHT",
+	"render_models", 1, true,
+"set_pass", "MAIN",
+
 	
 	"clear", "depth",
-	"render_models", 2,
+	"render_models", 2, false,
 	"custom", "render_gizmos",
 	"render_debug_texts"
 	]

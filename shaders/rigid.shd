@@ -1,5 +1,5 @@
 {
-	"passes" : ["MAIN", "SHADOW"],
+	"passes" : ["MAIN", "SHADOW", "POINT_LIGHT"],
 	"attributes" : ["in_position", "in_normal", "in_tangents", "in_tex_coords"],
 	"shadowmap_required" : true
 }
@@ -75,6 +75,10 @@ void main( void )
 		uniform float diffuse_intensity;
 		uniform vec4 fog_color;
 		uniform float fog_density;
+		#ifdef POINT_LIGHT_PASS
+			uniform vec3 light_pos;
+			uniform float light_range;
+		#endif
 
 
 		vec2 poissonDisk[4] = vec2[](
@@ -125,6 +129,25 @@ void main( void )
 		}
 		#endif
 		
+		#ifdef POINT_LIGHT_PASS
+		
+		void main( void )
+		{
+			float shadow = 1.0 - clamp((length(position.xyz - light_pos) / light_range), 0.0, 1.0);
+
+			vec4 surface = texture2D(tDiffuse, tex_coords).rgba;
+			#ifdef ALPHA_CUTOUT
+				if(surface.a < 0.30)
+					discard;
+			#endif
+
+			vec4 diffuse = shadow * diffuse_intensity * surface * diffuse_color;
+				
+			vec4 p = view_matrix * position;
+			out_color = mix(diffuse, fog_color, getFogFactor(p.z / p.w));
+		}
+		
+		#else
 		void main( void )
 		{
 			#ifdef SHADOW_RECEIVER
@@ -170,5 +193,7 @@ void main( void )
 			vec4 p = view_matrix * position;
 			out_color = mix(diffuse + ambient, fog_color, getFogFactor(p.z / p.w));
 		}
+		#endif // if POINT_LIGHT_PASS else
+		
 	#endif // if SHADOW_PASS else
 #endif // FRAGMENT_SHADER

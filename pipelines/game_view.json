@@ -16,6 +16,6 @@
 	"set_pass", "MAIN",
 	"apply_camera", "main", 
 	"clear", "all",
-	"render_models", 1
+	"render_models", 1, false
 ]
 }

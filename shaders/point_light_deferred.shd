@@ -1,0 +1,45 @@
+
+{
+	"passes" : ["MAIN", "SHADOW"],
+	"attributes" : ["in_position"],
+	"shadowmap_required" : true
+}
+
+//BEGIN
+
+#ifdef VERTEX_SHADER
+
+in vec3 in_position;
+in vec2 in_tex_coords;
+
+out vec2 tex_coords;
+out vec4 position;
+
+uniform mat4 view_matrix;
+uniform mat4 projection_matrix;
+
+void main( void )
+{
+	position = vec4(in_position, 1);
+	gl_Position = projection_matrix * (view_matrix * position); 
+}
+
+#endif // VERTEX_SHADER
+
+#ifdef FRAGMENT_SHADER
+
+	in vec4				position;
+	in vec2 			tex_coords;
+	out vec4			out_color;
+	uniform vec3 		light_pos;
+	uniform float 		light_range;
+	uniform vec4 		diffuse_color;
+	
+	void main( void )
+	{
+		float alpha = 1 - clamp(length(light_pos  - position.xyz) / light_range, 0, 1);
+		//out_color = vec4(diffuse_color.xyz, 0);
+		out_color = vec4(diffuse_color.xyz, alpha);
+	}
+
+#endif // FRAGMENT_SHADER

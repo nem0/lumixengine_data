@@ -1,0 +1,6 @@
+{
+"shader" : "shaders/point_light_deferred.shd", 
+"z_test" : false,
+"uniforms" : [
+]
+}

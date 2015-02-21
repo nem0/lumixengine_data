@@ -39,11 +39,18 @@
 	"bind_framebuffer_texture", "main_framebuffer", 1, 2,
 	"bind_framebuffer_texture", "main_framebuffer", 2, 3,
 	"clear", "all",
+	"apply_camera", "editor",
 	"draw_screen_quad", 
 	-1, -1, 0, 0, 
 	1, -1, 1, 0, 
 	1, 1, 1, 1, 
 	-1, 1, 0, 1, 
-	"models/editor/visualize_shadowmap.mat"
+	"models/editor/visualize_shadowmap.mat",
+	
+	"apply_camera", "editor", 
+	"bind_framebuffer_texture", "main_framebuffer", 0, 1,
+	"bind_framebuffer_texture", "main_framebuffer", 1, 2,
+	"bind_framebuffer_texture", "main_framebuffer", 2, 3,
+	"deferred_point_light_loop", "models/editor/point_light_deferred.mat"
 	]
 }

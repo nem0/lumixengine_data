@@ -185,7 +185,7 @@ def remove_face_uv_skinned(mesh, verts, tri_list, bone_indices, o):
     for i, vert in enumerate(verts):
         index_list.append(vert_index)
 
-        pt = Point3D(vert.co, vert.normal, tangets[vert.index])  # reuse, should be ok
+        pt = Point3D(vert.co, vert.normal, tangents[vert.index])  # reuse, should be ok
         uvmap = [None] * len(unique_uvs[i])
         for ii, uv_3ds in unique_uvs[i].values():
             pt.w = compute_weights(vert, bone_indices, o.vertex_groups, len(o.vertex_groups))
@@ -428,6 +428,12 @@ def write_skinned_model_indexed(context, f, armature, objs_to_export):
         f.write(struct.pack("h", int(uv.uv[1] * 2048)))
 
     write_skeleton(f, armature)
+
+    lod_count = 1
+    f.write(struct.pack("I", lod_count))
+    to_mesh = len(meshes) - 1
+    f.write(struct.pack("i", to_mesh))
+    f.write(struct.pack("f", sys.float_info.max))
 
     return meshes
 

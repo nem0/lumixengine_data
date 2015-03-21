@@ -21,6 +21,9 @@ def export_animation(context, filepath, export_selection):
 	o = None
 	if export_selection:
 		o = context.selected_objects[0]
+		a = o.find_armature();
+		if a != None:
+			o = a
 	else:
 		for i in context.scene.objects:
 			if i.find_armature() != None:

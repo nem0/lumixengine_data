@@ -291,18 +291,15 @@ def write_physics(f, o, context):
                 write_indices(f, o, m, face, 3);
                 write_indices(f, o, m, face, 2);
                 
-
-def write_skeleton(f, armature):
-    bone_count = len(armature.data.bones)
-    f.write(struct.pack("I", bone_count))    
-    for b in armature.data.bones:
-        write_str(f, b.name)
-        if b.parent == None:
+def write_bone(f, armature, bone, bones):
+    if not bone.name in bones:
+        write_str(f, bone.name)
+        if bone.parent == None:
             write_str(f, "")
-            mtx = armature.matrix_world * b.matrix_local;
         else:
-            write_str(f, b.parent.name)
-            mtx = armature.matrix_world * b.matrix_local;
+            write_bone(f, armature, bone.parent, bones)
+            write_str(f, bone.parent.name)
+        mtx = armature.matrix_world * bone.matrix_local;
         mtx = swap_y_z_matrix * mtx
         p = mtx.translation;
         f.write(struct.pack("f", round(p.x, 8)))
@@ -313,7 +310,14 @@ def write_skeleton(f, armature):
         f.write(struct.pack("f", round(q.y, 8)))
         f.write(struct.pack("f", round(q.z, 8)))
         f.write(struct.pack("f", round(q.w, 8)))
+        bones[bone.name] = True
 
+def write_skeleton(f, armature):
+    bone_count = len(armature.data.bones)
+    f.write(struct.pack("I", bone_count))
+    bones = {}
+    for b in armature.data.bones:
+        write_bone(f, armature, b, bones)
 
 def write_model_header(f):
     f.write(bytes("OML_", "ascii"))

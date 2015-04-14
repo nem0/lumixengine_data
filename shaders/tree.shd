@@ -104,6 +104,7 @@ void main( void )
 		uniform vec4 fog_color;
 		uniform float fog_density;
 		#ifdef POINT_LIGHT_PASS
+			uniform float light_fov;
 			uniform vec3 light_pos;
 			uniform float light_range;
 		#endif
@@ -154,8 +155,10 @@ void main( void )
 		
 		void main( void )
 		{
-			float shadow = 1.0 - clamp((length(position.xyz - light_pos) / light_range), 0.0, 1.0);
-
+			vec3 to_light_dir = position.xyz - light_pos;
+			float shadow = 1.0 - clamp((length(to_light_dir) / light_range), 0.0, 1.0);
+			shadow *= 1 - clamp(acos(dot(normalize(to_light_dir), light_dir)) / light_fov, 0, 1);
+			
 			vec4 surface = texture2D(tDiffuse, tex_coords).rgba;
 			#ifdef ALPHA_CUTOUT
 				if(surface.a < 0.30)

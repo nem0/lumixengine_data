@@ -172,6 +172,7 @@ void main( void )
 		uniform float fog_density;
 		#ifdef POINT_LIGHT_PASS
 			uniform vec3 light_pos;
+			uniform float light_fov;
 			uniform float light_range;
 		#endif
 		
@@ -225,8 +226,10 @@ void main( void )
 		void main( void )
 		{
 			vec4 world_pos = world_matrix * position;
-			float shadow = 1.0 - clamp((length(world_pos.xyz - light_pos) / light_range), 0.0, 1.0);
-
+			vec3 to_light_dir = world_pos.xyz - light_pos;
+			float shadow = 1.0 - clamp((length(to_light_dir) / light_range), 0.0, 1.0);
+			shadow *= 1 - clamp(acos(dot(normalize(to_light_dir), light_dir)) / light_fov, 0, 1);
+			
 			vec4 splat = texture2D(splat_texture, global_uv).rgba;
 			//splat = normalize(splat);
 			vec4 surface = 

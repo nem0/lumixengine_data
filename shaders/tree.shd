@@ -14,6 +14,7 @@ in vec3 in_normal;
 in vec3 in_tangents;
 
 out vec3 normals;
+out vec3 tangents;
 out vec4 position;
 out vec2 tex_coords;
 
@@ -29,6 +30,7 @@ void main( void )
 	normals = normalize(mat3(world_matrix[gl_InstanceID]) * in_position);
 	normals.y = 0.0;
 	normals = normalize(normals);
+	tangents = vec3(0, 1, 0);
 	position = vec4(in_position, 1);
 	position = position + position.y * 0.01 * sin(3*time+world_matrix[gl_InstanceID][3].x*0.3) * wind;
 	position = world_matrix[gl_InstanceID] * position;
@@ -85,12 +87,16 @@ void main( void )
 
 		in vec4		position;
 		in vec3		normals;
+		in vec3		tangents;
 		in vec2 	tex_coords;
 
 		out vec4			out_color;
 
 		uniform sampler2D	tDiffuse;
 		uniform sampler2D	shadowmap;
+		#ifdef NORMAL_MAPPING
+			uniform sampler2D	normalmap;
+		#endif
 		uniform mat4 shadowmap_matrix0;
 		uniform mat4 shadowmap_matrix1;
 		uniform mat4 shadowmap_matrix2;
@@ -117,6 +123,21 @@ void main( void )
 			return fResult;
 		}
 
+		vec3 computeNormal()
+		{
+			#ifdef NORMAL_MAPPING
+				mat3 tangent_space_mtx = transpose(mat3(
+					tangents,
+					cross(tangents, normals),
+					normals
+				));
+				vec3 local_normal = texture2D(normalmap, tex_coords).rgb * 2 - 1;
+				return tangent_space_mtx * local_normal;
+			#else
+				return normals;
+			#endif
+		}
+		
 		#ifdef SHADOW_RECEIVER
 
 			float texture2DCompare(sampler2D depths, vec2 uv, ivec2 offset, float compare){
@@ -158,7 +179,8 @@ void main( void )
 			vec3 to_light_dir = position.xyz - light_pos;
 			float shadow = 1.0 - clamp((length(to_light_dir) / light_range), 0.0, 1.0);
 			shadow *= 1 - clamp(acos(dot(normalize(to_light_dir), light_dir)) / light_fov, 0, 1);
-			shadow = shadow * max(0, dot(normals, -light_dir));
+			vec3 normal = computeNormal();
+			shadow = shadow * max(0, dot(normal, -light_dir));
 			
 			vec4 surface = texture2D(tDiffuse, tex_coords).rgba;
 			#ifdef ALPHA_CUTOUT
@@ -202,7 +224,8 @@ void main( void )
 					split_index = 2;
 					
 				float shadow = step(shadow_coord[split_index].z, 1) * texture2DShadowLerp(shadowmap, textureSize(shadowmap, 0), tt[split_index], shadow_coord[split_index].z - 0.0001);
-				shadow = shadow * max(0, dot(normals, -light_dir));
+				vec3 normal = computeNormal();
+				shadow = shadow * max(0, dot(normal, -light_dir));
 			#endif
 
 			vec4 surface = texture2D(tDiffuse, tex_coords).rgba;
@@ -211,7 +234,7 @@ void main( void )
 					discard;
 			#endif
 
-			vec4 ambient = 			ambient_intensity * surface * ambient_color;
+			vec4 ambient = ambient_intensity * surface * ambient_color;
 			#ifdef SHADOW_RECEIVER
 				vec4 diffuse = shadow * diffuse_intensity * surface * diffuse_color;
 			#else
@@ -221,6 +244,7 @@ void main( void )
 			vec4 p = view_matrix * position;
 			out_color = mix(ambient + diffuse, fog_color, getFogFactor(p.z / p.w));
 
+			//out_color = vec4(normal, 1);
 			//out_color = vec4(normals.x, 0, 0, 1);
 			//gl_FragColor = vec4(light_dir, 1);
 			//gl_FragColor = vec4(1, 0, 0, 1);

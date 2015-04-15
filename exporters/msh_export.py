@@ -67,6 +67,7 @@ def UVKey(uv):
 
 def extract_tangents(mesh):
     tangents = []
+    mesh.calc_tangents();
     for i in range(len(mesh.vertices)):
         tangents.append([0, mathutils.Vector()])
 

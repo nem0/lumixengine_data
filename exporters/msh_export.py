@@ -65,22 +65,29 @@ class PointUV(object):
 def UVKey(uv):
     return round(uv[0], 6), round(uv[1], 6)
 
-def extract_tangents(mesh):
+def extract_tangent_space(mesh):
     tangents = []
+    normals = []
+    mesh.calc_normals();
     mesh.calc_tangents();
     for i in range(len(mesh.vertices)):
         tangents.append([0, mathutils.Vector()])
+        normals.append([0, mathutils.Vector()])
 
     for l in mesh.loops:
         i = l.vertex_index
         tangents[i][0] = tangents[i][0] + 1
         tangents[i][1] = tangents[i][1] + l.tangent
+        normals[i][0] = normals[i][0] + 1
+        normals[i][1] = normals[i][1] + l.normal
 
     tmp = []
     for t in tangents:
         tmp.append(t[1] / t[0])
-    
-    return tmp
+    tmp2 = []
+    for n in normals:
+        tmp2.append(n[1] / n[0]);
+    return tmp, tmp2
     
 def extract_triangles(mesh):
     tri_list = []
@@ -138,12 +145,12 @@ def remove_face_uv(mesh, verts, tri_list):
     vert_array = []
     uv_array = []
     index_list = []
-    tangents = extract_tangents(mesh)
+    tangents, normals = extract_tangent_space(mesh)
 
     for i, vert in enumerate(verts):
         index_list.append(vert_index)
 
-        pt = Point3D(vert.co, vert.normal, tangents[vert.index])
+        pt = Point3D(vert.co, normals[vert.index], tangents[vert.index])
         uvmap = [None] * len(unique_uvs[i])
         for ii, uv_3ds in unique_uvs[i].values():
             vert_array.append(pt)
@@ -181,12 +188,12 @@ def remove_face_uv_skinned(mesh, verts, tri_list, bone_indices, o):
     vert_array = []
     uv_array = []
     index_list = []
-    tangents = extract_tangents(mesh)
+    tangents, normals = extract_tangent_space(mesh)
     
     for i, vert in enumerate(verts):
         index_list.append(vert_index)
 
-        pt = Point3D(vert.co, vert.normal, tangents[vert.index])  # reuse, should be ok
+        pt = Point3D(vert.co, normals[vert.index], tangents[vert.index])  # reuse, should be ok
         uvmap = [None] * len(unique_uvs[i])
         for ii, uv_3ds in unique_uvs[i].values():
             pt.w = compute_weights(vert, bone_indices, o.vertex_groups, len(o.vertex_groups))

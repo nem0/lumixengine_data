@@ -25,8 +25,9 @@ uniform mat4 projection_matrix;
 void main( void )
 {
 	tex_coords = in_tex_coords / 2048;
-	normals = mat3(world_matrix[gl_InstanceID]) * vec3(in_normal.x / 127, in_normal.z / 127, in_normal.y / 127);
-	tangents = mat3(world_matrix[gl_InstanceID]) * vec3(in_tangents.x / 127, in_tangents.y / 127, in_tangents.z / 127);
+	mat3 world_matrix3x3 = mat3(world_matrix[gl_InstanceID]);
+	normals = world_matrix3x3 * in_normal.xyz / 127;
+	tangents = world_matrix3x3 * in_tangents.xyz / 127;
 	
 	position = world_matrix[gl_InstanceID] * vec4(in_position, 1);
 	gl_Position = projection_matrix * (view_matrix * position); 
@@ -53,7 +54,7 @@ void main( void )
 					discard;
 				out_color = vec4(1, 1, 1, normals.x + tangents.x);
 			#else
-				out_color = vec4(tex_coords, 1, normals.x + tangents.x); // if I remove tex_coords from here, it also does not work correctly in #ifdef ALPHA_CUTOUT
+				out_color = vec4(tex_coords, 1, normals.x + tangents.x); // if I remove tex_coords, normals from here, it also does not work correctly in #ifdef ALPHA_CUTOUT
 			#endif
 		}
 

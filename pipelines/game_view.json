@@ -4,8 +4,7 @@
 		"name" : "shadowmap",
 		"width" : 2048,
 		"height" : 2048,
-		"color_buffers_count" : 0,
-		"is_depth_buffer" : true
+		"renderbuffers" : [{"format" : "depth24"}]
 	}
 ],
 "commands" : [

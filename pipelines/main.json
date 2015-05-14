@@ -4,14 +4,14 @@
 		"name" : "shadowmap",
 		"width" : 2048,
 		"height" : 2048,
-		"color_buffers_count" : 0,
-		"is_depth_buffer" : true
+		"renderbuffers" : [ {"format" : "rg16"}, {"format" : "depth32"}]
 	}
 ],
 "commands" : [
 	"set_pass", "SHADOW",
 	"render_shadowmap", 1, "editor",
 	"bind_shadowmap",
+	"bind_framebuffer_texture", "shadowmap", 0, 7, 
 
 	"set_pass", "MAIN",
 	"apply_camera", "editor", 

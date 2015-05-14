@@ -12,7 +12,7 @@
 	"render_shadowmap", 1, "editor",
 	"bind_shadowmap",
 	"bind_framebuffer_texture", "shadowmap", 0, 7, 
-
+	
 	"set_pass", "MAIN",
 	"apply_camera", "editor", 
 	"clear", "all",

@@ -10,7 +10,7 @@
 "commands" : [
 	"set_pass", "SHADOW",
 	"render_shadowmap", 1, "main",
-	"bind_shadowmap",
+	"bind_framebuffer_texture", "shadowmap", 1, "shadowmap", 
 	
 	"set_pass", "MAIN",
 	"apply_camera", "main", 

@@ -1,7 +1,6 @@
 {
 	"passes" : ["MAIN", "SHADOW", "POINT_LIGHT"],
-	"attributes" : ["in_position", "in_normal", "in_tangents", "in_tex_coords"],
-	"shadowmap_required" : true
+	"attributes" : ["in_position", "in_normal", "in_tangents", "in_tex_coords"]
 }
 
 //BEGIN
@@ -44,16 +43,11 @@ void main( void )
 	in vec2 			tex_coords;
 	out vec4			out_color;
 	uniform sampler2D	tDiffuse;
-	uniform sampler2D	xx7;
 	
 	#ifdef SHADOW_PASS
 
-
 		void main( void )
 		{
-			float depth = position.z / position.w;
-			depth = depth * 0.5 + 0.5;
-			
 			#ifdef ALPHA_CUTOUT
 				vec4 surface = texture2D(tDiffuse, tex_coords).rgba;
 				if(surface.a < 0.3)
@@ -63,12 +57,6 @@ void main( void )
 				out_color = vec4(tex_coords, 1, normals.x + tangents.x); // if I remove tex_coords, normals from here, it also does not work correctly in #ifdef ALPHA_CUTOUT
 				out_color = vec4(1, 0, 0, 1);
 			#endif
-			
-			float moment2 = depth * depth;
-			float dx = dFdx(depth);
-			float dy = dFdy(depth);
-			moment2 += 0.25*(dx*dx+dy*dy) ;
-			out_color = vec4(depth, moment2, 0, 0);
 		}
 
 	#else
@@ -117,50 +105,11 @@ void main( void )
 		}
 
 		#ifdef SHADOW_RECEIVER
-			float texture2DCompare(sampler2D depths, vec2 uv, ivec2 offset, float compare){
-				float depth = textureOffset(depths, uv, offset).r;
-				return step(compare, depth);
-			}
-
-			float PCF(sampler2D depths, vec2 size, vec2 uv, float compare){
-				float result = 0.0;
-				for(int x=-1; x<=1; x++){
-					for(int y=-1; y<=1; y++){
-						ivec2 off = ivec2(x,y);
-						result += texture2DCompare(depths, uv, off, compare);
-					}
-				}
-				return result/9.0;
-			}
-			
-			float linstep(float low, float high, float v){
-				return clamp((v-low)/(high-low), 0.0, 1.0);
-			}
-			
+						
 			float VSM(sampler2D depths, vec2 uv, float compare){
-				vec2 moments = texture2D(depths, uv).xy;
-				float p = smoothstep(compare-0.0001, compare, moments.x);
-				float variance = max(moments.y - moments.x*moments.x, -0.001);
-				float d = compare - moments.x;
-				float p_max = linstep(0.2, 1.0, variance / (variance + d*d));
-				return p; //clamp(max(p, p_max), 0.0, 1.0);
+				return smoothstep(compare-0.0001, compare, texture2D(depths, uv).x);
 			}
 			
-			float texture2DShadowLerp(sampler2D depths, vec2 size, vec2 uv, float compare){
-				vec2 texelSize = vec2(1.0)/size;
-				vec2 f = fract(uv*size+0.5);
-				vec2 centroidUV = floor(uv*size+0.5)/size;
-
-				float lb = texture2DCompare(depths, centroidUV, ivec2(0, 0), compare);
-				float lt = texture2DCompare(depths, centroidUV, ivec2(0, 1), compare);
-				float rb = texture2DCompare(depths, centroidUV, ivec2(1, 0), compare);
-				float rt = texture2DCompare(depths, centroidUV, ivec2(1, 1), compare);
-				float a = mix(lb, lt, f.y);
-				float b = mix(rb, rt, f.y);
-				float c = mix(a, b, f.x);
-				return c;
-			}
-		
 			float getShadowmapValue()
 			{
 				vec3 shadow_coord[4] = vec3[](
@@ -187,7 +136,6 @@ void main( void )
 					* step(0.01, shadow_coord[2].x)	* step(0.01, shadow_coord[2].y) > 0)
 					split_index = 2;
 
-				//return step(shadow_coord[split_index].z, 1) * texture2DShadowLerp(shadowmap, textureSize(shadowmap, 0), tt[split_index], shadow_coord[split_index].z);
 				return step(shadow_coord[split_index].z, 1) * VSM(shadowmap, tt[split_index], shadow_coord[split_index].z);
 			}
 		#else
@@ -231,9 +179,6 @@ void main( void )
 			shadow *=  max(0.0, dot(normal, -to_light_dir));
 			vec4 diffuse = shadow * diffuse_intensity * surface * diffuse_color;
 			out_color = mix(attenuation * (diffuse + ambient), fog_color, getFogFactor(p.z / p.w));
-			vec4 sh = texture2D(xx7, tex_coords);
-			 //out_color = vec4(sh.y, 0, 0, 1);
-			//			out_color = vec4(normal, 1);
 		}
 		
 	#endif // if SHADOW_PASS else

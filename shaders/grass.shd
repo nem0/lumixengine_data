@@ -1,7 +1,6 @@
 {
 	"passes" : ["MAIN", "POINT_LIGHT"],
-	"attributes" : ["in_position", "in_normal", "in_tangents", "in_tex_coords", "in_indices"],
-	"shadowmap_required" : true
+	"attributes" : ["in_position", "in_normal", "in_tangents", "in_tex_coords", "in_indices"]
 }
 
 //BEGIN

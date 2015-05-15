@@ -1,7 +1,6 @@
 {
 	"passes" : ["MAIN", "DEFERRED"],
-	"attributes" : ["in_position", "in_normal", "in_tangents", "in_tex_coords"],
-	"shadowmap_required" : true
+	"attributes" : ["in_position", "in_normal", "in_tangents", "in_tex_coords"]
 }
 //BEGIN
 

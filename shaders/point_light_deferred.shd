@@ -1,8 +1,7 @@
 
 {
 	"passes" : ["MAIN"],
-	"attributes" : ["in_position"],
-	"shadowmap_required" : true
+	"attributes" : ["in_position"]
 }
 
 //BEGIN

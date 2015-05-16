@@ -1,31 +1,33 @@
-{
-"frame_buffers" : [
+framebuffers = {
 	{
-		"name" : "shadowmap",
-		"width" : 2048,
-		"height" : 2048,
-		"renderbuffers" : [{"format" : "rg16"}, {"format" : "depth32"}]
+		name = "shadowmap",
+		width = 2048,
+		height = 2048,
+		renderbuffers = {
+			{format = "rg16"}, 
+			{format = "depth32"}
+		}
 	}
-],
-"commands" : [
-	"set_pass", "SHADOW",
-	"render_shadowmap", 1, "editor",
-	"bind_framebuffer_texture", "shadowmap", 1, "shadowmap", 
-
-	"set_pass", "MAIN",
-	"apply_camera", "editor", 
-	"clear", "all",
-	"polygon_mode", true,
-	"render_models", 1, false,
-	"render_debug_lines",
-
-	"set_pass", "POINT_LIGHT",
-	"render_models", 1, true,
-	"set_pass", "MAIN",
-
-	"clear", "depth",
-	"render_models", 2, false,
-	"custom", "render_gizmos",
-	"render_debug_texts"
-	]
 }
+
+function render(pipeline)
+	setPass(pipeline, "SHADOW")
+	renderShadowmap(pipeline, 1, "editor")
+	bindFramebufferTexture(pipeline, "shadowmap", 1, "shadowmap")
+	
+	setPass(pipeline, "MAIN")
+	applyCamera(pipeline, "editor")
+	clear("all")
+	polygonMode(pipeline, true)
+	renderModels(pipeline, 1, false)
+	renderDebugLines(pipeline)
+	
+	setPass("POINT_LIGHT")
+	renderModels(pipeline, 1, true)
+	setPass(pipeline, "MAIN")
+	
+	clear("depth")
+	renderModels(pipeline, 2, false)
+	executeCustomCommand(pipeline, "render_gizmos")
+	renderDebugTexts(pipeline)
+end

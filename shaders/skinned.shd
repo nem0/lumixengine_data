@@ -1,49 +1,42 @@
-{
-	"passes" : ["MAIN", "SHADOW"],
-	"attributes" : ["in_weights", "in_indices", "in_position", "in_normal", "in_tangents", "in_tex_coords"]
-}
+passes = {"MAIN", "SHADOW"}
+attributes = {"in_weights", "in_indices", "in_position", "in_normal", "in_tangents", "in_tex_coords"}
+vertex_shader = [[
 
-//BEGIN
+	in vec3 in_position;
+	in vec3 in_normal;
+	in vec3 in_tangents;
+	in vec4 in_weights;
+	in vec4 in_indices;
+	in vec2 in_tex_coords;
 
-#ifdef VERTEX_SHADER
+	out vec3 normals;
+	out vec4 position;
+	out vec2 tex_coords;
 
-in vec3 in_position;
-in vec3 in_normal;
-in vec3 in_tangents;
-in vec4 in_weights;
-in vec4 in_indices;
-in vec2 in_tex_coords;
+	uniform mat4 world_matrix;
+	uniform mat4 view_matrix;
+	uniform mat4 projection_matrix;
+	uniform mat4 bone_matrices[64];
 
-out vec3 normals;
-out vec4 position;
-out vec2 tex_coords;
+	void main( void )
+	{
+		vec4 p = vec4(in_position, 1);
+		tex_coords	= in_tex_coords / 2048;
+		normals		= normalize(mat3(world_matrix) * in_normal);
+		
+		position = in_weights.x * (bone_matrices[int(in_indices.x)] * p);
+		position = position + in_weights.y * (bone_matrices[int(in_indices.y)] * p);
+		position = position + in_weights.z * (bone_matrices[int(in_indices.z)] * p);
+		position = position + in_weights.w * (bone_matrices[int(in_indices.w)] * p);
+		//position = (bone_matrices[0] * p);
+		//position = (bone_matrices[int(in_indices.x)] * p);
+		//position = p;
+		gl_Position = projection_matrix * view_matrix * world_matrix * position; 
+	}
 
-uniform mat4 world_matrix;
-uniform mat4 view_matrix;
-uniform mat4 projection_matrix;
-uniform mat4 bone_matrices[64];
+]]
 
-void main( void )
-{
-	vec4 p = vec4(in_position, 1);
-	tex_coords	= in_tex_coords / 2048;
-	normals		= normalize(mat3(world_matrix) * in_normal);
-	
-	position = in_weights.x * (bone_matrices[int(in_indices.x)] * p);
-	position = position + in_weights.y * (bone_matrices[int(in_indices.y)] * p);
-	position = position + in_weights.z * (bone_matrices[int(in_indices.z)] * p);
-	position = position + in_weights.w * (bone_matrices[int(in_indices.w)] * p);
-	//position = (bone_matrices[0] * p);
-	//position = (bone_matrices[int(in_indices.x)] * p);
-	//position = p;
-	gl_Position = projection_matrix * view_matrix * world_matrix * position; 
-}
-
-#endif // VERTEX_SHADER
-
-//~VS
-
-#ifdef FRAGMENT_SHADER
+fragment_shader = [[
 
 	#ifdef SHADOW_PASS
 
@@ -182,4 +175,4 @@ void main( void )
 			out_color = mix(diffuse + ambient, fog_color, getFogFactor(p.z / p.w));
 		}
 	#endif // if SHADOW_PASS else
-#endif // FRAGMENT_SHADER
+]]

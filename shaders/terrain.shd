@@ -1,11 +1,6 @@
-{
-	"passes" : ["MAIN", "SHADOW", "DEFERRED", "POINT_LIGHT"],
-	"attributes" : ["in_position", "in_tex_coords"]
-}
-
-//
-
-#ifdef VERTEX_SHADER
+passes = {"MAIN", "SHADOW", "DEFERRED", "POINT_LIGHT"}
+attributes = {"in_position", "in_tex_coords"}
+vertex_shader = [[
 
 in vec3 in_position;
 in vec2 in_tex_coords;
@@ -63,9 +58,9 @@ void main( void )
 	tex_coords = uv * m * map_size * texture_scale;
 	cam_dist = dist;
 }
-#endif
+]]
 
-#ifdef FRAGMENT_SHADER
+fragment_shader = [[
 
 	#ifdef SHADOW_PASS
 
@@ -363,4 +358,4 @@ void main( void )
 		#endif // if POINT_LIGHT_PASS else
 		
 	#endif // if SHADOW_PASS else
-#endif // FRAGMENT_SHADER
+]]

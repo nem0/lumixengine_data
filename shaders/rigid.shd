@@ -1,11 +1,6 @@
-{
-	"passes" : ["MAIN", "SHADOW", "POINT_LIGHT"],
-	"attributes" : ["in_position", "in_normal", "in_tangents", "in_tex_coords"]
-}
-
-//BEGIN
-
-#ifdef VERTEX_SHADER
+passes = {"MAIN", "SHADOW", "POINT_LIGHT"}
+attributes = {"in_position", "in_normal", "in_tangents", "in_tex_coords"}
+vertex_shader = [[
 
 in vec3 in_position;
 in vec3 in_normal;
@@ -32,11 +27,9 @@ void main( void )
 	gl_Position = projection_matrix * (view_matrix * position); 
 }
 
-#endif // VERTEX_SHADER
+]]
 
-
-#ifdef FRAGMENT_SHADER
-
+fragment_shader = [[
 	in vec4 			position;
 	in vec3				normals;
 	in vec3				tangents;
@@ -182,4 +175,4 @@ void main( void )
 		}
 		
 	#endif // if SHADOW_PASS else
-#endif // FRAGMENT_SHADER
+]]

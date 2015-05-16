@@ -1,38 +1,31 @@
-{
-	"passes" : ["MAIN", "DEFERRED"],
-	"attributes" : ["in_position", "in_tex_coords"]
-}
+passes = {"MAIN", "DEFERRED"}
+attributes = {"in_position", "in_tex_coords"}
 
-//BEGIN
+vertex_shader = [[
 
-#ifdef VERTEX_SHADER
+	in vec2 in_position;
+	in vec2 in_tex_coords;
 
-in vec2 in_position;
-in vec2 in_tex_coords;
+	out vec2 uv;
 
-out vec2 uv;
+	uniform mat4 view_matrix;
+	uniform mat4 projection_matrix;
 
-uniform mat4 view_matrix;
-uniform mat4 projection_matrix;
+	void main( void )
+	{
+		uv = in_tex_coords;
+		vec4 position = vec4(in_position, 0, 1);
+		gl_Position = projection_matrix * view_matrix * position; 
+	}
+]]
 
-void main( void )
-{
-	uv = in_tex_coords;
-	vec4 position = vec4(in_position, 0, 1);
-	gl_Position = projection_matrix * view_matrix * position; 
-}
+fragment_shader = [[
+	in vec2 			uv;
+	out vec4			out_color;
+	uniform sampler2D	diffuse;
 
-//~VS
-#endif
-
-
-#ifdef FRAGMENT_SHADER
-in vec2 			uv;
-out vec4			out_color;
-uniform sampler2D	diffuse;
-
-void main( void )
-{
-	out_color = texture2D(diffuse, uv).rgba;
-}
-#endif
+	void main( void )
+	{
+		out_color = texture2D(diffuse, uv).rgba;
+	}
+]]

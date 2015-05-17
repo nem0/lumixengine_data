@@ -3,7 +3,7 @@ attributes = {"in_position", "in_normal", "in_tangents", "in_tex_coords"}
 
 require "shaders/common"
 
-vertex_shader = [[
+vertex_shader = createShaderSource([[
 
 in vec3 in_position;
 in vec3 in_normal;
@@ -25,11 +25,11 @@ void main( void )
 	mat3 world_matrix3x3 = mat3(world_matrix[gl_InstanceID]);
 	normals = world_matrix3x3 * in_normal.xyz / 127;
 	tangents = world_matrix3x3 * in_tangents.xyz / 127;
-	
+
 	position = world_matrix[gl_InstanceID] * vec4(in_position, 1);
 	gl_Position = projection_matrix * (view_matrix * position); 
 }
 
-]]
+]])
 
 fragment_shader = base_fragment_shader

@@ -3,7 +3,7 @@ attributes = {"in_weights", "in_indices", "in_position", "in_normal", "in_tangen
 
 require "shaders/common"
 
-vertex_shader = [[
+vertex_shader = createShaderSource([[
 
 	in vec3 in_position;
 	in vec3 in_normal;
@@ -54,6 +54,6 @@ vertex_shader = [[
 		gl_Position = projection_matrix * view_matrix * position; 
 	}
 
-]]
+]])
 
 fragment_shader = base_fragment_shader

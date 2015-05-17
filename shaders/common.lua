@@ -1,4 +1,11 @@
-common_fragment = [[
+function createShaderSource(source)
+    local lineNumber = debug.getinfo(2).currentline
+    preamble = "#line " .. lineNumber .. "\n"
+    return preamble .. source
+end
+
+
+common_fragment = createShaderSource([[
 
 	float getFogFactor(float fFogCoord, float fog_density) 
 	{ 
@@ -68,8 +75,9 @@ common_fragment = [[
 		#endif
 	}
 	
-]]
-base_fragment_shader = common_fragment .. [[
+]])
+
+base_fragment_shader = common_fragment .. createShaderSource([[
 	in vec4 			position;
 	in vec3				normals;
 	in vec3				tangents;
@@ -152,4 +160,4 @@ base_fragment_shader = common_fragment .. [[
 		}
 		
 	#endif // if SHADOW_PASS else
-]]
+]])

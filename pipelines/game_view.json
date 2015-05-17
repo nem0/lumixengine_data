@@ -1,20 +1,21 @@
-{
-"frame_buffers" : [
+framebuffers = {
 	{
-		"name" : "shadowmap",
-		"width" : 2048,
-		"height" : 2048,
-		"renderbuffers" : [{"format" : "depth24"}]
+		name = "shadowmap",
+		width = 2048,
+		height = 2048,
+		renderbuffers = {
+			{format = "depth32"}
+		}
 	}
-],
-"commands" : [
-	"set_pass", "SHADOW",
-	"render_shadowmap", 1, "main",
-	"bind_framebuffer_texture", "shadowmap", 1, "shadowmap", 
-	
-	"set_pass", "MAIN",
-	"apply_camera", "main", 
-	"clear", "all",
-	"render_models", 1, false
-]
 }
+
+function render(pipeline)
+	setPass(pipeline, "SHADOW")
+	renderShadowmap(pipeline, 1, "main")
+	bindFramebufferTexture(pipeline, "shadowmap", 1, "shadowmap")
+	
+	setPass(pipeline, "MAIN")
+	applyCamera(pipeline, "main")
+	clear("all")
+	renderModels(pipeline, 1, false)
+end

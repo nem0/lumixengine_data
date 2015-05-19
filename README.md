@@ -13,6 +13,6 @@ Source code of the engine and the editor is available @ https://github.com/nem0/
 Media
 -----------
 
-[Terrain video](https://www.youtube.com/watch?v=DirHQUGFoOg)
+[Videos](https://www.youtube.com/channel/UCtjtIy0ldsq-9siM1Gm_rXg)
 
 ![Editor screenshot](https://raw.githubusercontent.com/nem0/LumixEngine/master/docs/editor.png "Editor screenshot")

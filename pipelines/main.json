@@ -22,7 +22,7 @@ function render(pipeline)
 	renderModels(pipeline, 1, false)
 	renderDebugLines(pipeline)
 	
-	setPass("POINT_LIGHT")
+	setPass(pipeline, "POINT_LIGHT")
 	renderModels(pipeline, 1, true)
 	setPass(pipeline, "MAIN")
 	

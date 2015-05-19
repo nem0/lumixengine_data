@@ -5,3 +5,5 @@ scripts/*.ilk
 scripts/*.obj
 scripts/*.lib
 scripts/*.pdb
+/*.dll
+/*.exe

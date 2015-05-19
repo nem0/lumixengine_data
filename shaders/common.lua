@@ -96,7 +96,6 @@ base_fragment_shader = common_fragment .. createShaderSource([[
 				out_color = vec4(1, 1, 1, normals.x + tangents.x);
 			#else
 				out_color = vec4(tex_coords, 1, normals.x + tangents.x); // if I remove tex_coords, normals from here, it also does not work correctly in #ifdef ALPHA_CUTOUT
-				out_color = vec4(1, 0, 0, 1);
 			#endif
 		}
 

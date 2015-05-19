@@ -1,1 +1,0 @@
-{ "texture" : { "source" : "skybox.dds", "uniform" : "tDiffuse"}, "shader" : "shaders/skybox.shd", "backface_culling" : false, "depth_func" : "lequal" }

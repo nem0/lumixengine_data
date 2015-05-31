@@ -2,6 +2,32 @@ passes = {"MAIN", "SHADOW", "DEFERRED", "POINT_LIGHT"}
 attributes = {"in_position", "in_tex_coords"}
 
 require "shaders/common"
+texture_slots = {
+	{
+		name = "Diffuse 1",
+		uniform = "t1"
+	},
+	{
+		name = "Diffuse 2",
+		uniform = "t2"
+	},
+	{
+		name = "Diffuse 3",
+		uniform = "t3"
+	},
+	{
+		name = "Diffuse 4",
+		uniform = "t4"
+	},
+	{
+		name = "Heightmap",
+		uniform = "hm_texture"
+	},
+	{
+		name = "Splatmap",
+		uniform = "splat_texture"
+	}
+}
 
 vertex_shader = createShaderSource([[
 

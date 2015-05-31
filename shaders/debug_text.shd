@@ -1,5 +1,11 @@
 passes = {"MAIN", "DEFERRED"}
 attributes = {"in_position", "in_tex_coords"}
+texture_slots = {
+	{
+		name = "Font",
+		uniform = "diffuse"
+	}
+}
 
 vertex_shader = [[
 

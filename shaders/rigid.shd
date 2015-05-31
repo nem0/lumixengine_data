@@ -1,7 +1,7 @@
 passes = {"MAIN", "SHADOW", "POINT_LIGHT"}
 attributes = {"in_position", "in_normal", "in_tangents", "in_tex_coords"}
-
 require "shaders/common"
+texture_slots = base_fragment_shader_texture_slots
 
 vertex_shader = createShaderSource([[
 

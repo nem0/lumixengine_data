@@ -1,6 +1,7 @@
 passes = {"MAIN", "DEFERRED"}
 attributes = {"in_position", "in_normal", "in_tangents", "in_tex_coords"}
-vertex_shader = [[
+require "shaders/common"
+vertex_shader = createShaderSource([[
 
 
 in vec3 in_position;
@@ -25,9 +26,9 @@ void main( void )
 	gl_FrontColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
 
-]]
+]])
 
-fragment_shader = [[
+fragment_shader = createShaderSource([[
 
 	#ifdef DEFERRED_PASS
 
@@ -62,4 +63,4 @@ fragment_shader = [[
 
 	#endif // if DEFERRED_PASS else
 		
-]]
+]])

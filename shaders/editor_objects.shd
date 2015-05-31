@@ -1,6 +1,11 @@
 passes = {"MAIN", "DEFERRED"}
 attributes = {"in_position", "in_normals", "in_tangets", "in_tex_coords"}
-
+texture_slots = {
+	{
+		name = "Diffuse",
+		uniform = "tDiffuse"
+	}
+}
 vertex_shader = [[
 	in vec3 in_position;
 	in vec2 in_tex_coords;

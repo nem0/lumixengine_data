@@ -110,6 +110,18 @@ common_fragment = createShaderSource([[
 	
 ]])
 
+base_fragment_shader_texture_slots = {
+	{
+		name = "Diffuse",
+		uniform = "tDiffuse"
+	},
+	{
+		name = "Normal",
+		uniform = "normalmap",
+		define = "NORMAL_MAPPING"
+	}
+}
+
 base_fragment_shader = common_fragment .. createShaderSource([[
 	in vec4 			position;
 	in vec3				normals;

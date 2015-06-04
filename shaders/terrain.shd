@@ -26,6 +26,23 @@ texture_slots = {
 	{
 		name = "Splatmap",
 		uniform = "splat_texture"
+	},
+	{
+		name = "Normal 1",
+		uniform = "n1",
+		define = "NORMAL_MAPPING"
+	},
+	{
+		name = "Normal 2",
+		uniform = "n2"
+	},
+	{
+		name = "Normal 3",
+		uniform = "n3"
+	},
+	{
+		name = "Normal 4",
+		uniform = "n4"
 	}
 }
 
@@ -84,7 +101,7 @@ void main( void )
 
 	gl_Position = projection_matrix * view_matrix * world_matrix * position; 
 	global_uv = uv;
-	tex_coords = uv * m * map_size * texture_scale;
+	tex_coords = uv * map_size * texture_scale;
 	cam_dist = dist;
 }
 ]])
@@ -209,7 +226,6 @@ fragment_shader = common_fragment .. createShaderSource([[
 				shadow *= 1 - clamp(acos(dot(normalize(to_light_dir), light_dir)) / light_fov, 0, 1);
 				
 				vec4 splat = texture2D(splat_texture, global_uv).rgba;
-				//splat = normalize(splat);
 				vec4 surface = 
 					texture2D(t1, tex_coords).rgba * splat.x
 					+ texture2D(t2, tex_coords).rgba * splat.y
@@ -264,7 +280,7 @@ fragment_shader = common_fragment .. createShaderSource([[
 				#endif
 				
 				#ifdef NORMAL_MAPPING
-					vec4 normal = 
+					vec4 normal =
 						texture2D(n1, tex_coords).rgba * splat.x
 						+ texture2D(n2, tex_coords).rgba * splat.y
 						+ texture2D(n3, tex_coords).rgba * splat.z

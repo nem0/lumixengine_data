@@ -113,7 +113,7 @@ common_fragment = createShaderSource([[
 base_fragment_shader_texture_slots = {
 	{
 		name = "Diffuse",
-		uniform = "tDiffuse"
+		uniform = "u_texColor"
 	},
 	{
 		name = "Normal",

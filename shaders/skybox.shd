@@ -1,11 +1,16 @@
 passes = {"MAIN", "DEFERRED"}
 attributes = {"in_position", "in_normal", "in_tangents", "in_tex_coords"}
 require "shaders/common"
+texture_slots = {
+	{
+		name = "Diffuse",
+		uniform = "tDiffuse"
+	}
+}
 vertex_shader = createShaderSource([[
 
 
 in vec3 in_position;
-
 out vec3 tex_coords;
 
 uniform mat4 world_matrix;
@@ -57,7 +62,7 @@ fragment_shader = createShaderSource([[
 		void main( void )
 		{
 			vec4 texel = texture(tDiffuse, tex_coords).rgba;
-			out_color = texel;
+			out_color = texel; //vec4(texel.rg, 1, 1);
 			//gl_FragColor = vec4(1, 0, 0, 1);
 		}
 

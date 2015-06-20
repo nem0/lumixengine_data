@@ -9,25 +9,35 @@ framebuffers = {
 		}
 	}
 }
-
+ 
 function render(pipeline)
+	--[[
 	setPass(pipeline, "SHADOW")
-	renderShadowmap(pipeline, 1, "editor")
+	renderShadowmap(pipeline, 1, "editor") 
 	bindFramebufferTexture(pipeline, "shadowmap", 1, "shadowmap")
-	
+	]]--
+
 	setPass(pipeline, "MAIN")
+	clear(pipeline, "all")
 	applyCamera(pipeline, "editor")
-	clear("all")
-	polygonMode(pipeline, true)
 	renderModels(pipeline, 1, false)
-	renderDebugLines(pipeline)
 	
 	setPass(pipeline, "POINT_LIGHT")
+	enableBlending(pipeline)
+	applyCamera(pipeline, "editor")
 	renderModels(pipeline, 1, true)
+	disableBlending(pipeline)
+	    
+	--[[
+	renderDebugLines(pipeline)
 	setPass(pipeline, "MAIN")
-	
-	clear("depth")
+	clear(pipeline, "depth")
+	applyCamera(pipeline, "editor")   
 	renderModels(pipeline, 2, false)
+	]]--
+	
+	setPass(pipeline, "MAIN")
+	clear(pipeline, "all")
 	executeCustomCommand(pipeline, "render_gizmos")
-	renderDebugTexts(pipeline)
+	renderDebugTexts(pipeline)                     
 end

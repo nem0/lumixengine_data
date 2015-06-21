@@ -9,10 +9,12 @@ $input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0 // in...
 
 SAMPLER2D(u_texColor, 0);
 SAMPLER2D(u_texNormal, 1);
+SAMPLER2D(u_shadowmap, 2);
 uniform vec4 u_lightPosRadius;
 uniform vec4 u_lightRgbInnerR;
 uniform vec4 u_ambientColor;
 uniform vec4 u_lightDirFov; 
+
 
 vec2 blinn(vec3 _lightDir, vec3 _normal, vec3 _viewDir)
 {

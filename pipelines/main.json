@@ -4,40 +4,39 @@ framebuffers = {
 		width = 2048,
 		height = 2048,
 		renderbuffers = {
-			{format = "rg16"}, 
 			{format = "depth32"}
 		}
 	}
 }
  
+function init(pipeline)
+	shadowmap_uniform = createUniform(pipeline, "u_shadowmap")
+end
+ 
 function render(pipeline)
-	--[[
+
 	setPass(pipeline, "SHADOW")
-	renderShadowmap(pipeline, 1, "editor") 
-	bindFramebufferTexture(pipeline, "shadowmap", 1, "shadowmap")
-	]]--
+		setFramebuffer(pipeline, "shadowmap")
+		renderShadowmap(pipeline, 1, "editor") 
+		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
 
 	setPass(pipeline, "MAIN")
-	clear(pipeline, "all")
-	applyCamera(pipeline, "editor")
-	renderModels(pipeline, 1, false)
+		clear(pipeline, "all")
+		applyCamera(pipeline, "editor")
+		renderModels(pipeline, 1, false)
 	
 	setPass(pipeline, "POINT_LIGHT")
-	enableBlending(pipeline)
-	applyCamera(pipeline, "editor")
-	renderModels(pipeline, 1, true)
-	disableBlending(pipeline)
+		enableBlending(pipeline)
+		applyCamera(pipeline, "editor")
+		renderModels(pipeline, 1, true)
+		disableBlending(pipeline)
 	    
-	--[[
-	renderDebugLines(pipeline)
-	setPass(pipeline, "MAIN")
-	clear(pipeline, "depth")
-	applyCamera(pipeline, "editor")   
-	renderModels(pipeline, 2, false)
-	]]--
+	setPass(pipeline, "EDITOR")
+		clear(pipeline, "depth")
+		applyCamera(pipeline, "editor")
+		executeCustomCommand(pipeline, "render_gizmos")
+		renderDebugTexts(pipeline)     
+		--renderDebugLines(pipeline) 
 	
-	setPass(pipeline, "MAIN")
-	clear(pipeline, "all")
-	executeCustomCommand(pipeline, "render_gizmos")
-	renderDebugTexts(pipeline)                     
+	print(0, 10, "Rendered");	               
 end

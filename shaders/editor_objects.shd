@@ -1,15 +1,11 @@
 passes = {"EDITOR"}
 vs_combinations = { 
-	{},
-	{},                                                
 	{}
 }
 
 fs_combinations =               
 {
-	{},
-	{},
-	{},
+	{}
 }
    
 texture_slots = {

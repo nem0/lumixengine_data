@@ -1,4 +1,4 @@
-{"shader" : "shaders/editor_objects.shd",
+{"shader" : "shaders/screen_space.shd",
 "texture" : {"source" : "gizmo.tga"},
 "texture" : {"source" : ""},
 "uniforms" : [],

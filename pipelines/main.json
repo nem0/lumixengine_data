@@ -13,13 +13,19 @@ function init(pipeline)
 	shadowmap_uniform = createUniform(pipeline, "u_shadowmap")
 end
  
+function renderShadowmapDebug(pipeline)
+	setPass(pipeline, "SCREEN_SPACE")
+		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
+		drawQuad(pipeline, 0.18, 0.18, 0.8, 0.8)
+end
+ 
 function render(pipeline)
 
-	setPass(pipeline, "SHADOW")
+	setPass(pipeline, "SHADOW")         
 		setFramebuffer(pipeline, "shadowmap")
 		renderShadowmap(pipeline, 1, "editor") 
 		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
-
+		
 	setPass(pipeline, "MAIN")
 		clear(pipeline, "all")
 		applyCamera(pipeline, "editor")
@@ -38,5 +44,7 @@ function render(pipeline)
 		renderDebugTexts(pipeline)     
 		--renderDebugLines(pipeline) 
 	
-	print(0, 10, "Rendered");	               
+	renderShadowmapDebug(pipeline)
+		
+--	print(3, 3, "Rendered");	               
 end

@@ -1,0 +1,31 @@
+passes = {"MAIN", "SHADOW", "POINT_LIGHT"}
+vs_combinations = { 
+	{},
+	{},                                                
+	{}
+}
+--[[fs_combinations = 
+{
+	{ "NORMAL_MAPPING", "SHADOW_RECEIVER", "IS_ALPHA_CUTOUT" },
+	{ "IS_ALPHA_CUTOUT" },
+	{ "NORMAL_MAPPING", "SHADOW_RECEIVER", "IS_ALPHA_CUTOUT" },
+}   ]]--
+
+fs_combinations =               
+{
+	{ "NORMAL_MAPPING" },
+	{ },
+	{ "NORMAL_MAPPING" },
+}
+   
+texture_slots = {
+	{
+		name = "Diffuse",
+		uniform = "u_texColor"
+	},
+	{
+		name = "Normal",
+		uniform = "u_texNormal",
+		define = "NORMAL_MAPPING"
+	}
+}

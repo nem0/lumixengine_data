@@ -16,10 +16,11 @@ end
 function renderShadowmapDebug(pipeline)
 	setPass(pipeline, "SCREEN_SPACE")
 		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
-		drawQuad(pipeline, 0.18, 0.18, 0.8, 0.8)
+		drawQuad(pipeline, 0.48, 0.48, 0.5, 0.5)
 end
  
 function render(pipeline)
+	--executeCustomCommand(pipeline, "render_physics");
 
 	setPass(pipeline, "SHADOW")         
 		setFramebuffer(pipeline, "shadowmap")
@@ -30,7 +31,8 @@ function render(pipeline)
 		clear(pipeline, "all")
 		applyCamera(pipeline, "editor")
 		renderModels(pipeline, 1, false)
-	
+		renderDebugLines(pipeline)
+
 	setPass(pipeline, "POINT_LIGHT")
 		enableBlending(pipeline)
 		applyCamera(pipeline, "editor")
@@ -42,7 +44,6 @@ function render(pipeline)
 		applyCamera(pipeline, "editor")
 		executeCustomCommand(pipeline, "render_gizmos")
 		renderDebugTexts(pipeline)     
-		--renderDebugLines(pipeline) 
 	
 	renderShadowmapDebug(pipeline)
 		

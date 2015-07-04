@@ -1,0 +1,63 @@
+passes = {"MAIN", "SHADOW", "POINT_LIGHT"}
+vs_combinations = { 
+	{},
+	{},                                                
+	{}
+}
+--[[fs_combinations = 
+{
+	{},
+	{},
+	{},
+}   ]]--
+
+fs_combinations =               
+{
+	{},
+	{ },
+	{},
+}
+
+texture_slots = {
+	{
+		name = "Diffuse 1",
+		uniform = "u_texColor0"
+	},
+	{
+		name = "Diffuse 2",
+		uniform = "u_texColor1"
+	},
+	{
+		name = "Diffuse 3",
+		uniform = "u_texColor2"
+	},
+	{
+		name = "Diffuse 4",
+		uniform = "u_texColor3"
+	},
+	{
+		name = "Heightmap",
+		uniform = "u_heightmap"
+	},
+	{
+		name = "Splatmap",
+		uniform = "u_splatmap"
+	},
+	{
+		name = "Normal 1",
+		uniform = "u_normalmap0",
+		define = "NORMAL_MAPPING"
+	},
+	{
+		name = "Normal 2",
+		uniform = "u_normalmap1"
+	},
+	{
+		name = "Normal 3",
+		uniform = "u_normalmap2"
+	},
+	{
+		name = "Normal 4",
+		uniform = "u_normalmap3"
+	}
+}

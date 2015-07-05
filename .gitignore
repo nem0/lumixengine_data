@@ -7,3 +7,4 @@ scripts/*.lib
 scripts/*.pdb
 /*.dll
 /*.exe
+shaders/compiled

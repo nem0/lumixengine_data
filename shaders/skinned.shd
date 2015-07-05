@@ -1,60 +1,31 @@
-passes = {"MAIN", "SHADOW"}
-attributes = {"in_weights", "in_indices", "in_position", "in_normal", "in_tangents", "in_tex_coords"}
+passes = {"MAIN", "SHADOW", "POINT_LIGHT"}
+vs_combinations = { 
+	{},
+	{},                                                
+	{}
+}
+--[[fs_combinations = 
+{
+	{ "NORMAL_MAPPING", "SHADOW_RECEIVER", "IS_ALPHA_CUTOUT" },
+	{ "IS_ALPHA_CUTOUT" },
+	{ "NORMAL_MAPPING", "SHADOW_RECEIVER", "IS_ALPHA_CUTOUT" },
+}   ]]--
 
-require "shaders/common"
-texture_slots = base_fragment_shader_texture_slots
-
-vertex_shader = createShaderSource([[
-
-	in vec3 in_position;
-	in vec3 in_normal;
-	in vec3 in_tangents;
-	in vec4 in_weights;
-	in vec4 in_indices;
-	in vec2 in_tex_coords;
-
-	out vec3 normals;
-	out vec4 position;
-	out vec3 tangents;
-	out vec2 tex_coords;
-
-	uniform mat4 world_matrix;
-	uniform mat4 view_matrix;
-	uniform mat4 projection_matrix;
-	uniform mat4 bone_matrices[64];
-
-	void main( void )
+fs_combinations =               
+{
+	{ "NORMAL_MAPPING" },
+	{ },
+	{ "NORMAL_MAPPING" },
+}
+   
+texture_slots = {
 	{
-		vec4 p = vec4(in_position, 1);
-		tex_coords	= in_tex_coords / 2048;
-		normals		= normalize(mat3(world_matrix) * in_normal);
-		tangents		= normalize(mat3(world_matrix) * in_tangents);
-		
-		position = in_weights.x * (bone_matrices[int(in_indices.x)] * p);
-		position = position + in_weights.y * (bone_matrices[int(in_indices.y)] * p);
-		position = position + in_weights.z * (bone_matrices[int(in_indices.z)] * p);
-		position = position + in_weights.w * (bone_matrices[int(in_indices.w)] * p);
-
-		vec3 n = in_weights.x * (mat3(bone_matrices[int(in_indices.x)]) * in_normal);
-		n = n + in_weights.y * (mat3(bone_matrices[int(in_indices.y)]) * in_normal);
-		n = n + in_weights.z * (mat3(bone_matrices[int(in_indices.z)]) * in_normal);
-		n = n + in_weights.w * (mat3(bone_matrices[int(in_indices.w)]) * in_normal);
-		normals = normalize(vec3(mat3(world_matrix) * n));
-		
-		vec3 t = in_weights.x * (mat3(bone_matrices[int(in_indices.x)]) * in_tangents);
-		t = t + in_weights.y * (mat3(bone_matrices[int(in_indices.y)]) * in_tangents);
-		t = t + in_weights.z * (mat3(bone_matrices[int(in_indices.z)]) * in_tangents);
-		t = t + in_weights.w * (mat3(bone_matrices[int(in_indices.w)]) * in_tangents);
-		tangents = normalize(vec3(mat3(world_matrix) * t));
-
-		//position = (bone_matrices[0] * p);
-		//position = (bone_matrices[int(in_indices.x)] * p);
-		//position = p;
-
-		position = world_matrix * position;
-		gl_Position = projection_matrix * view_matrix * position; 
+		name = "Diffuse",
+		uniform = "u_texColor"
+	},
+	{
+		name = "Normal",
+		uniform = "u_texNormal",
+		define = "NORMAL_MAPPING"
 	}
-
-]])
-
-fragment_shader = base_fragment_shader
+}

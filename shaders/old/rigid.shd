@@ -1,0 +1,35 @@
+passes = {"MAIN", "SHADOW", "POINT_LIGHT"}
+attributes = {"in_position", "in_normal", "in_tangents", "in_tex_coords"}
+require "shaders/common"
+texture_slots = base_fragment_shader_texture_slots
+
+vertex_shader = createShaderSource([[
+
+in vec3 in_position;
+in vec3 in_normal;
+in vec3 in_tangents;
+in vec2 in_tex_coords;
+
+out vec4 position;
+out vec3 normals;
+out vec3 tangents;
+out vec2 tex_coords;
+
+uniform mat4 world_matrix[64];
+uniform mat4 view_matrix;
+uniform mat4 projection_matrix;
+
+void main( void )
+{
+	tex_coords = in_tex_coords / 2048;
+	mat3 world_matrix3x3 = mat3(world_matrix[gl_InstanceID]);
+	normals = world_matrix3x3 * in_normal.xyz / 127;
+	tangents = world_matrix3x3 * in_tangents.xyz / 127;
+
+	position = world_matrix[gl_InstanceID] * vec4(in_position, 1);
+	gl_Position = projection_matrix * (view_matrix * position); 
+}
+
+]])
+
+fragment_shader = base_fragment_shader

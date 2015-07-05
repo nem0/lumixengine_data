@@ -1,0 +1,33 @@
+framebuffers = {
+	{
+		name = "shadowmap",
+		width = 2048,
+		height = 2048,
+		renderbuffers = {
+			{format = "rg16"}, 
+			{format = "depth32"}
+		}
+	}
+}
+ 
+function render(pipeline)
+	--[[setPass(pipeline, "SHADOW")
+	renderShadowmap(pipeline, 1, "editor") 
+	bindFramebufferTexture(pipeline, "shadowmap", 1, "shadowmap")
+	]]--
+
+	setPass(pipeline, "MAIN")
+	applyCamera(pipeline, "editor")
+	clear("all")
+	--polygonMode(pipeline, true)
+	renderModels(pipeline, 1, false)
+	--[[renderDebugLines(pipeline)
+	
+	setPass(pipeline, "POINT_LIGHT")
+	renderModels(pipeline, 1, true)]]--
+	
+	clear("all")
+	--renderModels(pipeline, 2, false)
+	--executeCustomCommand(pipeline, "render_gizmos")
+	renderDebugTexts(pipeline)
+end

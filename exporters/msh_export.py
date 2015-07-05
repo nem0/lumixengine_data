@@ -337,7 +337,7 @@ def write_skinned_model_indexed(context, f, armature, objs_to_export):
     face_counts = []
     face_counts.append(0)
     face_count = 0
-    vertex_size = 56
+    vertex_size = 60
     indices = []
     vertices = []
     vertex_attributes_offsets = []
@@ -408,7 +408,7 @@ def write_skinned_model_indexed(context, f, armature, objs_to_export):
         write_str(f, "in_tangents");
         f.write(struct.pack("I", BYTE4))
         write_str(f, "in_tex_coords");
-        f.write(struct.pack("I", SHORT2))
+        f.write(struct.pack("I", FLOAT2))
     
     f.write(struct.pack("I", len(indices)))
     for i in indices:
@@ -436,8 +436,8 @@ def write_skinned_model_indexed(context, f, armature, objs_to_export):
         f.write(struct.pack("b", int(v.ty * 127)))
         f.write(struct.pack("b", int(v.tz * 127)))
         f.write(struct.pack("b", 0))
-        f.write(struct.pack("h", int(uv.uv[0] * 2048)))
-        f.write(struct.pack("h", int(uv.uv[1] * 2048)))
+        f.write(struct.pack("f", uv.uv[0]))
+        f.write(struct.pack("f", uv.uv[1]))
 
     write_skeleton(f, armature)
 
@@ -456,9 +456,9 @@ def write_rigid_model_indexed(context, f, objs_to_export, is_grass):
     face_counts = []
     face_counts.append(0)
     face_count = 0
-    vertex_size = 24
+    vertex_size = 28
     if is_grass:
-        vertex_size = 28
+        vertex_size = 32
     indices = []
     vertices = []
     vertex_attributes_offsets = []
@@ -523,7 +523,7 @@ def write_rigid_model_indexed(context, f, objs_to_export, is_grass):
         write_str(f, "in_tangents");
         f.write(struct.pack("I", BYTE4))
         write_str(f, "in_tex_coords");
-        f.write(struct.pack("I", SHORT2))
+        f.write(struct.pack("I", FLOAT2))
         
         if is_grass:
             write_str(f, "in_indices");
@@ -547,8 +547,8 @@ def write_rigid_model_indexed(context, f, objs_to_export, is_grass):
         f.write(struct.pack("b", int(v.ty * 127)))
         f.write(struct.pack("b", int(v.tz * 127)))
         f.write(struct.pack("b", 0))
-        f.write(struct.pack("h", int(uv.uv[0] * 2048)))
-        f.write(struct.pack("h", int(uv.uv[1] * 2048)))
+        f.write(struct.pack("f", uv.uv[0]))
+        f.write(struct.pack("f", uv.uv[1]))
         if is_grass:
             f.write(struct.pack("I", 1)) # just a placeholder
 

@@ -1,41 +1,16 @@
-passes = {"MAIN", "DEFERRED"}
-attributes = {"in_position", "in_normals", "in_tangets", "in_tex_coords"}
+passes = {"EDITOR"}
+vs_combinations = { 
+	{}
+}
+
+fs_combinations =               
+{
+	{}
+}
+   
 texture_slots = {
 	{
 		name = "Diffuse",
-		uniform = "tDiffuse"
+		uniform = "u_texColor"
 	}
 }
-vertex_shader = [[
-	in vec3 in_position;
-	in vec2 in_tex_coords;
-	in vec3 in_normals;
-	in vec3 in_tangents;
-
-	out vec2 tex_coords;
-
-	uniform mat4 world_matrix;
-	uniform mat4 view_matrix;
-	uniform mat4 projection_matrix;
-
-	void main( void )
-	{
-		tex_coords = in_tex_coords / 2048;
-		vec4 position = vec4(in_position, 1);
-		gl_Position = projection_matrix * view_matrix * world_matrix * position; 
-	}
-]]
-
-fragment_shader = [[
-	in vec2 tex_coords;
-
-	out vec4			out_color;
-
-	uniform sampler2D	tDiffuse;
-
-	void main( void )
-	{
-		vec4 texel = texture2D(tDiffuse, tex_coords).rgba;
-		out_color = texel;
-	}
-]]

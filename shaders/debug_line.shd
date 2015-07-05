@@ -1,0 +1,10 @@
+passes = {"MAIN"}
+vs_combinations = { 
+	{}
+}
+
+fs_combinations =               
+{
+	{}
+}
+   

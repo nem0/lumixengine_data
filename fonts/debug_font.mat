@@ -1,4 +1,0 @@
-{
-"texture" : { "source" : "debug_font.tga" },
-"shader" : "shaders/debug_text.shd"
-}

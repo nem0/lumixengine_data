@@ -99,47 +99,61 @@ float getShadowmapValue(vec4 position)
 	else if(step(shadow_coord[2].x, 0.99) * step(shadow_coord[2].y, 0.99)
 		* step(0.01, shadow_coord[2].x)	* step(0.01, shadow_coord[2].y) > 0.0)
 		split_index = 2;
-	
+	  
 	return step(shadow_coord[split_index].z, 1) * VSM(u_shadowmap, tt[split_index], shadow_coord[split_index].z);
-}
+}         
 
 void main()
-{
-	mat3 tbn = mat3(
-				normalize(v_tangent),
-				normalize(v_bitangent),
-				normalize(v_normal)
-				);
-
-	vec3 normal;
-	#ifdef NORMAL_MAPPING
-		normal.xy = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
-		normal.z = sqrt(1.0 - dot(normal.xy, normal.xy) );
-	#else
-		normal = vec3(0.0, 0.0, 1.0);
-	#endif
-	vec3 view = -normalize(v_view);
-
-	vec4 color = /*toLinear*/(texture2D(u_texColor, v_texcoord0) );
-				 
-	vec3 diffuse;
+{     
 	#ifdef POINT_LIGHT
-		diffuse = calcLight(tbn, v_wpos, mul(tbn, normal), view);
-	#else
-		diffuse = calcGlobalLight(u_lightRgbInnerR.rgb, mul(tbn, normal));
-	#endif
-	diffuse = diffuse.xyz * color.rgb;
-	diffuse = diffuse * getShadowmapValue(vec4(v_wpos, 1.0)); 
+		gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+	#endif 
 
-	#ifdef MAIN
-		vec3 ambient = u_ambientColor.rgb * color.rgb;
+	#ifdef SHADOW
+		vec4 color = texture2D(u_texColor, v_texcoord0);
+		if(color.a < 0.3)
+			discard;
+		gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 	#else
-		vec3 ambient = vec3(0, 0, 0);
-	#endif  
+		mat3 tbn = mat3(
+					normalize(v_tangent),
+					normalize(v_bitangent),
+					normalize(v_normal)
+					);
 
-    vec4 view_pos = mul(u_view, vec4(v_wpos, 1.0));
-    float fog_factor = getFogFactor(view_pos.z / view_pos.w);
-    gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
-	gl_FragColor.w = 1.0;
-	//gl_FragColor = toGamma(gl_FragColor);
+		vec3 normal;
+		#ifdef NORMAL_MAPPING
+			normal.xy = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
+			normal.z = sqrt(1.0 - dot(normal.xy, normal.xy) );
+		#else
+			normal = vec3(0.0, 0.0, 1.0);
+		#endif
+		vec3 view = -normalize(v_view);
+
+		vec4 color = /*toLinear*/(texture2D(u_texColor, v_texcoord0) );
+		if(color.a < 0.3)
+			discard;
+					 
+		vec3 diffuse;
+		#ifdef POINT_LIGHT
+			diffuse = calcLight(tbn, v_wpos, mul(tbn, normal), view);
+			diffuse = diffuse.xyz * color.rgb;
+		#else
+			diffuse = calcGlobalLight(u_lightRgbInnerR.rgb, mul(tbn, normal));
+			diffuse = diffuse.xyz * color.rgb;
+			diffuse = diffuse * getShadowmapValue(vec4(v_wpos, 1.0)); 
+		#endif
+
+		#ifdef MAIN
+			vec3 ambient = u_ambientColor.rgb * color.rgb;
+		#else
+			vec3 ambient = vec3(0, 0, 0);
+		#endif  
+
+		vec4 view_pos = mul(u_view, vec4(v_wpos, 1.0));
+		float fog_factor = getFogFactor(view_pos.z / view_pos.w);
+		gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
+		gl_FragColor.w = 1.0;
+		//gl_FragColor = toGamma(gl_FragColor);
+	#endif                  
 }

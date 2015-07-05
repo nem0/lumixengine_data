@@ -107,6 +107,11 @@ float getShadowmapValue(vec4 position)
 	else if(step(shadow_coord[2].x, 0.99) * step(shadow_coord[2].y, 0.99)
 		* step(0.01, shadow_coord[2].x)	* step(0.01, shadow_coord[2].y) > 0.0)
 		split_index = 2;
+	else if(step(shadow_coord[3].x, 0.99) * step(shadow_coord[3].y, 0.99)
+		* step(0.01, shadow_coord[3].x)	* step(0.01, shadow_coord[3].y) > 0.0)
+		split_index = 3;
+	else
+		return 1.0;
 	
 	return step(shadow_coord[split_index].z, 1) * VSM(u_shadowmap, tt[split_index], shadow_coord[split_index].z);
 }
@@ -140,11 +145,12 @@ void main()
 	vec3 diffuse;
 	#ifdef POINT_LIGHT
 		diffuse = calcLight(tbn, v_wpos, mul(tbn, normal), view);
+		diffuse = diffuse.xyz * color.rgb;
 	#else
 		diffuse = u_lightRgbInnerR.rgb; //calcGlobalLight(u_lightRgbInnerR.rgb, mul(tbn, normal));
+		diffuse = diffuse.xyz * color.rgb;
+		diffuse = diffuse * getShadowmapValue(vec4(v_wpos, 1.0)); 
 	#endif
-	diffuse = diffuse.xyz * color.rgb;
-	diffuse = diffuse * getShadowmapValue(vec4(v_wpos, 1.0)); 
 
 	#ifdef MAIN
 		vec3 ambient = u_ambientColor.rgb * color.rgb;

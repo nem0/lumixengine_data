@@ -1,4 +1,4 @@
-$input a_position, a_normal, a_tangent, a_texcoord0
+$input a_position, a_normal, a_tangent, a_texcoord0, i_data0, i_data1, i_data2, i_data3
 $output v_wpos, v_texcoord0
 
 /*
@@ -10,7 +10,13 @@ $output v_wpos, v_texcoord0
 
 void main()
 {
-	vec3 wpos = mul(u_model[0], vec4(a_position, 1.0) ).xyz;
+	mat4 model;
+	model[0] = i_data0;
+	model[1] = i_data1;
+	model[2] = i_data2;
+	model[3] = i_data3;
+
+	vec3 wpos = mul(model, vec4(a_position, 1.0) ).xyz;
 	gl_Position = mul(u_viewProj, vec4(wpos, 1.0) );
 
 	v_wpos = wpos;

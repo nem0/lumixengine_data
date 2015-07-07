@@ -1,4 +1,7 @@
-{
-	"texture" : { "source" : "phy_controller_icon.tga" },
-	"shader" : "shaders/editor_objects.shd"
-}
+{"shader" : "shaders/editor_objects.shd",
+"texture" : {"source" : "phy_controller_icon.tga"},
+"uniforms" : [],
+"backface_culling" : false,
+"alpha_cutout" : false,
+"shadow_receiver" : true,
+"z_test" : true}

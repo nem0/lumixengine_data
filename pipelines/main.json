@@ -43,7 +43,7 @@ function render(pipeline)
 		clear(pipeline, "depth")
 		applyCamera(pipeline, "editor")
 		executeCustomCommand(pipeline, "render_gizmos")
-		renderDebugTexts(pipeline)     
+		--renderDebugTexts(pipeline)     
 	
 	renderShadowmapDebug(pipeline)
 		

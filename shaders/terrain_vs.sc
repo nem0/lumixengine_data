@@ -8,7 +8,8 @@ $output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_texcoor
 
 #include "common.sh"
 
-SAMPLER2D(u_heightmap, 0);
+uniform usampler2D u_heightmap;
+//SAMPLER2D(u_heightmap, 0);
 uniform vec4 u_quadMinAndSize;
 uniform vec4 u_relCamPos;
 uniform vec4 u_morphConst;
@@ -51,7 +52,7 @@ void main()
 	
 	v_texcoord1 = uv;
 
-	v_wpos.y = u_terrainScale.y * texture2D(u_heightmap, uv).x;
+	v_wpos.y = u_terrainScale.y * texture(u_heightmap, uv).x / 65535.0;
 	v_wpos.x *= u_terrainScale.x;
 	v_wpos.z *= u_terrainScale.z;
 

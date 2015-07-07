@@ -1,4 +1,7 @@
-{
-	"texture" : { "source" : "camera_icon.dds" },
-	"shader" : "shaders/editor_objects.shd"
-}
+{"shader" : "shaders/editor_objects.shd",
+"texture" : {"source" : "camera_icon.dds"},
+"uniforms" : [],
+"backface_culling" : false,
+"alpha_cutout" : false,
+"shadow_receiver" : true,
+"z_test" : true}

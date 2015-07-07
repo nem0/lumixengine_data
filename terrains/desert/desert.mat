@@ -13,7 +13,6 @@
 "float_value" : 500.00000000},
 {"name" : "texture_scale",
 "float_value" : .01000000}],
-"alpha_to_coverage" : false,
 "backface_culling" : true,
 "alpha_cutout" : false,
 "shadow_receiver" : true,

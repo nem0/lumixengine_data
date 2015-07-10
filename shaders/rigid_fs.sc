@@ -10,12 +10,17 @@ $input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0 // in...
 SAMPLER2D(u_texColor, 0);
 SAMPLER2D(u_texNormal, 1);
 SAMPLER2D(u_shadowmap, 2);
+#ifdef SPECULAR_TEXTURE
+	SAMPLER2D(u_texSpecular, 3);
+#endif
 uniform vec4 u_lightPosRadius;
 uniform vec4 u_lightRgbInnerR;
 uniform vec4 u_ambientColor;
 uniform vec4 u_lightDirFov; 
 uniform mat4 u_shadowmapMatrices[4];
 uniform vec4 u_fogColorDensity; 
+uniform vec4 u_lightSpecular;
+uniform vec4 u_materialSpecularShininess;
 
 float getFogFactor(float fFogCoord) 
 { 
@@ -24,12 +29,11 @@ float getFogFactor(float fFogCoord)
 	return fResult;
 }
 
-
 vec2 blinn(vec3 _lightDir, vec3 _normal, vec3 _viewDir)
 {
 	float ndotl = dot(_normal, _lightDir);
-	vec3 reflected = _lightDir - 2.0*ndotl*_normal; // reflect(_lightDir, _normal);
-	float rdotv = dot(reflected, _viewDir);
+	vec3 reflected = _lightDir - 2.0 * ndotl * _normal; // reflect(_lightDir, _normal);
+	float rdotv = max(0.0, dot(-reflected, _viewDir));
 	return vec2(ndotl, rdotv);
 }
 
@@ -42,8 +46,10 @@ float fresnel(float _ndotl, float _bias, float _pow)
 vec4 lit(float _ndotl, float _rdotv, float _m)
 {
 	float diff = max(0.0, _ndotl);
-	float spec = step(0.0, _ndotl) * max(0.0, _rdotv * _m);
-	return vec4(1.0, diff, spec, 1.0);
+	
+	float _exp = u_materialSpecularShininess.w;
+	float spec = step(0.0, _ndotl) * pow(max(0.0, _rdotv), _exp);
+	return vec4(1.0, diff, step(1.0, u_materialSpecularShininess.w) * spec, 1.0);
 }
 
 vec4 powRgba(vec4 _rgba, float _pow)
@@ -62,6 +68,12 @@ vec3 calcLight(mat3 _tbn, vec3 _wpos, vec3 _normal, vec3 _view)
 	vec2 bln = blinn(lightDir, _normal, _view);
 	vec4 lc = lit(bln.x, bln.y, 1.0);
 	vec3 rgb = u_lightRgbInnerR.xyz * saturate(lc.y) * attn;
+	
+	rgb = rgb + u_lightSpecular.xyz * u_materialSpecularShininess.xyz *
+	#ifdef SPECULAR_TEXTURE
+		texture2D(u_texSpecular, v_texcoord0).rgb * 
+	#endif
+		saturate(lc.z);
 	return rgb;
 }
 
@@ -128,7 +140,7 @@ void main()
 		#else
 			normal = vec3(0.0, 0.0, 1.0);
 		#endif
-		vec3 view = -normalize(v_view);
+		vec3 view = normalize(v_view);
 
 		vec4 color = /*toLinear*/(texture2D(u_texColor, v_texcoord0) );
 		if(color.a < 0.3)
@@ -153,6 +165,9 @@ void main()
 		vec4 view_pos = mul(u_view, vec4(v_wpos, 1.0));
 		float fog_factor = getFogFactor(view_pos.z / view_pos.w);
 		gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
+		#ifdef POINT_LIGHT
+			//gl_FragColor.rgb = vec3(xxx, 0.0, 0.0);
+		#endif
 		gl_FragColor.w = 1.0;
 		//gl_FragColor = toGamma(gl_FragColor);
 	#endif                  

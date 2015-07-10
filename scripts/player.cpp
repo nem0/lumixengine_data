@@ -1,4 +1,3 @@
-#include "script\base_script.h"
 #include "universe\universe.h"
 #include "core/matrix.h"
 #include <cmath>
@@ -15,58 +14,49 @@
 #include "engine/plugin_manager.h"
 #include "core/input_system.h"
 
-#define DLL_EXPORT  __declspec(dllexport)
-#include <Windows.h>
+#define DLL_EXPORT  extern "C" __declspec(dllexport)
+#define UPDATE DLL_EXPORT void update(float time_delta)
+#define INIT DLL_EXPORT void init(ScriptScene* scene) 
+#define DONE DLL_EXPORT void done() 
+
+using namespace Lumix;
+
+Entity g_e;
+ScriptScene* g_scene;
 
 
-class MyScript : public Lumix::BaseScript
+INIT
 {
-
-	public:
-		virtual void create(Lumix::ScriptScene& ctx, Lumix::Entity entity) override
+	auto u = scene->getEngine().getUniverse();
+	g_e = Entity(u, 5);
+	auto render_scene = (RenderScene*)scene->getEngine().getScene(crc32("renderer"));
+	auto physics_scene = (PhysicsScene*)scene->getEngine().getScene(crc32("physics"));
+	for (int i = 0; i < 10; ++i)
+	{
+		for (int j = 0; j < 10; ++j)
 		{
-			m_scene = &ctx;
-			m_e = entity;
-			Lumix::IPlugin* physics = ctx.getEngine().getPluginManager().getPlugin("physics");
-			m_phy_scene = static_cast<Lumix::PhysicsScene*>(ctx.getEngine().getScene(crc32("physics")));
-			m_phy_controller = m_phy_scene->getController(entity);
-			ctx.getEngine().getInputSystem().addAction(crc32("left-right"), Lumix::InputSystem::MOUSE_X, 0);
-			ctx.getEngine().getInputSystem().addAction(crc32("forward"), Lumix::InputSystem::PRESSED, VK_UP);
-			ctx.getEngine().getInputSystem().addAction(crc32("back"), Lumix::InputSystem::PRESSED, VK_DOWN);
-			ctx.getEngine().getInputSystem().addAction(crc32("sprint"), Lumix::InputSystem::PRESSED, VK_SHIFT);
+			auto e = u->createEntity();
+			e.setPosition(30 + i * 4, j * 4, 30);
+			auto cmp = render_scene->createComponent(crc32("renderable"), e);
+			render_scene->setRenderablePath(cmp, string("models/utils/cube/cube.msh", scene->getEngine().getAllocator()));
+			cmp = physics_scene->createComponent(crc32("box_rigid_actor"), e);
+			physics_scene->setIsDynamic(cmp, true);
+			physics_scene->setHalfExtents(cmp, Vec3(0.5f, 0.5f, 0.5f));
 		}
-		
-		virtual void update(float dt) override
-		{
-			Lumix::Vec3 forward = m_e.getMatrix().getZVector();
-			float speed = 1;
-			if (m_scene->getEngine().getInputSystem().getActionValue(crc32("sprint")) > 0)
-				speed = 10;
-			if (m_scene->getEngine().getInputSystem().getActionValue(crc32("forward")) > 0)
-				m_phy_scene->moveController(m_phy_controller, forward * -dt * speed, dt);
-			if (m_scene->getEngine().getInputSystem().getActionValue(crc32("back")) > 0)
-				m_phy_scene->moveController(m_phy_controller, forward * dt * speed, dt);
-			Lumix::Quat q = m_e.getRotation();
-			q = q * Lumix::Quat(Lumix::Vec3(0, 1, 0), dt * -m_scene->getEngine().getInputSystem().getActionValue(crc32("left-right")));
-			m_e.setRotation(q);
-		}
-
-		virtual void visit(Lumix::ScriptVisitor& visitor) override
-		{
-		}
-		
-		Lumix::Entity m_e;
-		Lumix::Component m_phy_controller;
-		Lumix::PhysicsScene* m_phy_scene;
-		Lumix::ScriptScene* m_scene;
-};
-
-extern "C" DLL_EXPORT Lumix::BaseScript* createScript()
-{
-	return new MyScript();
+	}
 }
 
-extern "C" DLL_EXPORT void destroyScript(Lumix::BaseScript* scr)
+UPDATE
 {
-	delete scr;
+	static float f;
+	f += time_delta;
+	//if (g_scene->getEngine().getInputSystem().getActionValue(crc32("")) > 0)
+	{
+		g_e.setPosition(50 + cos(f) * 10, g_e.getPosition().y, 30 + sin(f) * 10);
+	}
+}
+
+DONE
+{
+	
 }

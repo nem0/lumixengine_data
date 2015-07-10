@@ -16,6 +16,6 @@ if exist "C:\Program Files\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" (
 		)
 	)
 )
-cd scripts
+cd tmp
 devenv "%1"
 exit %errorlevel%

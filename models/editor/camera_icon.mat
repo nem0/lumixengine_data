@@ -1,4 +1,4 @@
-{"shader" : "shaders/editor_objects.shd",
+{"shader" : "shaders/editorobjects.shd",
 "texture" : {"source" : "camera_icon.dds"},
 "uniforms" : [],
 "backface_culling" : false,

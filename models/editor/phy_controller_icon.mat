@@ -1,4 +1,4 @@
-{"shader" : "shaders/editor_objects.shd",
+{"shader" : "shaders/editorobjects.shd",
 "texture" : {"source" : "phy_controller_icon.tga"},
 "uniforms" : [],
 "backface_culling" : false,

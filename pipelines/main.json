@@ -28,6 +28,7 @@ function render(pipeline)
 		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
 		
 	setPass(pipeline, "MAIN")
+		setFramebuffer(pipeline, "default")
 		clear(pipeline, "all")
 		applyCamera(pipeline, "editor")
 		renderModels(pipeline, 1, false)
@@ -45,7 +46,7 @@ function render(pipeline)
 		executeCustomCommand(pipeline, "render_gizmos")
 		--renderDebugTexts(pipeline)     
 	
-	renderShadowmapDebug(pipeline)
-		
---	print(3, 3, "Rendered");	               
+	--renderShadowmapDebug(pipeline)
+	
+	print(0, 0, string.format("FPS: %.2f", getFPS(pipeline))	)
 end

@@ -6,6 +6,7 @@
 "texture" : {"source" : "hm.raw"},
 "texture" : {"source" : "splatmap.tga"},
 "texture" : {"source" : "normal1.dds"},
+"texture" : {"source" : "normal1.dds"},
 "texture" : {"source" : "normal2.dds"},
 "texture" : {"source" : "normal3.dds"},
 "texture" : {"source" : "normal4.dds"},
@@ -16,4 +17,8 @@
 "backface_culling" : true,
 "alpha_cutout" : false,
 "shadow_receiver" : true,
+"shininess" : 4.00000000,
+"specular" : [1.00000000,
+1.00000000,
+1.00000000],
 "z_test" : true}

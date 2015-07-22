@@ -1,4 +1,4 @@
-$input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_texcoord1 // in...
+$input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_texcoord1, v_common // in...
 
 /*
  * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
@@ -18,6 +18,7 @@ SAMPLER2D(u_normalmap1, 7);
 SAMPLER2D(u_normalmap2, 8);
 SAMPLER2D(u_normalmap3, 9);
 SAMPLER2D(u_shadowmap, 10);
+SAMPLER2D(u_satellitemap, 11);
 uniform vec4 u_lightPosRadius;
 uniform vec4 u_lightRgbInnerR;
 uniform vec4 u_ambientColor;
@@ -139,8 +140,9 @@ void main()
 		+ texture2D(u_texColor1, v_texcoord0).rgba * splat.y
 		+ texture2D(u_texColor2, v_texcoord0).rgba * splat.z
 		+ texture2D(u_texColor3, v_texcoord0).rgba * splat.w;
-					
-//	vec4 color = /*toLinear*/(texture2D(u_texColor0, v_texcoord0) );
+
+	float t = (v_common.x - 50) / 50;
+	color = mix(color, texture2D(u_satellitemap, v_texcoord1), clamp(t, 0, 1));
 				 
 	vec3 diffuse;
 	#ifdef POINT_LIGHT

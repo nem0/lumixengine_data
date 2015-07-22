@@ -44,6 +44,10 @@ texture_slots = {
 		uniform = "u_splatmap"
 	},
 	{
+		name = "Satellite map",
+		uniform = "u_satellitemap"
+	},
+	{
 		name = "Normal 1",
 		uniform = "u_normalmap0",
 		define = "NORMAL_MAPPING"

@@ -1,5 +1,5 @@
 $input a_position, a_normal, a_tangent, a_texcoord0, i_data0, i_data1
-$output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_texcoord1
+$output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_texcoord1, v_common
 
 #include "common.sh"
 
@@ -19,6 +19,8 @@ float computeWeight(vec3 pos, vec3 quad_min, vec2 morph_const)
 	
 	float dist = distance(cp, quad_min + pp.xyz);
 	float weight = (dist - morph_const.y) / (morph_const.x - morph_const.y);
+	
+	v_common.x = dist;
 	//return 0.0;
 	return clamp(weight, 0.0, 1.0);
 }

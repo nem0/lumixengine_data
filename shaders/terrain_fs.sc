@@ -11,14 +11,14 @@ SAMPLER2D(u_texColor0, 1);
 SAMPLER2D(u_texColor1, 2);
 SAMPLER2D(u_texColor2, 3);
 SAMPLER2D(u_texColor3, 4);
-SAMPLER2D(u_splatmap, 5);
+SAMPLER2D(u_texSplatmap, 5);
 
-SAMPLER2D(u_normalmap0, 6);
-SAMPLER2D(u_normalmap1, 7);
-SAMPLER2D(u_normalmap2, 8);
-SAMPLER2D(u_normalmap3, 9);
-SAMPLER2D(u_shadowmap, 10);
-SAMPLER2D(u_satellitemap, 11);
+SAMPLER2D(u_texNormalmap0, 6);
+SAMPLER2D(u_texNormalmap1, 7);
+SAMPLER2D(u_texNormalmap2, 8);
+SAMPLER2D(u_texNormalmap3, 9);
+SAMPLER2D(u_texShadowmap, 10);
+SAMPLER2D(u_texSatellitemap, 11);
 uniform vec4 u_lightPosRadius;
 uniform vec4 u_lightRgbInnerR;
 uniform vec4 u_ambientColor;
@@ -114,7 +114,7 @@ float getShadowmapValue(vec4 position)
 	else
 		return 1.0;
 	
-	return step(shadow_coord[split_index].z, 1) * VSM(u_shadowmap, tt[split_index], shadow_coord[split_index].z);
+	return step(shadow_coord[split_index].z, 1) * VSM(u_texShadowmap, tt[split_index], shadow_coord[split_index].z);
 }
 
 void main()
@@ -125,16 +125,20 @@ void main()
 				normalize(v_normal)
 				);
 
+    vec4 splat = texture2D(u_texSplatmap, v_texcoord1).rgba;
+
 	vec3 normal;
-	#ifdef NORMAL_MAPPING
-		normal.xy = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
+	//#ifdef NORMAL_MAPPING
+		normal.xy = (texture2D(u_texNormalmap0, v_texcoord0).xy * 2.0 - 1.0) * splat.x
+			+ (texture2D(u_texNormalmap1, v_texcoord0).xy * 2.0 - 1.0) * splat.y
+			+ (texture2D(u_texNormalmap2, v_texcoord0).xy * 2.0 - 1.0) * splat.z
+			+ (texture2D(u_texNormalmap3, v_texcoord0).xy * 2.0 - 1.0) * splat.w;
 		normal.z = sqrt(1.0 - dot(normal.xy, normal.xy) );
-	#else
+/*	#else
 		normal = vec3(0.0, 0.0, 1.0);
-	#endif
+	#endif*/
 	vec3 view = -normalize(v_view);
 
-    vec4 splat = texture2D(u_splatmap, v_texcoord1).rgba;
 	vec4 color =                                          
 		texture2D(u_texColor0, v_texcoord0).rgba * splat.x
 		+ texture2D(u_texColor1, v_texcoord0).rgba * splat.y
@@ -142,16 +146,17 @@ void main()
 		+ texture2D(u_texColor3, v_texcoord0).rgba * splat.w;
 
 	float t = (v_common.x - 50) / 50;
-	color = mix(color, texture2D(u_satellitemap, v_texcoord1), clamp(t, 0, 1));
+	color = mix(color, texture2D(u_texSatellitemap, v_texcoord1), clamp(t, 0, 1));
 				 
 	vec3 diffuse;
 	#ifdef POINT_LIGHT
 		diffuse = calcLight(tbn, v_wpos, mul(tbn, normal), view);
 		diffuse = diffuse.xyz * color.rgb;
 	#else
-		diffuse = u_lightRgbInnerR.rgb; //calcGlobalLight(u_lightRgbInnerR.rgb, mul(tbn, normal));
+		diffuse = calcGlobalLight(u_lightRgbInnerR.rgb, mul(tbn, normal));
+		// diffuse = u_lightRgbInnerR.rgb;
 		diffuse = diffuse.xyz * color.rgb;
-		diffuse = diffuse * getShadowmapValue(vec4(v_wpos, 1.0)); 
+		//diffuse = diffuse * getShadowmapValue(vec4(v_wpos, 1.0)); 
 	#endif
 
 	#ifdef MAIN
@@ -164,6 +169,8 @@ void main()
     float fog_factor = getFogFactor(view_pos.z / view_pos.w);
     gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
 	gl_FragColor.w = 1.0;
+	
+//	gl_FragColor.xyz = normal.xyz;
 	
 	//gl_FragColor = toGamma(gl_FragColor);
 }

@@ -20,7 +20,6 @@ function renderShadowmapDebug(pipeline)
 end
  
 function render(pipeline)
-	--executeCustomCommand(pipeline, "render_physics");
 
 	setPass(pipeline, "SHADOW")         
 		setFramebuffer(pipeline, "shadowmap")
@@ -32,6 +31,7 @@ function render(pipeline)
 		clear(pipeline, "all")
 		applyCamera(pipeline, "editor")
 		renderModels(pipeline, 1, false)
+--		executeCustomCommand(pipeline, "render_physics");
 		renderDebugLines(pipeline)
 
 	setPass(pipeline, "POINT_LIGHT")

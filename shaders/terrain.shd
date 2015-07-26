@@ -37,31 +37,31 @@ texture_slots = {
 	},
 	{
 		name = "Heightmap",
-		uniform = "u_heightmap"
+		uniform = "u_texHeightmap"
 	},
 	{
 		name = "Splatmap",
-		uniform = "u_splatmap"
+		uniform = "u_texSplatmap"
 	},
 	{
 		name = "Satellite map",
-		uniform = "u_satellitemap"
+		uniform = "u_texSatellitemap"
 	},
 	{
 		name = "Normal 1",
-		uniform = "u_normalmap0",
+		uniform = "u_texNormalmap0",
 		define = "NORMAL_MAPPING"
 	},
 	{
 		name = "Normal 2",
-		uniform = "u_normalmap1"
+		uniform = "u_texNormalmap1"
 	},
 	{
 		name = "Normal 3",
-		uniform = "u_normalmap2"
+		uniform = "u_texNormalmap2"
 	},
 	{
 		name = "Normal 4",
-		uniform = "u_normalmap3"
+		uniform = "u_texNormalmap3"
 	}
 }

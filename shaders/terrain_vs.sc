@@ -3,7 +3,7 @@ $output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_texcoor
 
 #include "common.sh"
 
-uniform usampler2D u_texHeightmap;
+uniform sampler2D u_texHeightmap;
 //SAMPLER2D(u_texHeightmap, 0);
 uniform vec4 u_relCamPos;
 uniform vec4 u_mapSize;
@@ -38,7 +38,7 @@ void main()
 	float fraction_z = fract(v_wpos.z / m) * m;
 
 	float weight = computeWeight(v_wpos, i_data0.xyz, i_data1.xy);
-
+	
 	v_wpos.x = v_wpos.x - weight * fraction_x;
 	v_wpos.z = v_wpos.z - weight * fraction_z;
 	v_wpos += i_data0.xyz;
@@ -49,7 +49,7 @@ void main()
 	
 	v_texcoord1 = uv;
 
-	v_wpos.y = u_terrainScale.y * texture(u_texHeightmap, uv).x / 65535.0;
+	v_wpos.y = u_terrainScale.y * texture2D(u_texHeightmap, uv ).x;
 	v_wpos.x *= u_terrainScale.x;
 	v_wpos.z *= u_terrainScale.z;
 

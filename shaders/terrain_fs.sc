@@ -17,8 +17,8 @@ SAMPLER2D(u_texNormalmap0, 6);
 SAMPLER2D(u_texNormalmap1, 7);
 SAMPLER2D(u_texNormalmap2, 8);
 SAMPLER2D(u_texNormalmap3, 9);
-SAMPLER2D(u_texShadowmap, 10);
 SAMPLER2D(u_texSatellitemap, 11);
+SAMPLER2D(u_texShadowmap, 13);
 uniform vec4 u_lightPosRadius;
 uniform vec4 u_lightRgbInnerR;
 uniform vec4 u_ambientColor;
@@ -156,7 +156,7 @@ void main()
 		diffuse = calcGlobalLight(u_lightRgbInnerR.rgb, mul(tbn, normal));
 		// diffuse = u_lightRgbInnerR.rgb;
 		diffuse = diffuse.xyz * color.rgb;
-		//diffuse = diffuse * getShadowmapValue(vec4(v_wpos, 1.0)); 
+		diffuse = diffuse * getShadowmapValue(vec4(v_wpos, 1.0)); 
 	#endif
 
 	#ifdef MAIN

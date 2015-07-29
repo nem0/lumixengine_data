@@ -3,8 +3,8 @@ $output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_texcoor
 
 #include "common.sh"
 
-uniform sampler2D u_texHeightmap;
-//SAMPLER2D(u_texHeightmap, 0);
+//uniform sampler2D u_texHeightmap;
+SAMPLER2D(u_texHeightmap, 0);
 uniform vec4 u_relCamPos;
 uniform vec4 u_mapSize;
 uniform vec4 u_terrainScale;

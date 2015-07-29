@@ -10,7 +10,7 @@ framebuffers = {
 }
  
 function init(pipeline)
-	shadowmap_uniform = createUniform(pipeline, "u_shadowmap")
+	shadowmap_uniform = createUniform(pipeline, "u_texShadowmap")
 end
  
 function renderShadowmapDebug(pipeline)
@@ -46,7 +46,7 @@ function render(pipeline)
 		executeCustomCommand(pipeline, "render_gizmos")
 		--renderDebugTexts(pipeline)     
 	
-	--renderShadowmapDebug(pipeline)
+	renderShadowmapDebug(pipeline)
 	
 	print(0, 0, string.format("FPS: %.2f", getFPS(pipeline))	)
 end

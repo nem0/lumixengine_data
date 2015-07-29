@@ -1,3 +1,5 @@
+-- LUMIX PROPERTY PLAYER_SPEED
+
 cmp = API_createComponent(API_getScene(g_engine, "physics"), "physical_controller", this)
 
 local LSHIFT_KEY = 160
@@ -21,7 +23,7 @@ API_addInputAction(g_engine, SPRINT_ACTION, 0, LSHIFT_KEY)
 
 function update(dt)
 	rotation = rotation + API_getInputActionValue(g_engine, ROT_H_ACTION) * -0.005;
-	local speed = 0.1
+	local speed = PLAYER_SPEED
 	
 	if API_getInputActionValue(g_engine, SPRINT_ACTION) > 0 then
 		speed = speed * 3

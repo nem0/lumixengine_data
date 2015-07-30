@@ -46,7 +46,7 @@ function render(pipeline)
 		executeCustomCommand(pipeline, "render_gizmos")
 		--renderDebugTexts(pipeline)     
 	
-	renderShadowmapDebug(pipeline)
+	--renderShadowmapDebug(pipeline)
 	
 	print(0, 0, string.format("FPS: %.2f", getFPS(pipeline))	)
 end

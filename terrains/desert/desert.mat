@@ -10,6 +10,7 @@
 "texture" : {"source" : "normal2.dds"},
 "texture" : {"source" : "normal3.dds"},
 "texture" : {"source" : "normal4.dds"},
+"texture" : {"source" : "colormap.tga"},
 "uniforms" : [{"name" : "detail_texture_distance",
 "float_value" : 500.00000000},
 {"name" : "texture_scale",

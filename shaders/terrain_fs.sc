@@ -19,6 +19,7 @@ SAMPLER2D(u_texNormalmap2, 8);
 SAMPLER2D(u_texNormalmap3, 9);
 SAMPLER2D(u_texSatellitemap, 11);
 SAMPLER2D(u_texShadowmap, 13);
+SAMPLER2D(u_texColormap, 14);
 uniform vec4 u_lightPosRadius;
 uniform vec4 u_lightRgbInnerR;
 uniform vec4 u_ambientColor;
@@ -125,7 +126,7 @@ void main()
 				normalize(v_normal)
 				);
 
-    vec4 splat = texture2D(u_texSplatmap, v_texcoord1).rgba;
+    vec4 splat = normalize(texture2D(u_texSplatmap, v_texcoord1).rgba);
 
 	vec3 normal;
 	//#ifdef NORMAL_MAPPING
@@ -139,7 +140,8 @@ void main()
 	#endif*/
 	vec3 view = -normalize(v_view);
 
-	vec4 color =                                          
+	vec4 color =                                        
+		vec4(texture2D(u_texColormap, v_texcoord1).rgb, 1.0) * 
 		texture2D(u_texColor0, v_texcoord0).rgba * splat.x
 		+ texture2D(u_texColor1, v_texcoord0).rgba * splat.y
 		+ texture2D(u_texColor2, v_texcoord0).rgba * splat.z

@@ -10,7 +10,7 @@ framebuffers = {
 }
 
 function init(pipeline)
-	shadowmap_uniform = createUniform(pipeline, "u_shadowmap")
+	shadowmap_uniform = createUniform(pipeline, "u_texShadowmap")
 end
 
 function render(pipeline)
@@ -24,12 +24,12 @@ function render(pipeline)
 		clear(pipeline, "all")
 		applyCamera(pipeline, "main")
 		renderModels(pipeline, 1, false)
-		renderDebugLines(pipeline)
+		--renderDebugLines(pipeline)
 
-	setPass(pipeline, "POINT_LIGHT")
+	--[[setPass(pipeline, "POINT_LIGHT")
 		enableBlending(pipeline)
 		applyCamera(pipeline, "main")
 		renderModels(pipeline, 1, true)
-		disableBlending(pipeline)
+		disableBlending(pipeline)]]--
 		
 end

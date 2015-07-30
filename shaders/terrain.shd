@@ -63,5 +63,9 @@ texture_slots = {
 	{
 		name = "Normal 4",
 		uniform = "u_texNormalmap3"
+	},
+	{
+		name = "Colormap",
+		uniform = "u_texColormap"
 	}
 }

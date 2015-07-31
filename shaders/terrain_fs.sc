@@ -142,10 +142,10 @@ void main()
 
 	vec4 color =                                        
 		vec4(texture2D(u_texColormap, v_texcoord1).rgb, 1.0) * 
-		texture2D(u_texColor0, v_texcoord0).rgba * splat.x
+		(texture2D(u_texColor0, v_texcoord0).rgba * splat.x
 		+ texture2D(u_texColor1, v_texcoord0).rgba * splat.y
 		+ texture2D(u_texColor2, v_texcoord0).rgba * splat.z
-		+ texture2D(u_texColor3, v_texcoord0).rgba * splat.w;
+		+ texture2D(u_texColor3, v_texcoord0).rgba * splat.w);
 
 	float t = (v_common.x - 50) / 50;
 	color = mix(color, texture2D(u_texSatellitemap, v_texcoord1), clamp(t, 0, 1));

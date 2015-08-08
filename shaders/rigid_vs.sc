@@ -17,6 +17,8 @@ void main()
 	model[2] = i_data2;
 	model[3] = i_data3;
 
+	model = transpose(model);
+	
     v_wpos = mul(model, vec4(a_position, 1.0) ).xyz;
 	#ifndef SHADOW
 		vec4 normal = a_normal * 2.0 - 1.0;
@@ -29,5 +31,5 @@ void main()
 		v_view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - v_wpos;
 	#endif
 
-	gl_Position = mul(u_viewProj, vec4(v_wpos, 1.0) );
+	gl_Position =  mul(u_viewProj, vec4(v_wpos, 1.0) );
 }

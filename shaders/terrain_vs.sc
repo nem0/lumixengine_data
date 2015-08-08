@@ -10,8 +10,9 @@ uniform vec4 u_mapSize;
 uniform vec4 u_terrainScale;
 uniform mat4 u_terrainMatrix;
 
-float computeWeight(vec3 pos, vec3 quad_min, vec2 morph_const)
+vec3 computeWeight(vec3 pos, vec3 quad_min, vec2 morph_const)
 {
+	vec3 r;
 	vec3 cp = u_relCamPos.xyz;
 	cp.y = 0.0;
 	vec3 pp = pos;
@@ -20,10 +21,10 @@ float computeWeight(vec3 pos, vec3 quad_min, vec2 morph_const)
 	float dist = distance(cp, quad_min + pp.xyz);
 	float weight = (dist - morph_const.y) / (morph_const.x - morph_const.y);
 	
-	v_common.x = dist;
-	v_common.y = i_data0.w;
+	r.x = dist;
 	//return 0.0;
-	return clamp(weight, 0.0, 1.0);
+	r.z = clamp(weight, 0.0, 1.0);
+	return r;
 }
 
 void main()
@@ -37,7 +38,10 @@ void main()
 	float fraction_x = fract(v_wpos.x / m) * m;
 	float fraction_z = fract(v_wpos.z / m) * m;
 
-	float weight = computeWeight(v_wpos, i_data0.xyz, i_data1.xy);
+	vec3 com = computeWeight(v_wpos, i_data0.xyz, i_data1.xy);
+	float weight = com.z;
+	v_common.x = com.x;
+	v_common.y = i_data0.w;
 	
 	v_wpos.x = v_wpos.x - weight * fraction_x;
 	v_wpos.z = v_wpos.z - weight * fraction_z;
@@ -49,7 +53,7 @@ void main()
 	
 	v_texcoord1 = uv;
 
-	v_wpos.y = u_terrainScale.y * texture2D(u_texHeightmap, uv ).x;
+	v_wpos.y = u_terrainScale.y * texture2DLod(u_texHeightmap, uv, 0).x;
 	v_wpos.x *= u_terrainScale.x;
 	v_wpos.z *= u_terrainScale.z;
 

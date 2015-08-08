@@ -13,13 +13,13 @@ SAMPLER2D(u_texColor2, 3);
 SAMPLER2D(u_texColor3, 4);
 SAMPLER2D(u_texSplatmap, 5);
 
-SAMPLER2D(u_texNormalmap0, 6);
-SAMPLER2D(u_texNormalmap1, 7);
-SAMPLER2D(u_texNormalmap2, 8);
-SAMPLER2D(u_texNormalmap3, 9);
-SAMPLER2D(u_texSatellitemap, 11);
-SAMPLER2D(u_texShadowmap, 13);
-SAMPLER2D(u_texColormap, 14);
+SAMPLER2D(u_texSatellitemap, 6);
+SAMPLER2D(u_texNormalmap0, 7);
+SAMPLER2D(u_texNormalmap1, 8);
+SAMPLER2D(u_texNormalmap2, 9);
+SAMPLER2D(u_texNormalmap3, 10);
+SAMPLER2D(u_texColormap, 11);
+SAMPLER2D(u_texShadowmap, 12);
 uniform vec4 u_lightPosRadius;
 uniform vec4 u_lightRgbInnerR;
 uniform vec4 u_ambientColor;
@@ -88,10 +88,10 @@ float VSM(sampler2D depths, vec2 uv, float compare)
 float getShadowmapValue(vec4 position)
 {
 	vec3 shadow_coord[4];
-	shadow_coord[0] = vec3(mul(u_shadowmapMatrices[0], position));
-	shadow_coord[1] = vec3(mul(u_shadowmapMatrices[1], position));
-	shadow_coord[2] = vec3(mul(u_shadowmapMatrices[2], position));
-	shadow_coord[3] = vec3(mul(u_shadowmapMatrices[3], position));
+	shadow_coord[0] = mul(u_shadowmapMatrices[0], position).xyz;
+	shadow_coord[1] = mul(u_shadowmapMatrices[1], position).xyz;
+	shadow_coord[2] = mul(u_shadowmapMatrices[2], position).xyz;
+	shadow_coord[3] = mul(u_shadowmapMatrices[3], position).xyz;
 
 	vec2 tt[4];
 	tt[0] = vec2(shadow_coord[0].x * 0.5, 0.50 + shadow_coord[0].y * 0.5);
@@ -140,7 +140,7 @@ void main()
 	#endif*/
 	vec3 view = -normalize(v_view);
 
-	vec4 color =                                        
+	vec4 color =  
 		vec4(texture2D(u_texColormap, v_texcoord1).rgb, 1.0) * 
 		(texture2D(u_texColor0, v_texcoord0).rgba * splat.x
 		+ texture2D(u_texColor1, v_texcoord0).rgba * splat.y

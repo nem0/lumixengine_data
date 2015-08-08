@@ -1,4 +1,4 @@
-$input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0 // in...
+$input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0
 
 /*
  * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
@@ -60,7 +60,7 @@ vec4 powRgba(vec4 _rgba, float _pow)
 	return result;
 }
 
-vec3 calcLight(mat3 _tbn, vec3 _wpos, vec3 _normal, vec3 _view)
+vec3 calcLight(mat3 _tbn, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 {
 	vec3 lp = u_lightPosRadius.xyz - _wpos;
 	float attn = 1.0 - smoothstep(u_lightRgbInnerR.w, 1.0, length(lp) / u_lightPosRadius.w);
@@ -71,7 +71,7 @@ vec3 calcLight(mat3 _tbn, vec3 _wpos, vec3 _normal, vec3 _view)
 	
 	rgb = rgb + u_lightSpecular.xyz * u_materialSpecularShininess.xyz *
 	#ifdef SPECULAR_TEXTURE
-		texture2D(u_texSpecular, v_texcoord0).rgb * 
+		texture2D(u_texSpecular, uv).rgb * 
 	#endif
 		saturate(lc.z);
 	return rgb;
@@ -90,10 +90,10 @@ float VSM(sampler2D depths, vec2 uv, float compare)
 float getShadowmapValue(vec4 position)
 {
 	vec3 shadow_coord[4];
-	shadow_coord[0] = vec3(mul(u_shadowmapMatrices[0], position));
-	shadow_coord[1] = vec3(mul(u_shadowmapMatrices[1], position));
-	shadow_coord[2] = vec3(mul(u_shadowmapMatrices[2], position));
-	shadow_coord[3] = vec3(mul(u_shadowmapMatrices[3], position));
+	shadow_coord[0] = mul(u_shadowmapMatrices[0], position).xyz;
+	shadow_coord[1] = mul(u_shadowmapMatrices[1], position).xyz;
+	shadow_coord[2] = mul(u_shadowmapMatrices[2], position).xyz;
+	shadow_coord[3] = mul(u_shadowmapMatrices[3], position).xyz;
 
 	vec2 tt[4];
 	tt[0] = vec2(shadow_coord[0].x * 0.5, 0.50 + shadow_coord[0].y * 0.5);
@@ -148,7 +148,7 @@ void main()
 					 
 		vec3 diffuse;
 		#ifdef POINT_LIGHT
-			diffuse = calcLight(tbn, v_wpos, mul(tbn, normal), view);
+			diffuse = calcLight(tbn, v_wpos, mul(tbn, normal), view, v_texcoord0);
 			diffuse = diffuse.xyz * color.rgb;
 		#else
 			diffuse = calcGlobalLight(u_lightRgbInnerR.rgb, mul(tbn, normal));

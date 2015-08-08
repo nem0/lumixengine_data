@@ -20,6 +20,10 @@ fs_combinations =
 
 texture_slots = {
 	{
+		name = "Heightmap",
+		uniform = "u_texHeightmap"
+	},
+	{
 		name = "Diffuse 1",
 		uniform = "u_texColor0"
 	},
@@ -34,10 +38,6 @@ texture_slots = {
 	{
 		name = "Diffuse 4",
 		uniform = "u_texColor3"
-	},
-	{
-		name = "Heightmap",
-		uniform = "u_texHeightmap"
 	},
 	{
 		name = "Splatmap",

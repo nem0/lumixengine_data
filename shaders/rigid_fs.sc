@@ -8,11 +8,13 @@ $input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0
 #include "common.sh"
 
 SAMPLER2D(u_texColor, 0);
-SAMPLER2D(u_texNormal, 1);
-SAMPLER2D(u_shadowmap, 2);
-#ifdef SPECULAR_TEXTURE
-	SAMPLER2D(u_texSpecular, 3);
+#ifdef NORMAL_MAPPING
+	SAMPLER2D(u_texNormal, 1);
 #endif
+#ifdef SPECULAR_TEXTURE
+	SAMPLER2D(u_texSpecular, 2);
+#endif
+SAMPLER2D(u_texShadowmap, 3);
 uniform vec4 u_lightPosRadius;
 uniform vec4 u_lightRgbInnerR;
 uniform vec4 u_ambientColor;
@@ -84,7 +86,7 @@ vec3 calcGlobalLight(vec3 _light_color, vec3 _normal)
 
 float VSM(sampler2D depths, vec2 uv, float compare)
 {
-	return smoothstep(compare-0.0001, compare, texture2D(depths, uv).x);
+	return smoothstep(compare-0.0001, compare, texture2D(depths, uv).x * 0.5 + 0.5);
 }
 
 float getShadowmapValue(vec4 position)
@@ -96,10 +98,10 @@ float getShadowmapValue(vec4 position)
 	shadow_coord[3] = mul(u_shadowmapMatrices[3], position).xyz;
 
 	vec2 tt[4];
-	tt[0] = vec2(shadow_coord[0].x * 0.5, 0.50 + shadow_coord[0].y * 0.5);
-	tt[1] = vec2(0.5 + shadow_coord[1].x * 0.5, 0.50 + shadow_coord[1].y * 0.5);
-	tt[2] = vec2(shadow_coord[2].x * 0.5, shadow_coord[2].y * 0.5);
-	tt[3] = vec2(0.5 + shadow_coord[3].x * 0.5, shadow_coord[3].y * 0.5);
+	tt[0] = vec2(shadow_coord[0].x * 0.5, shadow_coord[0].y * 0.5);
+	tt[1] = vec2(0.5 + shadow_coord[1].x * 0.5, shadow_coord[1].y * 0.5);
+	tt[2] = vec2(shadow_coord[2].x * 0.5, 0.5 + shadow_coord[2].y * 0.5);
+	tt[3] = vec2(0.5 + shadow_coord[3].x * 0.5, 0.5 + shadow_coord[3].y * 0.5);
 
 	int split_index = 3;
 	if(step(shadow_coord[0].x, 0.99) * step(shadow_coord[0].y, 0.99)
@@ -111,9 +113,14 @@ float getShadowmapValue(vec4 position)
 	else if(step(shadow_coord[2].x, 0.99) * step(shadow_coord[2].y, 0.99)
 		* step(0.01, shadow_coord[2].x)	* step(0.01, shadow_coord[2].y) > 0.0)
 		split_index = 2;
-	  
-	return step(shadow_coord[split_index].z, 1) * VSM(u_shadowmap, tt[split_index], shadow_coord[split_index].z);
-}         
+	else if(step(shadow_coord[3].x, 0.99) * step(shadow_coord[3].y, 0.99)
+		* step(0.01, shadow_coord[3].x)	* step(0.01, shadow_coord[3].y) > 0.0)
+		split_index = 3;
+	else
+		return 1.0;
+
+	return step(shadow_coord[split_index].z, 1) * VSM(u_texShadowmap, tt[split_index], shadow_coord[split_index].z);
+}
 
 void main()
 {     
@@ -169,6 +176,8 @@ void main()
 			//gl_FragColor.rgb = vec3(xxx, 0.0, 0.0);
 		#endif
 		gl_FragColor.w = 1.0;
+		
+		//gl_FragColor = vec4(getShadowmapValue(vec4(v_wpos, 1.0)), 0, 0, 1);
 		//gl_FragColor = toGamma(gl_FragColor);
 	#endif                  
 }

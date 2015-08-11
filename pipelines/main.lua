@@ -16,7 +16,7 @@ end
 function renderShadowmapDebug(pipeline)
 	setPass(pipeline, "SCREEN_SPACE")
 		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
-		drawQuad(pipeline, 0.48, 0.48, 0.5, 0.5)
+		drawQuad(pipeline, 0.5, 0.5, 0.48, 0.48)
 end
  
 function render(pipeline)

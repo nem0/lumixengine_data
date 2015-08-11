@@ -7,11 +7,11 @@ $input v_wpos, v_texcoord0 // in...
 
 #include "common.sh"
 
-SAMPLER2D(u_shadowmap, 0);
+SAMPLER2D(u_texShadowmap, 0);
 
 void main()
 {
-	vec4 color = (texture2D(u_shadowmap, v_texcoord0) );
+	vec4 color = (texture2D(u_texShadowmap, v_texcoord0) );
 
 	gl_FragColor.rgb = color.rgb;
 	gl_FragColor.w = 1.0;

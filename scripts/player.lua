@@ -1,6 +1,8 @@
 -- LUMIX PROPERTY PLAYER_SPEED
 
-cmp = API_createComponent(API_getScene(g_engine, "physics"), "physical_controller", this)
+PLAYER_SPEED = 0.1
+
+cmp = API_createComponent(API_getScene(g_universe_context, "physics"), "physical_controller", this)
 
 local LSHIFT_KEY = 160
 
@@ -31,7 +33,7 @@ function update(dt)
 	
 	API_setEntityRotation(g_universe, this, 0, 1, 0, rotation);
 	
-	local scene = API_getScene(g_engine, "physics");
+	local scene = API_getScene(g_universe_context, "physics");
 	if API_getInputActionValue(g_engine, LEFT_ACTION) > 0 then
 		local v = API_multVecQuat(-speed, 0, 0, 0, 1, 0, rotation)
 		API_moveController(scene, cmp, v[0], v[1], v[2], dt)

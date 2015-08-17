@@ -14,6 +14,13 @@ function init(pipeline)
 end
 
 function render(pipeline)
+	if not cameraExists(pipeline, "main") then
+		setPass(pipeline, "MAIN")
+			setFramebuffer(pipeline, "default")
+			clear(pipeline, "all")
+		return
+	end
+
 	setPass(pipeline, "SHADOW")         
 		setFramebuffer(pipeline, "shadowmap")
 		renderShadowmap(pipeline, 1, "main") 
@@ -31,5 +38,7 @@ function render(pipeline)
 		applyCamera(pipeline, "main")
 		renderModels(pipeline, 1, true)
 		disableBlending(pipeline)]]--
-		
+	
+	--setPass(pipeline, "IMGUI")
+	
 end

@@ -1,0 +1,20 @@
+passes = {"IMGUI"}
+vs_combinations = { 
+	{},
+	{},                                                
+	{}
+}
+
+fs_combinations =               
+{
+	{ },
+	{ },
+	{ },
+}
+   
+texture_slots = {
+	{
+		name = "Diffuse",
+		uniform = "s_texColor"
+	}
+}

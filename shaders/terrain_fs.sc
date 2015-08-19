@@ -1,25 +1,15 @@
 $input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_texcoord1, v_common // in...
 
-/*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
- */
-
 #include "common.sh"
 
-SAMPLER2D(u_texColor0, 1);
-SAMPLER2D(u_texColor1, 2);
-SAMPLER2D(u_texColor2, 3);
-SAMPLER2D(u_texColor3, 4);
-SAMPLER2D(u_texSplatmap, 5);
+SAMPLER2D(u_texHeightmap, 0);
+SAMPLER2D(u_texSplatmap, 1);
+SAMPLER2D(u_texSatellitemap, 2);
+SAMPLER2D(u_texColormap, 3);
+SAMPLER3D(u_texColor, 4);
+SAMPLER3D(u_texNormal, 5);
+SAMPLER2D(u_texShadowmap, 6);
 
-SAMPLER2D(u_texSatellitemap, 6);
-SAMPLER2D(u_texNormalmap0, 7);
-SAMPLER2D(u_texNormalmap1, 8);
-SAMPLER2D(u_texNormalmap2, 9);
-SAMPLER2D(u_texNormalmap3, 10);
-SAMPLER2D(u_texColormap, 11);
-SAMPLER2D(u_texShadowmap, 12);
 uniform vec4 u_lightPosRadius;
 uniform vec4 u_lightRgbInnerR;
 uniform vec4 u_ambientColor;
@@ -120,6 +110,23 @@ float getShadowmapValue(vec4 position)
 	return step(shadow_coord[split_index].z, 1) * VSM(u_texShadowmap, tt[split_index], shadow_coord[split_index].z);
 }
 
+
+/*
+double getBilinearFilteredPixelColor(Texture tex, double u, double v) {
+   u = u * tex.size - 0.5;
+   v = v * tex.size - 0.5;
+   int x = floor(u);
+   int y = floor(v);
+   double u_ratio = u - x;
+   double v_ratio = v - y;
+   double u_opposite = 1 - u_ratio;
+   double v_opposite = 1 - v_ratio;
+   double result = (tex[x][y]   * u_opposite  + tex[x+1][y]   * u_ratio) * v_opposite + 
+                   (tex[x][y+1] * u_opposite  + tex[x+1][y+1] * u_ratio) * v_ratio;
+   return result;
+ }
+*/
+ 
 void main()
 {
 	mat3 tbn = mat3(
@@ -128,28 +135,68 @@ void main()
 				normalize(v_normal)
 				);
 
-    vec4 splat = normalize(texture2D(u_texSplatmap, v_texcoord1).rgba);
+	float tex_size = 1024;
+	float texel = 1/tex_size;
+	float half_texel = texel * 0.5;
+	int texture_count = 4;
+				
+    vec4 splat = texture2D(u_texSplatmap, v_texcoord1 - vec2(half_texel, half_texel)).rgba;
+	vec2 ff = fract(v_texcoord0);
 
+	vec4 color = 
+		texture2D(u_texColormap, v_texcoord1) * 
+		texture3D(u_texColor, vec3(v_texcoord0.xy, splat.x *256.0 / texture_count));
+
+	float u = v_texcoord1.x * tex_size - 0.5;
+	float v = v_texcoord1.y * tex_size - 0.5;
+	int x = floor(u);
+	int y = floor(v);
+	float u_ratio = u - x;
+	float v_ratio = v - y;
+	float u_opposite = 1 - u_ratio;
+	float v_opposite = 1 - v_ratio;
+	vec4 splat00 = texture2D(u_texSplatmap, vec2(x/tex_size, y/tex_size)).rgba;
+	vec4 splat10 = texture2D(u_texSplatmap, vec2((x+1)/tex_size, y/tex_size)).rgba;
+	vec4 splat11 = texture2D(u_texSplatmap, vec2((x+1)/tex_size, (y+1)/tex_size)).rgba;
+	vec4 splat01 = texture2D(u_texSplatmap, vec2(x/tex_size, (y+1)/tex_size)).rgba;
+	vec4 c00 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat00.x * 256.0 / texture_count));
+	vec4 c10 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat10.x * 256.0 / texture_count));
+	vec4 c11 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat11.x * 256.0 / texture_count));
+	vec4 c01 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat01.x * 256.0 / texture_count));
+	
+
+	float a00 = c00.w * u_opposite * v_opposite;
+	float a10 =  c10.w * u_ratio * v_opposite;
+	float a01 =  c01.w * u_opposite * v_ratio;
+	float a11 =  c11.w * u_ratio * v_ratio;
+	if(a11 > a00 && a11 > a10 && a11 > a01)
+		color = c11;
+	else if(a00 > a10 && a00 > a01)
+		color = c00;
+	else if(a10 > a01)
+		color = c10;
+	else 
+		color = c01;
+	
+	// http://www.gamasutra.com/blogs/AndreyMishkinis/20130716/196339/Advanced_Terrain_Texture_Splatting.php
+	// without height blend
+	//color = (c00 * u_opposite  + c10  * u_ratio) * v_opposite + (c01 * u_opposite  + c11 * u_ratio) * v_ratio;
+	
+		
 	vec3 normal;
-	//#ifdef NORMAL_MAPPING
-		normal.xy = (texture2D(u_texNormalmap0, v_texcoord0).xy * 2.0 - 1.0) * splat.x
-			+ (texture2D(u_texNormalmap1, v_texcoord0).xy * 2.0 - 1.0) * splat.y
-			+ (texture2D(u_texNormalmap2, v_texcoord0).xy * 2.0 - 1.0) * splat.z
-			+ (texture2D(u_texNormalmap3, v_texcoord0).xy * 2.0 - 1.0) * splat.w;
+	#ifdef NORMAL_MAPPING
+		normal.xy = (texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0) * splat.x
+			+ (texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0) * splat.y
+			+ (texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0) * splat.z
+			+ (texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0) * splat.w;
 		normal.z = sqrt(1.0 - dot(normal.xy, normal.xy) );
-/*	#else
+	#else
 		normal = vec3(0.0, 0.0, 1.0);
-	#endif*/
+	#endif
 	vec3 view = -normalize(v_view);
 
-	vec4 color =  
-		vec4(texture2D(u_texColormap, v_texcoord1).rgb, 1.0) * 
-		(texture2D(u_texColor0, v_texcoord0).rgba * splat.x
-		+ texture2D(u_texColor1, v_texcoord0).rgba * splat.y
-		+ texture2D(u_texColor2, v_texcoord0).rgba * splat.z
-		+ texture2D(u_texColor3, v_texcoord0).rgba * splat.w);
-
-	float t = (v_common.x - 50) / 50;
+	
+	float t = (v_common.x - 500) / 500;
 	color = mix(color, texture2D(u_texSatellitemap, v_texcoord1), clamp(t, 0, 1));
 				 
 	vec3 diffuse;
@@ -173,6 +220,9 @@ void main()
     vec4 view_pos = mul(u_view, vec4(v_wpos, 1.0));
     float fog_factor = getFogFactor(view_pos.z / view_pos.w);
     gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
+
+//	if(v_texcoord1.x > 2*half_texel)		gl_FragColor.xyz = vec3(1, 0, 0);
+
 	gl_FragColor.w = 1.0;
 	
 //	gl_FragColor = vec4(xxx(vec4(v_wpos, 1.0)), 0, 0, 1);

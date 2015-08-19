@@ -4,12 +4,6 @@ vs_combinations = {
 	{},                                                
 	{}
 }
---[[fs_combinations = 
-{
-	{},
-	{},
-	{},
-}   ]]--
 
 fs_combinations =               
 {
@@ -24,22 +18,6 @@ texture_slots = {
 		uniform = "u_texHeightmap"
 	},
 	{
-		name = "Diffuse 1",
-		uniform = "u_texColor0"
-	},
-	{
-		name = "Diffuse 2",
-		uniform = "u_texColor1"
-	},
-	{
-		name = "Diffuse 3",
-		uniform = "u_texColor2"
-	},
-	{
-		name = "Diffuse 4",
-		uniform = "u_texColor3"
-	},
-	{
 		name = "Splatmap",
 		uniform = "u_texSplatmap"
 	},
@@ -48,24 +26,16 @@ texture_slots = {
 		uniform = "u_texSatellitemap"
 	},
 	{
-		name = "Normal 1",
-		uniform = "u_texNormalmap0",
-		define = "NORMAL_MAPPING"
-	},
-	{
-		name = "Normal 2",
-		uniform = "u_texNormalmap1"
-	},
-	{
-		name = "Normal 3",
-		uniform = "u_texNormalmap2"
-	},
-	{
-		name = "Normal 4",
-		uniform = "u_texNormalmap3"
-	},
-	{
 		name = "Colormap",
 		uniform = "u_texColormap"
+	},
+	{
+		name = "Diffuse",
+		uniform = "u_texColor"
+	},
+	{
+		name = "Normal",
+		uniform = "u_texNormal",
+		define = "NORMAL_MAPPING"
 	}
 }

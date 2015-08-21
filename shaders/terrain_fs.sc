@@ -110,22 +110,6 @@ float getShadowmapValue(vec4 position)
 	return step(shadow_coord[split_index].z, 1) * VSM(u_texShadowmap, tt[split_index], shadow_coord[split_index].z);
 }
 
-
-/*
-double getBilinearFilteredPixelColor(Texture tex, double u, double v) {
-   u = u * tex.size - 0.5;
-   v = v * tex.size - 0.5;
-   int x = floor(u);
-   int y = floor(v);
-   double u_ratio = u - x;
-   double v_ratio = v - y;
-   double u_opposite = 1 - u_ratio;
-   double v_opposite = 1 - v_ratio;
-   double result = (tex[x][y]   * u_opposite  + tex[x+1][y]   * u_ratio) * v_opposite + 
-                   (tex[x][y+1] * u_opposite  + tex[x+1][y+1] * u_ratio) * v_ratio;
-   return result;
- }
-*/
  
 void main()
 {
@@ -147,8 +131,8 @@ void main()
 		texture2D(u_texColormap, v_texcoord1) * 
 		texture3D(u_texColor, vec3(v_texcoord0.xy, splat.x *256.0 / texture_count));
 
-	float u = v_texcoord1.x * tex_size - 0.5;
-	float v = v_texcoord1.y * tex_size - 0.5;
+	float u = v_texcoord1.x * tex_size - 1.0;
+	float v = v_texcoord1.y * tex_size - 1.0;
 	int x = floor(u);
 	int y = floor(v);
 	float u_ratio = u - x;
@@ -163,12 +147,11 @@ void main()
 	vec4 c10 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat10.x * 256.0 / texture_count));
 	vec4 c11 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat11.x * 256.0 / texture_count));
 	vec4 c01 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat01.x * 256.0 / texture_count));
-	
 
-	float a00 = c00.w * u_opposite * v_opposite;
-	float a10 =  c10.w * u_ratio * v_opposite;
-	float a01 =  c01.w * u_opposite * v_ratio;
-	float a11 =  c11.w * u_ratio * v_ratio;
+	float a00 = splat00.y * c00.w * u_opposite * v_opposite;
+	float a10 = splat10.y * c10.w * u_ratio * v_opposite;
+	float a01 = splat01.y * c01.w * u_opposite * v_ratio;
+	float a11 = splat11.y * c11.w * u_ratio * v_ratio;
 	if(a11 > a00 && a11 > a10 && a11 > a01)
 		color = c11;
 	else if(a00 > a10 && a00 > a01)
@@ -177,6 +160,9 @@ void main()
 		color = c10;
 	else 
 		color = c01;
+	
+	//gl_FragColor = vec4(splat00.y, 0, 0, 1);
+	//return;
 	
 	// http://www.gamasutra.com/blogs/AndreyMishkinis/20130716/196339/Advanced_Terrain_Texture_Splatting.php
 	// without height blend

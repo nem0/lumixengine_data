@@ -1,6 +1,6 @@
 {"shader" : "shaders/terrain.shd",
 "texture" : {"source" : "hm.raw"},
-"texture" : {"source" : "splatmap.tga", "min_filter" : "point", "mag_filter" : "point"},
+"texture" : {"source" : "splatmap.tga", "min_filter" : "point", "mag_filter" : "point", "u_clamp" : true, "v_clamp" : true},
 "texture" : {"source" : "colormap.tga"},
 "texture" : {"source" : "colormap.tga"},
 "texture" : {"source" : "3d.dds", "w_clamp" : true},

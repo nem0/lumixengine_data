@@ -7,7 +7,7 @@ vs_combinations = {
 
 fs_combinations =               
 {
-	{},
+	{"NORMAL_MAPPING"},
 	{ },
 	{},
 }

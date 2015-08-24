@@ -1,0 +1,13 @@
+{"shader" : "shaders/rigid.shd",
+"texture" : {"source" : "default.dds"},
+"texture" : {"source" : "normal.dds"},
+"texture" : {"source" : ""},
+"uniforms" : [],
+"backface_culling" : true,
+"alpha_cutout" : false,
+"shadow_receiver" : true,
+"shininess" : 4.00000000,
+"specular" : [1.00000000,
+1.00000000,
+1.00000000],
+"z_test" : true}

@@ -1,10 +1,5 @@
 $input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0
 
-/*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
- */
-
 #include "common.sh"
 
 SAMPLER2D(u_texColor, 0);
@@ -81,7 +76,7 @@ vec3 calcLight(mat3 _tbn, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 
 vec3 calcGlobalLight(vec3 _light_color, vec3 _normal)
 {
-	return max(0.0, dot(u_lightDirFov.xyz, -_normal)) * _light_color;	
+	return max(0.0, dot(-u_lightDirFov.xyz, _normal)) * _light_color;	
 }
 
 float VSM(sampler2D depths, vec2 uv, float compare)
@@ -124,10 +119,6 @@ float getShadowmapValue(vec4 position)
 
 void main()
 {     
-	#ifdef POINT_LIGHT
-		gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-	#endif 
-
 	#ifdef SHADOW
 		vec4 color = texture2D(u_texColor, v_texcoord0);
 		if(color.a < 0.3)
@@ -136,18 +127,22 @@ void main()
 	#else
 		mat3 tbn = mat3(
 					normalize(v_tangent),
-					normalize(v_bitangent),
-					normalize(v_normal)
+					normalize(v_normal),
+					normalize(v_bitangent)
 					);
-
+		tbn = transpose(tbn);
+					
 		vec3 normal;
 		#ifdef NORMAL_MAPPING
-			normal.xy = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
-			normal.z = sqrt(1.0 - dot(normal.xy, normal.xy) );
+			normal.xz = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
+			normal.y = sqrt(1.0 - dot(normal.xz, normal.xz) );
 		#else
-			normal = vec3(0.0, 0.0, 1.0);
+			normal = vec3(0.0, 1.0, 0.0);
 		#endif
+		//normal = vec3(0, 1, 0);
 		vec3 view = normalize(v_view);
+		gl_FragColor = vec4(mul(tbn, normal), 1);
+		//return;
 
 		vec4 color = /*toLinear*/(texture2D(u_texColor, v_texcoord0) );
 		if(color.a < 0.3)

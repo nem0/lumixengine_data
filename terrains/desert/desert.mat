@@ -4,7 +4,7 @@
 "texture" : {"source" : "colormap.tga"},
 "texture" : {"source" : "colormap.tga"},
 "texture" : {"source" : "3d.dds", "w_clamp" : true},
-"texture" : {"source" : "3d.dds", "w_clamp" : true},
+"texture" : {"source" : "normal3d.dds", "w_clamp" : true},
 "uniforms" : [{"name" : "detail_texture_distance",
 "float_value" : 500.00000000},
 {"name" : "texture_scale",

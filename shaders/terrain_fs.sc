@@ -16,6 +16,7 @@ uniform vec4 u_ambientColor;
 uniform vec4 u_lightDirFov; 
 uniform mat4 u_shadowmapMatrices[4];
 uniform vec4 u_fogColorDensity; 
+uniform vec4 u_terrainParams;
 
 float getFogFactor(float fFogCoord) 
 { 
@@ -54,7 +55,7 @@ vec4 powRgba(vec4 _rgba, float _pow)
 	return result;
 }
 
-vec3 calcLight(mat3 _tbn, vec3 _wpos, vec3 _normal, vec3 _view)
+vec3 calcLight(vec3 _wpos, vec3 _normal, vec3 _view)
 {
 	vec3 lp = u_lightPosRadius.xyz - _wpos;
 	float attn = 1.0 - smoothstep(u_lightRgbInnerR.w, 1.0, length(lp) / u_lightPosRadius.w);
@@ -67,7 +68,7 @@ vec3 calcLight(mat3 _tbn, vec3 _wpos, vec3 _normal, vec3 _view)
 
 vec3 calcGlobalLight(vec3 _light_color, vec3 _normal)
 {
-	return max(0.0, dot(u_lightDirFov.xyz, -_normal)) * _light_color;	
+	return max(0.0, dot(-u_lightDirFov.xyz, _normal)) * _light_color;	
 }
 
 
@@ -110,25 +111,26 @@ float getShadowmapValue(vec4 position)
 	return step(shadow_coord[split_index].z, 1) * VSM(u_texShadowmap, tt[split_index], shadow_coord[split_index].z);
 }
 
- 
+
 void main()
 {
+
 	mat3 tbn = mat3(
 				normalize(v_tangent),
-				normalize(v_bitangent),
-				normalize(v_normal)
+				normalize(v_normal),
+				normalize(v_bitangent)
 				);
+	tbn = transpose(tbn);
 
-	float tex_size = 1024;
+	float tex_size = 4 * u_terrainParams.y;
 	float texel = 1/tex_size;
 	float half_texel = texel * 0.5;
-	int texture_count = 4;
+	int texture_count = u_terrainParams.z;
 				
     vec4 splat = texture2D(u_texSplatmap, v_texcoord1 - vec2(half_texel, half_texel)).rgba;
 	vec2 ff = fract(v_texcoord0);
 
 	vec4 color = 
-		texture2D(u_texColormap, v_texcoord1) * 
 		texture3D(u_texColor, vec3(v_texcoord0.xy, splat.x *256.0 / texture_count));
 
 	float u = v_texcoord1.x * tex_size - 1.0;
@@ -140,61 +142,73 @@ void main()
 	float u_opposite = 1 - u_ratio;
 	float v_opposite = 1 - v_ratio;
 	vec4 splat00 = texture2D(u_texSplatmap, vec2(x/tex_size, y/tex_size)).rgba;
+	vec4 splat01 = texture2D(u_texSplatmap, vec2(x/tex_size, (y+1)/tex_size)).rgba;
 	vec4 splat10 = texture2D(u_texSplatmap, vec2((x+1)/tex_size, y/tex_size)).rgba;
 	vec4 splat11 = texture2D(u_texSplatmap, vec2((x+1)/tex_size, (y+1)/tex_size)).rgba;
-	vec4 splat01 = texture2D(u_texSplatmap, vec2(x/tex_size, (y+1)/tex_size)).rgba;
 	vec4 c00 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat00.x * 256.0 / texture_count));
+	vec4 c01 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat01.x * 256.0 / texture_count));
 	vec4 c10 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat10.x * 256.0 / texture_count));
 	vec4 c11 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat11.x * 256.0 / texture_count));
-	vec4 c01 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat01.x * 256.0 / texture_count));
 
-	float a00 = splat00.y * c00.w * u_opposite * v_opposite;
-	float a10 = splat10.y * c10.w * u_ratio * v_opposite;
-	float a01 = splat01.y * c01.w * u_opposite * v_ratio;
-	float a11 = splat11.y * c11.w * u_ratio * v_ratio;
-	if(a11 > a00 && a11 > a10 && a11 > a01)
-		color = c11;
-	else if(a00 > a10 && a00 > a01)
-		color = c00;
-	else if(a10 > a01)
-		color = c10;
-	else 
-		color = c01;
+	vec4 bicoef = vec4(
+		u_opposite * v_opposite,
+		u_opposite * v_ratio,
+		u_ratio * v_opposite,
+		u_ratio * v_ratio
+	);
+		
+	float a00 = (splat00.y + c00.a) * bicoef.x;
+	float a01 = (splat01.y + c01.a) * bicoef.y;
+	float a10 = (splat10.y + c10.a) * bicoef.z;
+	float a11 = (splat11.y + c11.a) * bicoef.w;
+
+	float ma = max(a00, a01);
+	ma = max(ma, a10);
+	ma = max(ma, a11);
+	ma = ma - 0.05;
 	
-	//gl_FragColor = vec4(splat00.y, 0, 0, 1);
-	//return;
+    float b1 = max(a00 - ma, 0);
+    float b2 = max(a01 - ma, 0);
+    float b3 = max(a10 - ma, 0);
+    float b4 = max(a11 - ma, 0);
+
+    color = 
+		texture2D(u_texColormap, v_texcoord1) * 
+		vec4((c00.rgb * b1 + c01.rgb * b2 + c10.rgb * b3 + c11.rgb * b4) / (b1 + b2 + b3 + b4), 1);
+
+	vec3 normal;
+	#ifdef NORMAL_MAPPING
+		vec4 n00 = texture3D(u_texNormal, vec3(v_texcoord0.xy, splat00.x * 256.0 / texture_count));
+		vec4 n01 = texture3D(u_texNormal, vec3(v_texcoord0.xy, splat01.x * 256.0 / texture_count));
+		vec4 n10 = texture3D(u_texNormal, vec3(v_texcoord0.xy, splat10.x * 256.0 / texture_count));
+		vec4 n11 = texture3D(u_texNormal, vec3(v_texcoord0.xy, splat11.x * 256.0 / texture_count));
+		normal.xz = (n00.xy * b1 + n01.xy * b2 + n10.xy * b3 + n11.xy * b4) / (b1 + b2 + b3 + b4);
+		normal.xz = normal.xz * 2.0 - 1.0;
+		normal.y = sqrt(1 - dot(normal.xz, normal.xz));
+	#else
+		normal = vec3(0.0, 1.0, 0.0);
+	#endif
+		
+//	gl_FragColor = vec4(xx.z, 0, 0, 1);
+//	return;
 	
 	// http://www.gamasutra.com/blogs/AndreyMishkinis/20130716/196339/Advanced_Terrain_Texture_Splatting.php
 	// without height blend
 	//color = (c00 * u_opposite  + c10  * u_ratio) * v_opposite + (c01 * u_opposite  + c11 * u_ratio) * v_ratio;
-	
 		
-	vec3 normal;
-	#ifdef NORMAL_MAPPING
-		normal.xy = (texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0) * splat.x
-			+ (texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0) * splat.y
-			+ (texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0) * splat.z
-			+ (texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0) * splat.w;
-		normal.z = sqrt(1.0 - dot(normal.xy, normal.xy) );
-	#else
-		normal = vec3(0.0, 0.0, 1.0);
-	#endif
 	vec3 view = -normalize(v_view);
-
 	
 	float t = (v_common.x - 500) / 500;
 	color = mix(color, texture2D(u_texSatellitemap, v_texcoord1), clamp(t, 0, 1));
 				 
 	vec3 diffuse;
 	#ifdef POINT_LIGHT
-		diffuse = calcLight(tbn, v_wpos, mul(tbn, normal), view);
+		diffuse = calcLight(v_wpos, mul(tbn, normal), view);
 		diffuse = diffuse.xyz * color.rgb;
 	#else
-		diffuse = calcGlobalLight(u_lightRgbInnerR.rgb, mul(tbn, -normal));
-		// diffuse = u_lightRgbInnerR.rgb;
+		diffuse = calcGlobalLight(u_lightRgbInnerR.rgb, mul(tbn, normal));
 		diffuse = diffuse.xyz * color.rgb;
-		//diffuse = /*diffuse*/mul(vec3(1, 1, 1), getShadowmapValue(vec4(v_wpos, 1.0))); 
-		diffuse = diffuse * getShadowmapValue(vec4(v_wpos, 1.0)); 
+		//diffuse = diffuse * getShadowmapValue(vec4(v_wpos, 1.0)); 
 	#endif
 
 	#ifdef MAIN
@@ -206,10 +220,5 @@ void main()
     vec4 view_pos = mul(u_view, vec4(v_wpos, 1.0));
     float fog_factor = getFogFactor(view_pos.z / view_pos.w);
     gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
-
-//	if(v_texcoord1.x > 2*half_texel)		gl_FragColor.xyz = vec3(1, 0, 0);
-
 	gl_FragColor.w = 1.0;
-	
-//	gl_FragColor = vec4(xxx(vec4(v_wpos, 1.0)), 0, 0, 1);
 }

@@ -1,10 +1,5 @@
 $input v_texcoord0, v_common2
 
-/*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
- */
-
 #include <bgfx_shader.sh>
 
 SAMPLER2D(s_texColor, 0);

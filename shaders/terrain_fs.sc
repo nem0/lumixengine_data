@@ -208,7 +208,7 @@ void main()
 	#else
 		diffuse = calcGlobalLight(u_lightRgbInnerR.rgb, mul(tbn, normal));
 		diffuse = diffuse.xyz * color.rgb;
-		//diffuse = diffuse * getShadowmapValue(vec4(v_wpos, 1.0)); 
+		diffuse = diffuse * getShadowmapValue(vec4(v_wpos, 1.0)); 
 	#endif
 
 	#ifdef MAIN

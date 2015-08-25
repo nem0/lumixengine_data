@@ -39,6 +39,6 @@ function render(pipeline)
 		renderModels(pipeline, 1, true)
 		disableBlending(pipeline)]]--
 	
-	--setPass(pipeline, "IMGUI")
+	setPass(pipeline, "IMGUI")
 	
 end

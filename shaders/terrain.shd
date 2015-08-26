@@ -9,7 +9,7 @@ fs_combinations =
 {
 	{"NORMAL_MAPPING"},
 	{ },
-	{},
+	{"NORMAL_MAPPING"},
 }
 
 texture_slots = {

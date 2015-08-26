@@ -66,7 +66,7 @@ vec3 calcLight(mat3 _tbn, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 	vec4 lc = lit(bln.x, bln.y, 1.0);
 	vec3 rgb = u_lightRgbInnerR.xyz * saturate(lc.y) * attn;
 	
-	rgb = rgb + u_lightSpecular.xyz * u_materialSpecularShininess.xyz *
+	rgb = rgb + attn * u_lightSpecular.xyz * u_materialSpecularShininess.xyz *
 	#ifdef SPECULAR_TEXTURE
 		texture2D(u_texSpecular, uv).rgb * 
 	#endif

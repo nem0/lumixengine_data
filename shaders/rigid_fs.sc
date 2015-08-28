@@ -34,12 +34,6 @@ vec2 blinn(vec3 _lightDir, vec3 _normal, vec3 _viewDir)
 	return vec2(ndotl, rdotv);
 }
 
-float fresnel(float _ndotl, float _bias, float _pow)
-{
-	float facing = (1.0 - _ndotl);
-	return max(_bias + (1.0 - _bias) * pow(facing, _pow), 0.0);
-}
-
 vec4 lit(float _ndotl, float _rdotv, float _m)
 {
 	float diff = max(0.0, _ndotl);
@@ -49,28 +43,24 @@ vec4 lit(float _ndotl, float _rdotv, float _m)
 	return vec4(1.0, diff, step(1.0, u_materialSpecularShininess.w) * spec, 1.0);
 }
 
-vec4 powRgba(vec4 _rgba, float _pow)
-{
-	vec4 result;
-	result.xyz = pow(_rgba.xyz, vec3_splat(_pow) );
-	result.w = _rgba.w;
-	return result;
-}
-
-vec3 calcLight(mat3 _tbn, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
+vec3 calcLight(vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 {
 	vec3 lp = u_lightPosRadius.xyz - _wpos;
-	float attn = 1.0 - smoothstep(u_lightRgbInnerR.w, 1.0, length(lp) / u_lightPosRadius.w);
+	float radius = u_lightPosRadius.w;
+	float dist = length(lp);
+	float attn = 1.0 / (1.0 + 0.2 * dist + 0.04 * dist * dist);
+	attn = attn * attn;
+	
 	vec3 lightDir = normalize(lp);
 	vec2 bln = blinn(lightDir, _normal, _view);
 	vec4 lc = lit(bln.x, bln.y, 1.0);
-	vec3 rgb = u_lightRgbInnerR.xyz * saturate(lc.y) * attn;
-	
-	rgb = rgb + attn * u_lightSpecular.xyz * u_materialSpecularShininess.xyz *
-	#ifdef SPECULAR_TEXTURE
-		texture2D(u_texSpecular, uv).rgb * 
-	#endif
-		saturate(lc.z);
+	vec3 rgb = 
+		attn * (u_lightRgbInnerR.xyz * saturate(lc.y) 
+		+ u_lightSpecular.xyz * u_materialSpecularShininess.xyz *
+		#ifdef SPECULAR_TEXTURE
+			texture2D(u_texSpecular, uv).rgb * 
+		#endif
+		saturate(lc.z));
 	return rgb;
 }
 
@@ -150,7 +140,7 @@ void main()
 					 
 		vec3 diffuse;
 		#ifdef POINT_LIGHT
-			diffuse = calcLight(tbn, v_wpos, mul(tbn, normal), view, v_texcoord0);
+			diffuse = calcLight(v_wpos, mul(tbn, normal), view, v_texcoord0);
 			diffuse = diffuse.xyz * color.rgb;
 		#else
 			diffuse = calcGlobalLight(u_lightRgbInnerR.rgb, mul(tbn, normal));

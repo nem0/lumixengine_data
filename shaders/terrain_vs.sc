@@ -53,6 +53,7 @@ void main()
 	uv.y += 0.5/u_terrainParams.x;
 	
 	v_texcoord1 = uv;
+	v_texcoord0 = uv * u_terrainParams.x;
 
 	vec2 size = vec2(1, 0.0);
 	float tex_size = 4 * u_terrainParams.y;
@@ -75,7 +76,6 @@ void main()
 
 	gl_Position = mul(u_viewProj, mul(u_terrainMatrix, vec4(v_wpos, 1.0))); 
 
-	v_texcoord0 = uv * u_terrainParams.x;
     v_wpos = mul(u_terrainMatrix, vec4(v_wpos, 1.0) ).xyz;
-	v_view = mul(u_view, vec4(0.0, 0.0, 1.0, 0.0)).xyz;
+	v_view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - v_wpos;
 }

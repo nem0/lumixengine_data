@@ -219,6 +219,10 @@ void main()
 
     vec4 view_pos = mul(u_view, vec4(v_wpos, 1.0));
     float fog_factor = getFogFactor(view_pos.z / view_pos.w);
-    gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
+	#ifdef POINT_LIGHT
+		gl_FragColor.xyz = (1 - fog_factor) * (diffuse + ambient);
+	#else
+		gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
+	#endif
 	gl_FragColor.w = 1.0;
 }

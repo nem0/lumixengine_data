@@ -32,7 +32,7 @@ function render(pipeline)
 		applyCamera(pipeline, "editor")
 		renderModels(pipeline, 1, false)
 --		executeCustomCommand(pipeline, "render_physics");
-		renderDebugLines(pipeline)
+		renderDebugShapes(pipeline)
 
 	setPass(pipeline, "POINT_LIGHT")
 		enableBlending(pipeline)
@@ -44,8 +44,9 @@ function render(pipeline)
 		clear(pipeline, "depth")
 		applyCamera(pipeline, "editor")
 		executeCustomCommand(pipeline, "render_gizmos")
+		executeCustomCommand(pipeline, "render_physics")
 		--renderDebugTexts(pipeline)     
-	
+		
 	--renderShadowmapDebug(pipeline)
 	
 	print(0, 0, string.format("FPS: %.2f", getFPS(pipeline))	)

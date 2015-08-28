@@ -5,3 +5,4 @@
 
 #include <bgfx_shader.sh>
 #include "shaderlib.sh"
+#include "lumix_common.sh"

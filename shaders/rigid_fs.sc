@@ -19,29 +19,6 @@ uniform vec4 u_fogColorDensity;
 uniform vec4 u_lightSpecular;
 uniform vec4 u_materialSpecularShininess;
 
-float getFogFactor(float fFogCoord) 
-{ 
-	float fResult = exp(-pow(u_fogColorDensity.w * fFogCoord, 2.0)); 
-	fResult = 1.0-clamp(fResult, 0.0, 1.0); 
-	return fResult;
-}
-
-vec2 blinn(vec3 _lightDir, vec3 _normal, vec3 _viewDir)
-{
-	float ndotl = dot(_normal, _lightDir);
-	vec3 reflected = _lightDir - 2.0 * ndotl * _normal; // reflect(_lightDir, _normal);
-	float rdotv = max(0.0, dot(-reflected, _viewDir));
-	return vec2(ndotl, rdotv);
-}
-
-vec4 lit(float _ndotl, float _rdotv, float _m)
-{
-	float diff = max(0.0, _ndotl);
-	
-	float _exp = u_materialSpecularShininess.w;
-	float spec = step(0.0, _ndotl) * pow(max(0.0, _rdotv), _exp);
-	return vec4(1.0, diff, step(1.0, u_materialSpecularShininess.w) * spec, 1.0);
-}
 
 vec3 calcLight(vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 {
@@ -53,7 +30,7 @@ vec3 calcLight(vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 	
 	vec3 lightDir = normalize(lp);
 	vec2 bln = blinn(lightDir, _normal, _view);
-	vec4 lc = lit(bln.x, bln.y, 1.0);
+	vec4 lc = lit(bln.x, bln.y, u_materialSpecularShininess.w);
 	vec3 rgb = 
 		attn * (u_lightRgbInnerR.xyz * saturate(lc.y) 
 		+ u_lightSpecular.xyz * u_materialSpecularShininess.xyz *
@@ -62,11 +39,6 @@ vec3 calcLight(vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 		#endif
 		saturate(lc.z));
 	return rgb;
-}
-
-vec3 calcGlobalLight(vec3 _light_color, vec3 _normal)
-{
-	return max(0.0, dot(-u_lightDirFov.xyz, _normal)) * _light_color;	
 }
 
 float VSM(sampler2D depths, vec2 uv, float compare)
@@ -143,7 +115,7 @@ void main()
 			diffuse = calcLight(v_wpos, mul(tbn, normal), view, v_texcoord0);
 			diffuse = diffuse.xyz * color.rgb;
 		#else
-			diffuse = calcGlobalLight(u_lightRgbInnerR.rgb, mul(tbn, normal));
+			diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, mul(tbn, normal));
 			diffuse = diffuse.xyz * color.rgb;
 			diffuse = diffuse * getShadowmapValue(vec4(v_wpos, 1.0)); 
 		#endif
@@ -155,7 +127,7 @@ void main()
 		#endif  
 
 		vec4 view_pos = mul(u_view, vec4(v_wpos, 1.0));
-		float fog_factor = getFogFactor(view_pos.z / view_pos.w);
+		float fog_factor = getFogFactor(view_pos.z / view_pos.w, u_fogColorDensity.w);
 		#ifdef POINT_LIGHT
 			gl_FragColor.xyz = (1 - fog_factor) * (diffuse + ambient);
 		#else

@@ -6,6 +6,7 @@
 #ifndef __SHADERLIB_SH__
 #define __SHADERLIB_SH__
 
+
 vec4 encodeRE8(float _r)
 {
 	float exponent = ceil(log2(_r) );

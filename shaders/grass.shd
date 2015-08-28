@@ -1,0 +1,30 @@
+passes = {"MAIN", "SHADOW", "POINT_LIGHT"}
+vs_combinations = { 
+	{},
+	{},                                                
+	{}
+}
+
+fs_combinations =               
+{
+	{ "NORMAL_MAPPING" },
+	{ },
+	{ "NORMAL_MAPPING", "SPECULAR_TEXTURE"  },
+}
+   
+texture_slots = {
+	{
+		name = "Diffuse",
+		uniform = "u_texColor"
+	},
+	{
+		name = "Normal",
+		uniform = "u_texNormal",
+		define = "NORMAL_MAPPING"
+	},
+	{
+		name = "Specular",
+		uniform = "u_texSpecular",
+		define = "SPECULAR_TEXTURE"
+	}
+}

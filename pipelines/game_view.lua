@@ -33,11 +33,11 @@ function render(pipeline)
 		renderModels(pipeline, 1, false)
 		--renderDebugLines(pipeline)
 
-	--[[setPass(pipeline, "POINT_LIGHT")
+	setPass(pipeline, "POINT_LIGHT")
 		enableBlending(pipeline)
 		applyCamera(pipeline, "main")
 		renderModels(pipeline, 1, true)
-		disableBlending(pipeline)]]--
+		disableBlending(pipeline)
 	
 	setPass(pipeline, "IMGUI")
 	

@@ -1,4 +1,4 @@
-{"shader" : "shaders/rigid.shd",
+{"shader" : "shaders/grass.shd",
 "texture" : {"source" : "texture0.dds"},
 "uniforms" : [],
 "backface_culling" : false,

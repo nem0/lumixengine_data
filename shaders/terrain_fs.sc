@@ -19,6 +19,8 @@ uniform vec4 u_fogColorDensity;
 uniform vec4 u_terrainParams;
 uniform vec4 u_lightSpecular;
 uniform vec4 u_materialSpecularShininess;
+uniform vec4 detail_texture_distance;
+uniform vec4 texture_scale;
 
 
 vec3 calcLight(vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
@@ -85,6 +87,7 @@ float getShadowmapValue(vec4 position)
 
 void main()
 {
+	vec2 detail_uv = v_texcoord0.xy * texture_scale.x;
 
 	mat3 tbn = mat3(
 				normalize(v_tangent),
@@ -99,10 +102,10 @@ void main()
 	int texture_count = u_terrainParams.z;
 				
     vec4 splat = texture2D(u_texSplatmap, v_texcoord1 - vec2(half_texel, half_texel)).rgba;
-	vec2 ff = fract(v_texcoord0);
+	vec2 ff = fract(detail_uv);
 
 	vec4 color = 
-		texture3D(u_texColor, vec3(v_texcoord0.xy, splat.x *256.0 / texture_count));
+		texture3D(u_texColor, vec3(detail_uv.xy, splat.x *256.0 / texture_count));
 
 	float u = v_texcoord1.x * tex_size - 1.0;
 	float v = v_texcoord1.y * tex_size - 1.0;
@@ -116,10 +119,10 @@ void main()
 	vec4 splat01 = texture2D(u_texSplatmap, vec2(x/tex_size, (y+1)/tex_size)).rgba;
 	vec4 splat10 = texture2D(u_texSplatmap, vec2((x+1)/tex_size, y/tex_size)).rgba;
 	vec4 splat11 = texture2D(u_texSplatmap, vec2((x+1)/tex_size, (y+1)/tex_size)).rgba;
-	vec4 c00 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat00.x * 256.0 / texture_count));
-	vec4 c01 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat01.x * 256.0 / texture_count));
-	vec4 c10 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat10.x * 256.0 / texture_count));
-	vec4 c11 = texture3D(u_texColor, vec3(v_texcoord0.xy, splat11.x * 256.0 / texture_count));
+	vec4 c00 = texture3D(u_texColor, vec3(detail_uv.xy, splat00.x * 256.0 / texture_count));
+	vec4 c01 = texture3D(u_texColor, vec3(detail_uv.xy, splat01.x * 256.0 / texture_count));
+	vec4 c10 = texture3D(u_texColor, vec3(detail_uv.xy, splat10.x * 256.0 / texture_count));
+	vec4 c11 = texture3D(u_texColor, vec3(detail_uv.xy, splat11.x * 256.0 / texture_count));
 
 	vec4 bicoef = vec4(
 		u_opposite * v_opposite,
@@ -149,10 +152,10 @@ void main()
 
 	vec3 normal;
 	#ifdef NORMAL_MAPPING
-		vec4 n00 = texture3D(u_texNormal, vec3(v_texcoord0.xy, splat00.x * 256.0 / texture_count));
-		vec4 n01 = texture3D(u_texNormal, vec3(v_texcoord0.xy, splat01.x * 256.0 / texture_count));
-		vec4 n10 = texture3D(u_texNormal, vec3(v_texcoord0.xy, splat10.x * 256.0 / texture_count));
-		vec4 n11 = texture3D(u_texNormal, vec3(v_texcoord0.xy, splat11.x * 256.0 / texture_count));
+		vec4 n00 = texture3D(u_texNormal, vec3(detail_uv.xy, splat00.x * 256.0 / texture_count));
+		vec4 n01 = texture3D(u_texNormal, vec3(detail_uv.xy, splat01.x * 256.0 / texture_count));
+		vec4 n10 = texture3D(u_texNormal, vec3(detail_uv.xy, splat10.x * 256.0 / texture_count));
+		vec4 n11 = texture3D(u_texNormal, vec3(detail_uv.xy, splat11.x * 256.0 / texture_count));
 		normal.xz = (n00.xy * b1 + n01.xy * b2 + n10.xy * b3 + n11.xy * b4) / (b1 + b2 + b3 + b4);
 		normal.xz = normal.xz * 2.0 - 1.0;
 		normal.y = sqrt(1 - dot(normal.xz, normal.xz));
@@ -169,12 +172,12 @@ void main()
 		
 	vec3 view = normalize(v_view);
 	
-	float t = (v_common.x - 500) / 500;
+	float t = (v_common.x - detail_texture_distance.x) / detail_texture_distance.x;
 	color = mix(color, texture2D(u_texSatellitemap, v_texcoord1), clamp(t, 0, 1));
 				 
 	vec3 diffuse;
 	#ifdef POINT_LIGHT
-		diffuse = calcLight(v_wpos, mul(tbn, normal), view, v_texcoord0.xy);
+		diffuse = calcLight(v_wpos, mul(tbn, normal), view, detail_uv.xy);
 		diffuse = diffuse.xyz * color.rgb;
 	#else
 		diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, mul(tbn, normal));

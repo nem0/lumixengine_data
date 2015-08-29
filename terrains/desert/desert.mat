@@ -8,7 +8,7 @@
 "uniforms" : [{"name" : "detail_texture_distance",
 "float_value" : 500.00000000},
 {"name" : "texture_scale",
-"float_value" : .01000000}],
+"float_value" : 1.0000000}],
 "backface_culling" : true,
 "alpha_cutout" : false,
 "shadow_receiver" : false,

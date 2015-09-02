@@ -23,7 +23,7 @@ uniform vec4 detail_texture_distance;
 uniform vec4 texture_scale;
 
 
-vec3 calcLight(vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
+vec3 calcLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 {
 	vec3 lp = u_lightPosRadius.xyz - _wpos;
 	float radius = u_lightPosRadius.w;
@@ -31,8 +31,15 @@ vec3 calcLight(vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 	float attn = 1.0 / (1.0 + 0.2 * dist + 0.04 * dist * dist);
 	attn = attn * attn;
 	
-	vec3 lightDir = normalize(lp);
-	vec2 bln = blinn(lightDir, _normal, _view);
+	vec3 toLightDir = normalize(lp);
+	float cosDir = dot(normalize(dirFov.xyz), normalize(-toLightDir));
+	float cosCone = cos(dirFov.w * 0.5);
+
+	if(cosDir < cosCone)
+		discard;
+	attn *= (cosDir - cosCone) / (1 - cosCone);
+	
+	vec2 bln = blinn(toLightDir, _normal, _view);
 	vec4 lc = lit(bln.x, bln.y, u_materialSpecularShininess.w);
 	vec3 rgb = 
 		attn * (u_lightRgbInnerR.xyz * saturate(lc.y) 
@@ -83,6 +90,17 @@ float getShadowmapValue(vec4 position)
 
 	return step(shadow_coord[split_index].z, 1) * VSM(u_texShadowmap, tt[split_index], shadow_coord[split_index].z);
 }
+
+
+
+float getPLShadowmapValue(vec4 position)
+{
+	vec4 tmp = mul(u_shadowmapMatrices[0], position);
+	vec3 shadow_coord = tmp.xyz / tmp.w;
+	
+	return step(shadow_coord.z, 1) * VSM(u_texShadowmap, shadow_coord.xy, shadow_coord.z);
+}
+
 
 
 void main()
@@ -177,8 +195,9 @@ void main()
 				 
 	vec3 diffuse;
 	#ifdef POINT_LIGHT
-		diffuse = calcLight(v_wpos, mul(tbn, normal), view, detail_uv.xy);
+		diffuse = calcLight(u_lightDirFov, v_wpos, mul(tbn, normal), view, detail_uv.xy);
 		diffuse = diffuse.xyz * color.rgb;
+		diffuse = diffuse * getPLShadowmapValue(vec4(v_wpos, 1.0)); 
 	#else
 		diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, mul(tbn, normal));
 		diffuse = diffuse.xyz * color.rgb;
@@ -193,6 +212,8 @@ void main()
 
     vec4 view_pos = mul(u_view, vec4(v_wpos, 1.0));
     float fog_factor = getFogFactor(view_pos.z / view_pos.w, u_fogColorDensity.w);
+	fog_factor = fog_factor * clamp((7.0 - v_wpos.y) / 10, 0, 1);
+	
 	#ifdef POINT_LIGHT
 		gl_FragColor.xyz = (1 - fog_factor) * (diffuse + ambient);
 	#else

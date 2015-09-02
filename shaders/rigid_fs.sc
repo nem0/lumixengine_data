@@ -20,16 +20,23 @@ uniform vec4 u_lightSpecular;
 uniform vec4 u_materialSpecularShininess;
 
 
-vec3 calcLight(vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
+vec3 calcLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 {
 	vec3 lp = u_lightPosRadius.xyz - _wpos;
 	float radius = u_lightPosRadius.w;
 	float dist = length(lp);
-	float attn = 1.0 / (1.0 + 0.2 * dist + 0.04 * dist * dist);
+	float attn = 1.0 / (1.0 + 0.02 * dist + 0.04 * dist * dist);
 	attn = attn * attn;
 	
-	vec3 lightDir = normalize(lp);
-	vec2 bln = blinn(lightDir, _normal, _view);
+	vec3 toLightDir = normalize(lp);
+	float cosDir = dot(normalize(dirFov.xyz), normalize(-toLightDir));
+	float cosCone = cos(dirFov.w * 0.5);
+
+	if(cosDir < cosCone)
+		discard;
+	attn *= (cosDir - cosCone) / (1 - cosCone);
+		
+   vec2 bln = blinn(toLightDir, _normal, _view);
 	vec4 lc = lit(bln.x, bln.y, u_materialSpecularShininess.w);
 	vec3 rgb = 
 		attn * (u_lightRgbInnerR.xyz * saturate(lc.y) 
@@ -79,8 +86,24 @@ float getShadowmapValue(vec4 position)
 	return step(shadow_coord[split_index].z, 1) * VSM(u_texShadowmap, tt[split_index], shadow_coord[split_index].z);
 }
 
+float getPLShadowmapValue(vec4 position)
+{
+	vec4 tmp = mul(u_shadowmapMatrices[0], position);
+	vec3 shadow_coord = tmp.xyz / tmp.w;
+	
+	return step(shadow_coord.z, 1) * VSM(u_texShadowmap, shadow_coord.xy, shadow_coord.z);
+}
+
+
 void main()
 {     
+	#ifdef POINT_LIGHT
+	
+	gl_FragColor = vec4(u_lightDirFov.xyz, 1);
+	//gl_FragColor = vec4(u_lightDirFov.y, 0, 0, 1);
+	return;
+	#endif
+
 	#ifdef SHADOW
 		vec4 color = texture2D(u_texColor, v_texcoord0);
 		if(color.a < 0.3)
@@ -112,8 +135,9 @@ void main()
 					 
 		vec3 diffuse;
 		#ifdef POINT_LIGHT
-			diffuse = calcLight(v_wpos, mul(tbn, normal), view, v_texcoord0);
+			diffuse = calcLight(u_lightDirFov, v_wpos, mul(tbn, normal), view, v_texcoord0);
 			diffuse = diffuse.xyz * color.rgb;
+			//diffuse = diffuse * getPLShadowmapValue(vec4(v_wpos, 1.0)); 
 		#else
 			diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, mul(tbn, normal));
 			diffuse = diffuse.xyz * color.rgb;

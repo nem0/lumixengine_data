@@ -19,8 +19,8 @@ framebuffers = {
 
 	{
 		name = "point_light2_shadowmap",
-		width = 1024,
-		height = 1024,
+		width = 256,
+		height = 256,
 		renderbuffers = {
 			{format = "depth32"}
 		}
@@ -69,8 +69,7 @@ function render(pipeline)
 		executeCustomCommand(pipeline, "render_gizmos")
 		executeCustomCommand(pipeline, "render_physics")
 		--renderDebugTexts(pipeline)     
-		
-	renderShadowmapDebug(pipeline)
+	--renderShadowmapDebug(pipeline)
 	
 	print(0, 0, string.format("FPS: %.2f", getFPS(pipeline))	)
 end

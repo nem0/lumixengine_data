@@ -97,13 +97,6 @@ float getPLShadowmapValue(vec4 position)
 
 void main()
 {     
-	#ifdef POINT_LIGHT
-	
-	gl_FragColor = vec4(u_lightDirFov.xyz, 1);
-	//gl_FragColor = vec4(u_lightDirFov.y, 0, 0, 1);
-	return;
-	#endif
-
 	#ifdef SHADOW
 		vec4 color = texture2D(u_texColor, v_texcoord0);
 		if(color.a < 0.3)
@@ -137,7 +130,7 @@ void main()
 		#ifdef POINT_LIGHT
 			diffuse = calcLight(u_lightDirFov, v_wpos, mul(tbn, normal), view, v_texcoord0);
 			diffuse = diffuse.xyz * color.rgb;
-			//diffuse = diffuse * getPLShadowmapValue(vec4(v_wpos, 1.0)); 
+			diffuse = diffuse * getPLShadowmapValue(vec4(v_wpos, 1.0)); 
 		#else
 			diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, mul(tbn, normal));
 			diffuse = diffuse.xyz * color.rgb;

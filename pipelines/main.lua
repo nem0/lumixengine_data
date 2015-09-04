@@ -19,8 +19,8 @@ framebuffers = {
 
 	{
 		name = "point_light2_shadowmap",
-		width = 256,
-		height = 256,
+		width = 1024,
+		height = 1024,
 		renderbuffers = {
 			{format = "depth32"}
 		}
@@ -43,12 +43,15 @@ end
 function render(pipeline)
 
 	setPass(pipeline, "SHADOW")         
+		disableRGBWrite(pipeline)
+		disableAlphaWrite(pipeline)
 		setFramebuffer(pipeline, "shadowmap")
 		renderShadowmap(pipeline, 1, "editor") 
 
 		renderLocalLightsShadowmaps(pipeline, 1, {"point_light_shadowmap", "point_light2_shadowmap"}, "editor")
 		
 	setPass(pipeline, "MAIN")
+		enableRGBWrite(pipeline)
 		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
 		setFramebuffer(pipeline, "default")
 		clear(pipeline, "all")
@@ -58,18 +61,20 @@ function render(pipeline)
 		renderDebugShapes(pipeline)
 
 	setPass(pipeline, "POINT_LIGHT")
+		disableDepthWrite(pipeline)
 		enableBlending(pipeline)
 		applyCamera(pipeline, "editor")
 		renderModels(pipeline, 1, true)
-	    
+
 	setPass(pipeline, "EDITOR")
+		enableDepthWrite(pipeline)
 		disableBlending(pipeline)
 		clear(pipeline, "depth")
 		applyCamera(pipeline, "editor")
 		executeCustomCommand(pipeline, "render_gizmos")
 		executeCustomCommand(pipeline, "render_physics")
 		--renderDebugTexts(pipeline)     
-	--renderShadowmapDebug(pipeline)
+	renderShadowmapDebug(pipeline)
 	
 	print(0, 0, string.format("FPS: %.2f", getFPS(pipeline))	)
 end

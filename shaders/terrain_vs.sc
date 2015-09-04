@@ -30,7 +30,6 @@ vec3 computeWeight(vec3 pos, vec3 quad_min, vec2 morph_const)
 
 void main()
 {
-
 	float m = i_data0.w / 8.0;
 	v_wpos = a_position;  
 	v_wpos.x *= i_data0.w;
@@ -51,7 +50,7 @@ void main()
 	vec2 uv = v_wpos.xz / (u_terrainParams.x);
 	uv.x += 0.5/u_terrainParams.x;
 	uv.y += 0.5/u_terrainParams.x;
-	
+
 	v_texcoord1 = uv;
 	v_texcoord0 = uv * u_terrainParams.x;
 
@@ -78,4 +77,5 @@ void main()
 
     v_wpos = mul(u_terrainMatrix, vec4(v_wpos, 1.0) ).xyz;
 	v_view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - v_wpos;
+	
 }

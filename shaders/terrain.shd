@@ -9,7 +9,7 @@ fs_combinations =
 {
 	{"NORMAL_MAPPING"},
 	{ },
-	{"NORMAL_MAPPING"},
+	{"NORMAL_MAPPING", "HAS_SHADOWMAP"},
 }
 
 texture_slots = {

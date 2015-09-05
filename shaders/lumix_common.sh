@@ -35,4 +35,156 @@ vec3 calcGlobalLight(vec3 light_dir, vec3 _light_color, vec3 _normal)
 }
 
 
+float hardShadow(sampler2D _sampler, vec4 _shadowCoord, float _bias)
+{
+	vec2 texCoord = _shadowCoord.xy/_shadowCoord.w;
+
+	bool outside = any(greaterThan(texCoord, vec2_splat(1.0)))
+				|| any(lessThan   (texCoord, vec2_splat(0.0)))
+				 ;
+
+	if (outside)
+	{
+		return 1.0;
+	}
+
+	float receiver = (_shadowCoord.z-_bias)/_shadowCoord.w;
+	float occluder = //unpackRgbaToFloat(texture2D(_sampler, texCoord) );
+		texture2D(_sampler, texCoord).x * 0.5 + 0.5;
+	float visibility = step(receiver, occluder);
+	return visibility;
+}
+
+
+float PCF(sampler2D _sampler, vec4 _shadowCoord, float _bias, vec4 _pcfParams, vec2 _texelSize)
+{
+	float result = 0.0;
+	vec2 offset = _pcfParams.zw * _texelSize * _shadowCoord.w;
+
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-1.5, -1.5) * offset, 0.0, 0.0), _bias);
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-1.5, -0.5) * offset, 0.0, 0.0), _bias);
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-1.5,  0.5) * offset, 0.0, 0.0), _bias);
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-1.5,  1.5) * offset, 0.0, 0.0), _bias);
+
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-0.5, -1.5) * offset, 0.0, 0.0), _bias);
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-0.5, -0.5) * offset, 0.0, 0.0), _bias);
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-0.5,  0.5) * offset, 0.0, 0.0), _bias);
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-0.5,  1.5) * offset, 0.0, 0.0), _bias);
+
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(0.5, -1.5) * offset, 0.0, 0.0), _bias);
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(0.5, -0.5) * offset, 0.0, 0.0), _bias);
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(0.5,  0.5) * offset, 0.0, 0.0), _bias);
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(0.5,  1.5) * offset, 0.0, 0.0), _bias);
+
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(1.5, -1.5) * offset, 0.0, 0.0), _bias);
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(1.5, -0.5) * offset, 0.0, 0.0), _bias);
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(1.5,  0.5) * offset, 0.0, 0.0), _bias);
+	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(1.5,  1.5) * offset, 0.0, 0.0), _bias);
+
+	return result / 16.0;
+}
+
+
+float ESM(sampler2D _sampler, vec4 _shadowCoord, float _bias, float _depthMultiplier)
+{
+	vec2 texCoord = _shadowCoord.xy/_shadowCoord.w;
+
+	bool outside = any(greaterThan(texCoord, vec2_splat(1.0)))
+				|| any(lessThan   (texCoord, vec2_splat(0.0)))
+				 ;
+
+	if (outside)
+	{
+		return 1.0;
+	}
+
+	float receiver = (_shadowCoord.z-_bias)/_shadowCoord.w;
+	float occluder = unpackRgbaToFloat(texture2D(_sampler, texCoord) );
+
+	float visibility = clamp(exp(_depthMultiplier * (occluder-receiver) ), 0.0, 1.0);
+
+	return visibility;
+}
+
+
+float smoothShadow(sampler2D shadowmap, vec2 uv, float compare)
+{
+	return smoothstep(compare-0.0001, compare, texture2D(shadowmap, uv).x * 0.5 + 0.5);
+}
+
+
+float pointLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec4 position, float fov)
+{
+	if(fov > 3.14159)
+	{
+		vec4 a = mul(shadowmapMatrices[0], position);
+		vec4 b = mul(shadowmapMatrices[1], position);
+		vec4 c = mul(shadowmapMatrices[2], position);
+		vec4 d = mul(shadowmapMatrices[3], position);
+		
+		a = a / a.w;
+		b = b / b.w;
+		c = c / c.w;
+		d = d / d.w;
+
+	
+		bool selection0 = all(lessThan(a.xy, vec2_splat(0.99))) && all(greaterThan(a.xy, vec2_splat(0.01))) && a.z < 1;
+		bool selection1 = all(lessThan(b.xy, vec2_splat(0.99))) && all(greaterThan(b.xy, vec2_splat(0.01))) && b.z < 1;
+		bool selection2 = all(lessThan(c.xy, vec2_splat(0.99))) && all(greaterThan(c.xy, vec2_splat(0.01))) && c.z < 1;
+		bool selection3 = all(lessThan(d.xy, vec2_splat(0.99))) && all(greaterThan(d.xy, vec2_splat(0.01))) && d.z < 1;
+		
+
+		if(selection0)
+			return step(a.z, 1) * smoothShadow(shadowmap, vec2(a.x*0.5, a.y*0.5), a.z);
+		else if(selection1)
+			return step(b.z, 1) * smoothShadow(shadowmap, vec2(0.5+b.x*0.5, b.y*0.5), b.z);
+		else if(selection2)
+			return step(c.z, 1) * smoothShadow(shadowmap, vec2(c.x*0.5, 0.5+c.y*0.5), c.z);
+		else 
+			return step(d.z, 1) * smoothShadow(shadowmap, vec2(0.5+d.x*0.5, 0.5+d.y*0.5), d.z);
+	}
+	else
+	{
+		vec4 tmp = mul(shadowmapMatrices[0], position);
+		vec3 shadow_coord = tmp.xyz / tmp.w;
+		return step(shadow_coord.z, 1) * smoothShadow(shadowmap, shadow_coord.xy, shadow_coord.z);
+	}
+}
+
+
+float directionalLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec4 position)
+{
+	vec3 shadow_coord[4];
+	shadow_coord[0] = mul(shadowmapMatrices[0], position).xyz;
+	shadow_coord[1] = mul(shadowmapMatrices[1], position).xyz;
+	shadow_coord[2] = mul(shadowmapMatrices[2], position).xyz;
+	shadow_coord[3] = mul(shadowmapMatrices[3], position).xyz;
+
+	vec2 tt[4];
+	tt[0] = vec2(shadow_coord[0].x * 0.5, shadow_coord[0].y * 0.5);
+	tt[1] = vec2(0.5 + shadow_coord[1].x * 0.5, shadow_coord[1].y * 0.5);
+	tt[2] = vec2(shadow_coord[2].x * 0.5, 0.5 + shadow_coord[2].y * 0.5);
+	tt[3] = vec2(0.5 + shadow_coord[3].x * 0.5, 0.5 + shadow_coord[3].y * 0.5);
+
+	int split_index = 3;
+	if(step(shadow_coord[0].x, 0.99) * step(shadow_coord[0].y, 0.99)
+		* step(0.01, shadow_coord[0].x)	* step(0.01, shadow_coord[0].y) > 0.0)
+		split_index = 0;
+	else if(step(shadow_coord[1].x, 0.99) * step(shadow_coord[1].y, 0.99)
+		* step(0.01, shadow_coord[1].x)	* step(0.01, shadow_coord[1].y) > 0.0)
+		split_index = 1;
+	else if(step(shadow_coord[2].x, 0.99) * step(shadow_coord[2].y, 0.99)
+		* step(0.01, shadow_coord[2].x)	* step(0.01, shadow_coord[2].y) > 0.0)
+		split_index = 2;
+	else if(step(shadow_coord[3].x, 0.99) * step(shadow_coord[3].y, 0.99)
+		* step(0.01, shadow_coord[3].x)	* step(0.01, shadow_coord[3].y) > 0.0)
+		split_index = 3;
+	else
+		return 1.0;
+
+	return  
+		step(shadow_coord[split_index].z, 1) * smoothShadow(shadowmap, tt[split_index], shadow_coord[split_index].z);
+}
+
+
 #endif

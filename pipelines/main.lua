@@ -4,6 +4,7 @@ framebuffers = {
 		width = 2048,
 		height = 2048,
 		renderbuffers = {
+			{format="rgba8"},
 			{format = "depth32"}
 		}
 	},
@@ -35,21 +36,19 @@ end
  
 function renderShadowmapDebug(pipeline)
 	setPass(pipeline, "SCREEN_SPACE")
-		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
 		bindFramebufferTexture(pipeline, "point_light_shadowmap", 0, shadowmap2_uniform)
+		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
 		drawQuad(pipeline, 0.5, 0.98, 0.48, -0.48)
 end
  
 function render(pipeline)
-
 	setPass(pipeline, "SHADOW")         
-		disableRGBWrite(pipeline)
-		disableAlphaWrite(pipeline)
+		--disableRGBWrite(pipeline)
+		--disableAlphaWrite(pipeline)
 		setFramebuffer(pipeline, "shadowmap")
 		renderShadowmap(pipeline, 1, "editor") 
 
 		renderLocalLightsShadowmaps(pipeline, 1, {"point_light_shadowmap", "point_light2_shadowmap"}, "editor")
-		
 	setPass(pipeline, "MAIN")
 		enableRGBWrite(pipeline)
 		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)

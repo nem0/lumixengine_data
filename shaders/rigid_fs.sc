@@ -1,4 +1,4 @@
-$input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0
+$input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_common2
 
 #include "common.sh"
 
@@ -59,7 +59,9 @@ void main()
 		vec4 color = texture2D(u_texColor, v_texcoord0);
 		if(color.a < 0.3)
 			discard;
-		gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+		float depth = v_common2.z/v_common2.w * 0.5 + 0.5;
+		float depthSq = depth*depth;
+		gl_FragColor = vec4(packHalfFloat(depth), packHalfFloat(depthSq));
 	#else
 		mat3 tbn = mat3(
 					normalize(v_tangent),

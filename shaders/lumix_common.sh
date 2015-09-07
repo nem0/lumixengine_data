@@ -107,9 +107,41 @@ float ESM(sampler2D _sampler, vec4 _shadowCoord, float _bias, float _depthMultip
 }
 
 
+float VSM(sampler2D _sampler, vec4 _shadowCoord, float _bias, float _depthMultiplier, float _minVariance)
+{
+	vec2 texCoord = _shadowCoord.xy/_shadowCoord.w;
+
+	bool outside = any(greaterThan(texCoord, vec2_splat(1.0)))
+				|| any(lessThan   (texCoord, vec2_splat(0.0)))
+				 ;
+
+	if (outside)
+	{
+		return 1.0;
+	}
+
+	float receiver = (_shadowCoord.z-_bias)/_shadowCoord.w * _depthMultiplier;
+	vec4 rgba = texture2D(_sampler, texCoord);
+	vec2 occluder = vec2(unpackHalfFloat(rgba.rg), unpackHalfFloat(rgba.ba)) * _depthMultiplier;
+	
+	if (receiver < occluder.x)
+	{
+		return 1.0;
+	}
+	
+	//return 0;
+	float variance = max(occluder.y - (occluder.x*occluder.x), _minVariance);
+	float d = receiver - occluder.x;
+
+	float visibility = variance / (variance + d*d);
+
+	return visibility;
+}
+
+
 float smoothShadow(sampler2D shadowmap, vec2 uv, float compare)
 {
-	return smoothstep(compare-0.0001, compare, texture2D(shadowmap, uv).x * 0.5 + 0.5);
+	return smoothstep(compare-0.00001, compare, texture2D(shadowmap, uv).x * 0.5 + 0.5);
 }
 
 
@@ -135,6 +167,7 @@ float pointLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec4 posi
 		
 
 		if(selection0)
+			//return PCF(shadowmap, vec4(a.x*0.5, a.y*0.5, a.z, 1.0), 0.001, vec4(1, 1, 1, 1), vec2(1/1024.0,1/1024.0));
 			return step(a.z, 1) * smoothShadow(shadowmap, vec2(a.x*0.5, a.y*0.5), a.z);
 		else if(selection1)
 			return step(b.z, 1) * smoothShadow(shadowmap, vec2(0.5+b.x*0.5, b.y*0.5), b.z);
@@ -166,25 +199,37 @@ float directionalLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec
 	tt[2] = vec2(shadow_coord[2].x * 0.5, 0.5 + shadow_coord[2].y * 0.5);
 	tt[3] = vec2(0.5 + shadow_coord[3].x * 0.5, 0.5 + shadow_coord[3].y * 0.5);
 
+	float bias = 0.0;
 	int split_index = 3;
 	if(step(shadow_coord[0].x, 0.99) * step(shadow_coord[0].y, 0.99)
 		* step(0.01, shadow_coord[0].x)	* step(0.01, shadow_coord[0].y) > 0.0)
+	{
 		split_index = 0;
+	}
 	else if(step(shadow_coord[1].x, 0.99) * step(shadow_coord[1].y, 0.99)
 		* step(0.01, shadow_coord[1].x)	* step(0.01, shadow_coord[1].y) > 0.0)
+	{
 		split_index = 1;
+	}
 	else if(step(shadow_coord[2].x, 0.99) * step(shadow_coord[2].y, 0.99)
 		* step(0.01, shadow_coord[2].x)	* step(0.01, shadow_coord[2].y) > 0.0)
+	{
 		split_index = 2;
+	}
 	else if(step(shadow_coord[3].x, 0.99) * step(shadow_coord[3].y, 0.99)
 		* step(0.01, shadow_coord[3].x)	* step(0.01, shadow_coord[3].y) > 0.0)
+	{
 		split_index = 3;
+	}
 	else
 		return 1.0;
 
 	return  
-		step(shadow_coord[split_index].z, 1) * smoothShadow(shadowmap, tt[split_index], shadow_coord[split_index].z);
+		VSM(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), 0.001, 450, 0.0002);
+		//ESM(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), 0.02, 2500);
+		//hardShadow(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), bias);
+		//PCF(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), bias, vec4(1, 1, 1, 1), vec2(1/1024.0,1/1024.0));
+		//step(shadow_coord[split_index].z, 1) * smoothShadow(shadowmap, tt[split_index], shadow_coord[split_index].z);
 }
-
 
 #endif

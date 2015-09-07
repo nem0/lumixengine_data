@@ -1,5 +1,5 @@
 $input a_position, a_normal, a_tangent, a_texcoord0, i_data0, i_data1
-$output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_texcoord1, v_common
+$output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_texcoord1, v_common, v_common2
 
 #include "common.sh"
 
@@ -73,8 +73,9 @@ void main()
 	v_wpos.x *= u_terrainScale.x;
 	v_wpos.z *= u_terrainScale.z;
 
-	gl_Position = mul(u_viewProj, mul(u_terrainMatrix, vec4(v_wpos, 1.0))); 
-
+	v_common2 = mul(u_viewProj, mul(u_terrainMatrix, vec4(v_wpos, 1.0))); 
+	gl_Position = v_common2;
+	
     v_wpos = mul(u_terrainMatrix, vec4(v_wpos, 1.0) ).xyz;
 	v_view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - v_wpos;
 	

@@ -13,6 +13,6 @@ void main()
 {
 	vec4 color = (texture2D(u_texShadowmap2, v_texcoord0) );
 
-	gl_FragColor.rgb = color.rgb;
+	gl_FragColor.rgb = vec3(unpackHalfFloat(color.rg), 0, 0);
 	gl_FragColor.w = 1.0;
 }

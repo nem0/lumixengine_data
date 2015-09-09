@@ -1,5 +1,5 @@
 $input a_position, a_normal, a_tangent, a_texcoord0, i_data0, i_data1
-$output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_texcoord1, v_common
+$output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_texcoord1, v_common, v_common2
 
 #include "common.sh"
 
@@ -30,7 +30,6 @@ vec3 computeWeight(vec3 pos, vec3 quad_min, vec2 morph_const)
 
 void main()
 {
-
 	float m = i_data0.w / 8.0;
 	v_wpos = a_position;  
 	v_wpos.x *= i_data0.w;
@@ -51,7 +50,7 @@ void main()
 	vec2 uv = v_wpos.xz / (u_terrainParams.x);
 	uv.x += 0.5/u_terrainParams.x;
 	uv.y += 0.5/u_terrainParams.x;
-	
+
 	v_texcoord1 = uv;
 	v_texcoord0 = uv * u_terrainParams.x;
 
@@ -74,8 +73,10 @@ void main()
 	v_wpos.x *= u_terrainScale.x;
 	v_wpos.z *= u_terrainScale.z;
 
-	gl_Position = mul(u_viewProj, mul(u_terrainMatrix, vec4(v_wpos, 1.0))); 
-
+	v_common2 = mul(u_viewProj, mul(u_terrainMatrix, vec4(v_wpos, 1.0))); 
+	gl_Position = v_common2;
+	
     v_wpos = mul(u_terrainMatrix, vec4(v_wpos, 1.0) ).xyz;
 	v_view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - v_wpos;
+	
 }

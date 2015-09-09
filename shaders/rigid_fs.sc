@@ -1,4 +1,4 @@
-$input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0
+$input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_common2
 
 #include "common.sh"
 
@@ -18,18 +18,29 @@ uniform mat4 u_shadowmapMatrices[4];
 uniform vec4 u_fogColorDensity; 
 uniform vec4 u_lightSpecular;
 uniform vec4 u_materialSpecularShininess;
+uniform vec4 u_attenuationParams;
 
 
-vec3 calcLight(vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
+vec3 calcLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 {
 	vec3 lp = u_lightPosRadius.xyz - _wpos;
 	float radius = u_lightPosRadius.w;
 	float dist = length(lp);
-	float attn = 1.0 / (1.0 + 0.2 * dist + 0.04 * dist * dist);
-	attn = attn * attn;
+	float attn = pow(max(0, 1 - dist / u_attenuationParams.x), u_attenuationParams.y);
 	
-	vec3 lightDir = normalize(lp);
-	vec2 bln = blinn(lightDir, _normal, _view);
+	vec3 toLightDir = normalize(lp);
+	
+	if(dirFov.w < 3.14159)
+	{
+		float cosDir = dot(normalize(dirFov.xyz), normalize(-toLightDir));
+		float cosCone = cos(dirFov.w * 0.5);
+	
+		if(cosDir < cosCone)
+			discard;
+		attn *= (cosDir - cosCone) / (1 - cosCone);
+	}
+		
+   vec2 bln = blinn(toLightDir, _normal, _view);
 	vec4 lc = lit(bln.x, bln.y, u_materialSpecularShininess.w);
 	vec3 rgb = 
 		attn * (u_lightRgbInnerR.xyz * saturate(lc.y) 
@@ -41,43 +52,6 @@ vec3 calcLight(vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 	return rgb;
 }
 
-float VSM(sampler2D depths, vec2 uv, float compare)
-{
-	return smoothstep(compare-0.0001, compare, texture2D(depths, uv).x * 0.5 + 0.5);
-}
-
-float getShadowmapValue(vec4 position)
-{
-	vec3 shadow_coord[4];
-	shadow_coord[0] = mul(u_shadowmapMatrices[0], position).xyz;
-	shadow_coord[1] = mul(u_shadowmapMatrices[1], position).xyz;
-	shadow_coord[2] = mul(u_shadowmapMatrices[2], position).xyz;
-	shadow_coord[3] = mul(u_shadowmapMatrices[3], position).xyz;
-
-	vec2 tt[4];
-	tt[0] = vec2(shadow_coord[0].x * 0.5, shadow_coord[0].y * 0.5);
-	tt[1] = vec2(0.5 + shadow_coord[1].x * 0.5, shadow_coord[1].y * 0.5);
-	tt[2] = vec2(shadow_coord[2].x * 0.5, 0.5 + shadow_coord[2].y * 0.5);
-	tt[3] = vec2(0.5 + shadow_coord[3].x * 0.5, 0.5 + shadow_coord[3].y * 0.5);
-
-	int split_index = 3;
-	if(step(shadow_coord[0].x, 0.99) * step(shadow_coord[0].y, 0.99)
-		* step(0.01, shadow_coord[0].x)	* step(0.01, shadow_coord[0].y) > 0.0)
-		split_index = 0;
-	else if(step(shadow_coord[1].x, 0.99) * step(shadow_coord[1].y, 0.99)
-		* step(0.01, shadow_coord[1].x)	* step(0.01, shadow_coord[1].y) > 0.0)
-		split_index = 1;
-	else if(step(shadow_coord[2].x, 0.99) * step(shadow_coord[2].y, 0.99)
-		* step(0.01, shadow_coord[2].x)	* step(0.01, shadow_coord[2].y) > 0.0)
-		split_index = 2;
-	else if(step(shadow_coord[3].x, 0.99) * step(shadow_coord[3].y, 0.99)
-		* step(0.01, shadow_coord[3].x)	* step(0.01, shadow_coord[3].y) > 0.0)
-		split_index = 3;
-	else
-		return 1.0;
-
-	return step(shadow_coord[split_index].z, 1) * VSM(u_texShadowmap, tt[split_index], shadow_coord[split_index].z);
-}
 
 void main()
 {     
@@ -85,7 +59,8 @@ void main()
 		vec4 color = texture2D(u_texColor, v_texcoord0);
 		if(color.a < 0.3)
 			discard;
-		gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+		float depth = v_common2.z/v_common2.w;
+		gl_FragColor = vec4_splat(depth);
 	#else
 		mat3 tbn = mat3(
 					normalize(v_tangent),
@@ -101,10 +76,7 @@ void main()
 		#else
 			normal = vec3(0.0, 1.0, 0.0);
 		#endif
-		//normal = vec3(0, 1, 0);
 		vec3 view = normalize(v_view);
-		gl_FragColor = vec4(mul(tbn, normal), 1);
-		//return;
 
 		vec4 color = /*toLinear*/(texture2D(u_texColor, v_texcoord0) );
 		if(color.a < 0.3)
@@ -112,12 +84,15 @@ void main()
 					 
 		vec3 diffuse;
 		#ifdef POINT_LIGHT
-			diffuse = calcLight(v_wpos, mul(tbn, normal), view, v_texcoord0);
+			diffuse = calcLight(u_lightDirFov, v_wpos, mul(tbn, normal), view, v_texcoord0);
 			diffuse = diffuse.xyz * color.rgb;
+			#ifdef HAS_SHADOWMAP
+				diffuse = diffuse * pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), u_lightDirFov.w); 
+			#endif
 		#else
 			diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, mul(tbn, normal));
 			diffuse = diffuse.xyz * color.rgb;
-			diffuse = diffuse * getShadowmapValue(vec4(v_wpos, 1.0)); 
+			diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0)); 
 		#endif
 
 		#ifdef MAIN
@@ -134,8 +109,5 @@ void main()
 			gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
 		#endif
 		gl_FragColor.w = 1.0;
-		
-		//gl_FragColor = vec4(getShadowmapValue(vec4(v_wpos, 1.0)), 0, 0, 1);
-		//gl_FragColor = toGamma(gl_FragColor);
 	#endif                  
 }

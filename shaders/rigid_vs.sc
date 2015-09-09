@@ -1,5 +1,5 @@
 $input a_position, a_normal, a_tangent, a_texcoord0, i_data0, i_data1, i_data2, i_data3
-$output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0
+$output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_common2
 
 #include "common.sh"
 
@@ -26,5 +26,6 @@ void main()
 		v_view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - v_wpos;
 	#endif
 
-	gl_Position =  mul(u_viewProj, vec4(v_wpos, 1.0) );
+	v_common2 = mul(u_viewProj, vec4(v_wpos, 1.0) ); 
+	gl_Position =  v_common2;
 }

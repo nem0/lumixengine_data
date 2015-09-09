@@ -22,6 +22,7 @@ uniform vec4 u_materialSpecularShininess;
 uniform vec4 detail_texture_distance;
 uniform vec4 texture_scale;
 uniform vec4 u_attenuationParams;
+uniform vec4 u_relCamPos;
 
 
 vec3 shadePointLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
@@ -142,7 +143,9 @@ void main()
 
 		vec3 view = normalize(v_view);
 		
-		float t = (v_common.x - detail_texture_distance.x) / detail_texture_distance.x;
+		float dist = length(v_view);
+		
+		float t = (dist - detail_texture_distance.x) / detail_texture_distance.x;
 		color = mix(color, texture2D(u_texSatellitemap, v_texcoord1), clamp(t, 0, 1));
 					 
 		vec3 diffuse;

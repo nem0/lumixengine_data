@@ -4,7 +4,7 @@ framebuffers = {
 		width = 2048,
 		height = 2048,
 		renderbuffers = {
-			{format="rgba8"},
+			{format="r32f"},
 			{format = "depth32"}
 		}
 	},

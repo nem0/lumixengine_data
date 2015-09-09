@@ -28,8 +28,7 @@ vec3 shadePointLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 {
 	vec3 lp = u_lightPosRadius.xyz - _wpos;
 	float dist = length(lp);
-	float attn = 1.0 / (u_attenuationParams.x + u_attenuationParams.y * dist + u_attenuationParams.z * dist * dist);
-	attn = attn;
+	float attn = pow(max(0, 1 - dist / u_attenuationParams.x), u_attenuationParams.y);
 	
 	vec3 toLightDir = normalize(lp);
 	if(dirFov.w < 3.14159)
@@ -58,10 +57,8 @@ vec3 shadePointLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 void main()
 {
 	#ifdef SHADOW
-		float depth = v_common2.z/v_common2.w * 0.5 + 0.5;
-		float depthSq = depth*depth;
-		gl_FragColor = vec4(packHalfFloat(depth), packHalfFloat(depthSq));
-		//discard;
+		float depth = v_common2.z/v_common2.w;
+		gl_FragColor = vec4_splat(depth);
 	#else
 		vec2 detail_uv = v_texcoord0.xy * texture_scale.x;
 
@@ -122,7 +119,7 @@ void main()
 		float b3 = max(a10 - ma, 0);
 		float b4 = max(a11 - ma, 0);
 
-		color = 
+		color =
 			texture2D(u_texColormap, v_texcoord1) * 
 			vec4((c00.rgb * b1 + c01.rgb * b2 + c10.rgb * b3 + c11.rgb * b4) / (b1 + b2 + b3 + b4), 1);
 
@@ -138,14 +135,11 @@ void main()
 		#else
 			normal = vec3(0.0, 1.0, 0.0);
 		#endif
-			
-	//	gl_FragColor = vec4(xx.z, 0, 0, 1);
-	//	return;
-		
+
 		// http://www.gamasutra.com/blogs/AndreyMishkinis/20130716/196339/Advanced_Terrain_Texture_Splatting.php
 		// without height blend
 		//color = (c00 * u_opposite  + c10  * u_ratio) * v_opposite + (c01 * u_opposite  + c11 * u_ratio) * v_ratio;
-			
+
 		vec3 view = normalize(v_view);
 		
 		float t = (v_common.x - detail_texture_distance.x) / detail_texture_distance.x;

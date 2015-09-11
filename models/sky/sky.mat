@@ -1,4 +1,4 @@
-{"shader" : "shaders/screenspace.shd",
+{"shader" : "shaders/sky.shd",
 "backface_culling" : true,
 "alpha_cutout" : false,
 "shadow_receiver" : true,

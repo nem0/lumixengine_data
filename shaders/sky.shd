@@ -1,0 +1,12 @@
+passes = {"SKY"}
+vs_combinations = { 
+	{}
+}
+
+fs_combinations =               
+{
+	{}
+}
+   
+texture_slots = {
+}

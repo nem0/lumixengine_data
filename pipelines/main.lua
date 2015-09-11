@@ -32,13 +32,15 @@ framebuffers = {
 function init(pipeline)
 	shadowmap_uniform = createUniform(pipeline, "u_texShadowmap")
 	shadowmap2_uniform = createUniform(pipeline, "u_texShadowmap2")
+	sky_material = loadMaterial(pipeline, "models/sky/sky.mat")
+	screen_space_material = loadMaterial(pipeline, "models/editor/screen_space.mat")
 end
  
 function renderShadowmapDebug(pipeline)
 	setPass(pipeline, "SCREEN_SPACE")
 		bindFramebufferTexture(pipeline, "point_light_shadowmap", 0, shadowmap2_uniform)
 		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
-		drawQuad(pipeline, 0.5, 0.98, 0.48, -0.48)
+		drawQuad(pipeline, 0.5, 0.98, 0.48, -0.48, screen_space_material)
 end
  
 function render(pipeline)
@@ -49,15 +51,20 @@ function render(pipeline)
 		renderShadowmap(pipeline, 1, "editor") 
 
 		renderLocalLightsShadowmaps(pipeline, 1, {"point_light_shadowmap", "point_light2_shadowmap"}, "editor")
+
 	setPass(pipeline, "MAIN")
+		clear(pipeline, "all")
 		enableRGBWrite(pipeline)
 		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
 		setFramebuffer(pipeline, "default")
-		clear(pipeline, "all")
 		applyCamera(pipeline, "editor")
 		renderModels(pipeline, 1, false)
 --		executeCustomCommand(pipeline, "render_physics");
 		renderDebugShapes(pipeline)
+
+	setPass(pipeline, "SKY")
+		--disableBlending(pipeline)
+		drawQuad(pipeline, -1, -1, 2, 2, sky_material);
 
 	setPass(pipeline, "POINT_LIGHT")
 		disableDepthWrite(pipeline)
@@ -73,7 +80,8 @@ function render(pipeline)
 		executeCustomCommand(pipeline, "render_gizmos")
 		executeCustomCommand(pipeline, "render_physics")
 		--renderDebugTexts(pipeline)     
-	renderShadowmapDebug(pipeline)
+	
+	--renderShadowmapDebug(pipeline)
 	
 	print(0, 0, string.format("FPS: %.2f", getFPS(pipeline))	)
 end

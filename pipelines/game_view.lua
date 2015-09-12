@@ -11,6 +11,7 @@ framebuffers = {
 
 function init(pipeline)
 	shadowmap_uniform = createUniform(pipeline, "u_texShadowmap")
+	sky_material = loadMaterial(pipeline, "models/sky/sky.mat")
 end
 
 function render(pipeline)
@@ -18,6 +19,10 @@ function render(pipeline)
 		setPass(pipeline, "MAIN")
 			setFramebuffer(pipeline, "default")
 			clear(pipeline, "all")
+			
+		setPass(pipeline, "IMGUI")
+			clear(pipeline, "all")
+
 		return
 	end
 
@@ -33,6 +38,10 @@ function render(pipeline)
 		renderModels(pipeline, 1, false)
 		--renderDebugLines(pipeline)
 
+	setPass(pipeline, "SKY")
+		--disableBlending(pipeline)
+		drawQuad(pipeline, -1, -1, 2, 2, sky_material);
+		
 	setPass(pipeline, "POINT_LIGHT")
 		enableBlending(pipeline)
 		applyCamera(pipeline, "main")
@@ -40,5 +49,5 @@ function render(pipeline)
 		disableBlending(pipeline)
 	
 	setPass(pipeline, "IMGUI")
-	
+
 end

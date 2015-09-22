@@ -1,11 +1,6 @@
 $input a_position, a_color, a_texcoord0
 $output v_wpos, v_texcoord0
 
-/*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
- */
-
 #include "common.sh"
 
 void main()

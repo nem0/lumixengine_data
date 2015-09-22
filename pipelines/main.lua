@@ -1,5 +1,15 @@
 framebuffers = {
 	{
+		name = "default",
+		width = 1024,
+		height = 768,
+		renderbuffers = {
+			{format="rgba8"},
+			{format = "depth24"}
+		}
+	},
+	
+	{
 		name = "shadowmap",
 		width = 2048,
 		height = 2048,

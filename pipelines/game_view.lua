@@ -13,6 +13,7 @@ framebuffers = {
 		width = 2048,
 		height = 2048,
 		renderbuffers = {
+			{format="r32f"},
 			{format = "depth32"}
 		}
 	}
@@ -28,9 +29,6 @@ function render(pipeline)
 		setPass(pipeline, "MAIN")
 			setFramebuffer(pipeline, "default")
 			clear(pipeline, "all")
-			
-		setPass(pipeline, "IMGUI")
-			clear(pipeline, "all")
 
 		return
 	end
@@ -41,12 +39,13 @@ function render(pipeline)
 		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
 
 	setPass(pipeline, "MAIN")
-		setFramebuffer(pipeline, "default")
 		clear(pipeline, "all")
+		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
+		setFramebuffer(pipeline, "default")
 		applyCamera(pipeline, "main")
 		renderModels(pipeline, 1, false)
 		--renderDebugLines(pipeline)
-
+--[[
 	setPass(pipeline, "SKY")
 		--disableBlending(pipeline)
 		drawQuad(pipeline, -1, -1, 2, 2, sky_material);
@@ -56,5 +55,5 @@ function render(pipeline)
 		applyCamera(pipeline, "main")
 		renderModels(pipeline, 1, true)
 		disableBlending(pipeline)
-
+]]--
 end

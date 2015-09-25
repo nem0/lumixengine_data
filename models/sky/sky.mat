@@ -1,4 +1,9 @@
-{"shader" : "shaders/sky.shd",
+{"shader" : "shaders/clouds.shd",
+"uniforms" : [
+{
+"name": "u_time", "time" : 0
+}
+],
 "backface_culling" : true,
 "alpha_cutout" : false,
 "shadow_receiver" : true,

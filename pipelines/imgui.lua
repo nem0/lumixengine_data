@@ -1,9 +1,7 @@
 framebuffers = {
-	
 }
  
 function init(pipeline)
-	screen_space_material = loadMaterial(pipeline, "models/editor/screen_space.mat")
 end
  
  

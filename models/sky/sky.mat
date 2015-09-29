@@ -1,4 +1,4 @@
-{"shader" : "shaders/clouds.shd",
+{"shader" : "shaders/sky.shd",
 "uniforms" : [
 {
 "name": "u_time", "time" : 0

@@ -93,10 +93,11 @@ void main()
 		vec4 splat01 = texture2D(u_texSplatmap, vec2(x/tex_size, (y+1)/tex_size)).rgba;
 		vec4 splat10 = texture2D(u_texSplatmap, vec2((x+1)/tex_size, y/tex_size)).rgba;
 		vec4 splat11 = texture2D(u_texSplatmap, vec2((x+1)/tex_size, (y+1)/tex_size)).rgba;
-		vec4 c00 = texture3D(u_texColor, vec3(detail_uv.xy, splat00.x * 256.0 / texture_count));
-		vec4 c01 = texture3D(u_texColor, vec3(detail_uv.xy, splat01.x * 256.0 / texture_count));
-		vec4 c10 = texture3D(u_texColor, vec3(detail_uv.xy, splat10.x * 256.0 / texture_count));
-		vec4 c11 = texture3D(u_texColor, vec3(detail_uv.xy, splat11.x * 256.0 / texture_count));
+		float to_texture_z = 256.0 / (texture_count - 1);
+		vec4 c00 = texture3D(u_texColor, vec3(detail_uv.xy, splat00.x * to_texture_z));
+		vec4 c01 = texture3D(u_texColor, vec3(detail_uv.xy, splat01.x * to_texture_z));
+		vec4 c10 = texture3D(u_texColor, vec3(detail_uv.xy, splat10.x * to_texture_z));
+		vec4 c11 = texture3D(u_texColor, vec3(detail_uv.xy, splat11.x * to_texture_z));
 
 		vec4 bicoef = vec4(
 			u_opposite * v_opposite,
@@ -120,16 +121,16 @@ void main()
 		float b3 = max(a10 - ma, 0);
 		float b4 = max(a11 - ma, 0);
 
-		color =
+		color = 
 			texture2D(u_texColormap, v_texcoord1) * 
 			vec4((c00.rgb * b1 + c01.rgb * b2 + c10.rgb * b3 + c11.rgb * b4) / (b1 + b2 + b3 + b4), 1);
 
 		vec3 normal;
 		#ifdef NORMAL_MAPPING
-			vec4 n00 = texture3D(u_texNormal, vec3(detail_uv.xy, splat00.x * 256.0 / texture_count));
-			vec4 n01 = texture3D(u_texNormal, vec3(detail_uv.xy, splat01.x * 256.0 / texture_count));
-			vec4 n10 = texture3D(u_texNormal, vec3(detail_uv.xy, splat10.x * 256.0 / texture_count));
-			vec4 n11 = texture3D(u_texNormal, vec3(detail_uv.xy, splat11.x * 256.0 / texture_count));
+			vec4 n00 = texture3D(u_texNormal, vec3(detail_uv.xy, splat00.x * to_texture_z));
+			vec4 n01 = texture3D(u_texNormal, vec3(detail_uv.xy, splat01.x * to_texture_z));
+			vec4 n10 = texture3D(u_texNormal, vec3(detail_uv.xy, splat10.x * to_texture_z));
+			vec4 n11 = texture3D(u_texNormal, vec3(detail_uv.xy, splat11.x * to_texture_z));
 			normal.xz = (n00.xy * b1 + n01.xy * b2 + n10.xy * b3 + n11.xy * b4) / (b1 + b2 + b3 + b4);
 			normal.xz = normal.xz * 2.0 - 1.0;
 			normal.y = sqrt(1 - dot(normal.xz, normal.xz));

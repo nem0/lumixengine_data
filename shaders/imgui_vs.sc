@@ -6,7 +6,7 @@ $output v_texcoord0, v_common2
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#include <bgfx_shader.sh>
+#include "common.sh"
 
 void main()
 {

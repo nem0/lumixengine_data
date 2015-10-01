@@ -19,4 +19,4 @@ Media
 
 [Videos](https://www.youtube.com/channel/UCtjtIy0ldsq-9siM1Gm_rXg)
 
-![Editor screenshot](https://raw.githubusercontent.com/nem0/LumixEngine/gh-pages/images/editor.png "Editor screenshot")
+![Editor screenshot](https://cloud.githubusercontent.com/assets/153526/10109455/450c51be-63c7-11e5-9c87-96d9d00efe02.png)

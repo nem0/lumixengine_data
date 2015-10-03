@@ -78,9 +78,6 @@ void main()
 		vec4 splat = texture2D(u_texSplatmap, v_texcoord1 - vec2(half_texel, half_texel)).rgba;
 		vec2 ff = fract(detail_uv);
 
-		vec4 color = 
-			texture3D(u_texColor, vec3(detail_uv.xy, splat.x *256.0 / texture_count));
-
 		float u = v_texcoord1.x * tex_size - 1.0;
 		float v = v_texcoord1.y * tex_size - 1.0;
 		int x = floor(u);
@@ -121,7 +118,7 @@ void main()
 		float b3 = max(a10 - ma, 0);
 		float b4 = max(a11 - ma, 0);
 
-		color = 
+		vec4 color = 
 			texture2D(u_texColormap, v_texcoord1) * 
 			vec4((c00.rgb * b1 + c01.rgb * b2 + c10.rgb * b3 + c11.rgb * b4) / (b1 + b2 + b3 + b4), 1);
 

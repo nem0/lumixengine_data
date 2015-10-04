@@ -31,7 +31,8 @@ texture_slots = {
 	},
 	{
 		name = "Diffuse",
-		uniform = "u_texColor"
+		uniform = "u_texColor",
+		is_atlas = true
 	},
 	{
 		name = "Normal",

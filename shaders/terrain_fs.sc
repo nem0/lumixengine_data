@@ -119,7 +119,7 @@ void main()
 		float splatmap_size = u_terrainParams.y;
 		float half_texel = 0.5 / splatmap_size;
 		int texture_count = u_terrainParams.z * u_terrainParams.z;
-		int detail_splatmap_size = u_terrainParams.y / (2*u_terrainParams.z);
+		int detail_size = u_terrainParams.y / (2*u_terrainParams.z);
 					
 		vec2 ff = fract(detail_uv);
 
@@ -159,9 +159,9 @@ void main()
 			duv11 = getSubtextureUV16(ff, splat11.x * 256);
 		}
 		
-		float mipmap_level = max(mipmapLevel(v_texcoord0, vec2(detail_splatmap_size, detail_splatmap_size)), 0);
-
-		mipmap_level = min(mipmap_level, log2(detail_splatmap_size) - 1);
+		float mipmap_level = mipmapLevel(v_texcoord0 * texture_scale.x, vec2(detail_size, detail_size));
+	
+		mipmap_level = min(mipmap_level, log2(detail_size) - 1);
 		
 		vec4 c00 = texture2DLod(u_texColor, duv00, mipmap_level);
 		vec4 c01 = texture2DLod(u_texColor, duv01, mipmap_level);

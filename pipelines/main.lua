@@ -45,7 +45,7 @@ function init(pipeline)
 	sky_material = loadMaterial(pipeline, "models/sky/sky.mat")
 	screen_space_material = loadMaterial(pipeline, "models/editor/screen_space.mat")
 end
- 
+
 function renderShadowmapDebug(pipeline)
 	setPass(pipeline, "SCREEN_SPACE")
 		bindFramebufferTexture(pipeline, "point_light_shadowmap", 0, shadowmap2_uniform)
@@ -67,7 +67,6 @@ function render(pipeline)
 		setPass(pipeline, "MAIN")
 			clear(pipeline, "all")
 			enableRGBWrite(pipeline)
-			bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
 			setFramebuffer(pipeline, "default")
 			applyCamera(pipeline, "editor")
 			renderModels(pipeline, 1, false)

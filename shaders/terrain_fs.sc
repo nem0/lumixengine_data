@@ -116,7 +116,7 @@ void main()
 					);
 		tbn = transpose(tbn);
 
-		float splatmap_size = u_terrainParams.y;
+		float splatmap_size = u_terrainParams.w;
 		float half_texel = 0.5 / splatmap_size;
 		int texture_count = u_terrainParams.z * u_terrainParams.z;
 		int detail_size = u_terrainParams.y / (2*u_terrainParams.z);
@@ -189,6 +189,9 @@ void main()
 		float b2 = max(a01 - ma, 0);
 		float b3 = max(a10 - ma, 0);
 		float b4 = max(a11 - ma, 0);
+		
+		gl_FragColor = vec4(v_texcoord1.x, 0, 0, 1);
+		//return;
 		
 		vec4 color = 
 			texture2D(u_texColormap, v_texcoord1) * 

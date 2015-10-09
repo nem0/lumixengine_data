@@ -1,4 +1,4 @@
- rmdir /Q compiled
+ rmdir /S /Q compiled
  del /Q shader_test.log
  mkdir compiled
  cd..

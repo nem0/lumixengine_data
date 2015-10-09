@@ -7,4 +7,12 @@ scripts/*.lib
 scripts/*.pdb
 /*.dll
 /*.exe
+*_autosave.unv
+*.unv.lst
 shaders/compiled
+metadata.bin
+minidump.dmp
+fulldump.dmp
+imgui.ini
+error.log
+studio.ini

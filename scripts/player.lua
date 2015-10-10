@@ -1,7 +1,6 @@
 -- LUMIX PROPERTY CAMERA_ENTITY
 -- LUMIX PROPERTY PLAYER_SPEED
-
-PLAYER_SPEED = 0.1
+-- LUMIX PROPERTY MOUSE_SENSITIVITY
 
 cmp = API_createComponent(API_getScene(g_universe_context, "physics"), "physical_controller", this)
 
@@ -28,8 +27,8 @@ API_addInputAction(g_engine, SPRINT_ACTION, 0, LSHIFT_KEY)
 
 
 function update(dt)
-	yaw = yaw + API_getInputActionValue(g_engine, ROT_H_ACTION) * -0.005;
-	pitch = pitch + API_getInputActionValue(g_engine, ROT_V_ACTION) * -0.005;
+	yaw = yaw + API_getInputActionValue(g_engine, ROT_H_ACTION) * -0.01 * MOUSE_SENSITIVITY;
+	pitch = pitch + API_getInputActionValue(g_engine, ROT_V_ACTION) * -0.01 * MOUSE_SENSITIVITY;
 	
 	local PITCH_LIMIT = 0.7
 	

@@ -1,7 +1,11 @@
 {"shader" : "shaders/editorobjects.shd",
-"texture" : {"source" : "icon.tga"},
+"texture" : {"source" : "icon.dds"},
 "uniforms" : [],
 "backface_culling" : false,
 "alpha_cutout" : false,
-"shadow_receiver" : true,
+"shadow_receiver" : false,
+"shininess" : 4.00000000,
+"specular" : [1.00000000,
+1.00000000,
+1.00000000],
 "z_test" : true}

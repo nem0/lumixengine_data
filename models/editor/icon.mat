@@ -1,5 +1,5 @@
 {"shader" : "shaders/editorobjects.shd",
-"texture" : {"source" : "icon.dds"},
+"texture" : {"source" : "icon.tga"},
 "uniforms" : [],
 "backface_culling" : false,
 "alpha_cutout" : false,

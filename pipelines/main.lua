@@ -75,7 +75,7 @@ function render(pipeline)
 
 		setPass(pipeline, "SKY")
 			--disableBlending(pipeline)
-			drawQuad(pipeline, -1, -1, 2, 2, sky_material);
+			--drawQuad(pipeline, -1, -1, 2, 2, sky_material);
 
 		setPass(pipeline, "POINT_LIGHT")
 			disableDepthWrite(pipeline)

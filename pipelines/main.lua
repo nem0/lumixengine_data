@@ -93,7 +93,6 @@ function render(pipeline)
 			--renderDebugTexts(pipeline)     
 		
 		--renderShadowmapDebug(pipeline)
-		setPass(pipeline, "IMGUI")
 	else
 		setPass(pipeline, "IMGUI")
 			clear(pipeline, "all")

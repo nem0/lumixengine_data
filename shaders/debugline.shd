@@ -1,4 +1,4 @@
-passes = {"MAIN"}
+passes = {"MAIN", "EDITOR"}
 vs_combinations = { 
 	{}
 }

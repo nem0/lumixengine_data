@@ -19,6 +19,7 @@ uniform vec4 u_fogColorDensity;
 uniform vec4 u_lightSpecular;
 uniform vec4 u_materialSpecularShininess;
 uniform vec4 u_attenuationParams;
+uniform vec4 u_fogParams;
 
 
 vec3 calcLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
@@ -102,7 +103,7 @@ void main()
 		#endif  
 
 		vec4 view_pos = mul(u_view, vec4(v_wpos, 1.0));
-		float fog_factor = getFogFactor(view_pos.z / view_pos.w, u_fogColorDensity.w);
+		float fog_factor = getFogFactor(view_pos.z / view_pos.w, u_fogColorDensity.w, v_wpos.y, u_fogParams);
 		#ifdef POINT_LIGHT
 			gl_FragColor.xyz = (1 - fog_factor) * (diffuse + ambient);
 		#else

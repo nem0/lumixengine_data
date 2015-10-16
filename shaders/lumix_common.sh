@@ -21,10 +21,12 @@ vec2 blinn(vec3 _lightDir, vec3 _normal, vec3 _viewDir)
 }
 
 
-float getFogFactor(float fog_coord, float fog_density) 
+float getFogFactor(float fog_coord, float fog_density, float fragment_height, vec4 fog_params) 
 { 
 	float fResult = exp(-pow(fog_density * fog_coord, 2.0)); 
 	fResult = 1.0-clamp(fResult, 0.0, 1.0); 
+	fResult = fResult * clamp(((fog_params.x + fog_params.y) - fragment_height) / fog_params.y, 0, 1);
+	
 	return fResult;
 }
 

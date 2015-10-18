@@ -38,7 +38,7 @@ function render(pipeline)
 		renderShadowmap(pipeline, 1, "main") 
 
 	setPass(pipeline, "MAIN")
-		clear(pipeline, "all", 0)
+		clear(pipeline, "all", 0x000000ff)
 		setFramebuffer(pipeline, "default")
 		applyCamera(pipeline, "main")
 		renderModels(pipeline, 1, false)

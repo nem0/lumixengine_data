@@ -1,5 +1,5 @@
 $input a_position, a_normal, a_tangent, a_texcoord0, i_data0, i_data1
-$output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_texcoord1, v_common, v_common2
+$output v_wpos, v_view, v_texcoord0, v_texcoord1, v_common, v_common2
 
 #include "common.sh"
 
@@ -54,21 +54,6 @@ void main()
 	v_texcoord1 = uv;
 	v_texcoord0 = uv * u_terrainParams.x;
 
-	vec2 size = vec2(1, 0.0);
-	float tex_size = 4 * u_terrainParams.y;
-	vec3 off = vec3(-1.0 / tex_size, 0.0, 1.0 / tex_size);
-    
-	float s01 = texture2DLod(u_texHeightmap, uv + off.xy, 0).x;
-    float s21 = texture2DLod(u_texHeightmap, uv + off.zy, 0).x;
-    float s10 = texture2DLod(u_texHeightmap, uv + off.yx, 0).x;
-    float s12 = texture2DLod(u_texHeightmap, uv + off.yz, 0).x;
-    vec3 va = normalize(vec3(2, u_terrainScale.y * (s21-s01), 0));
-    vec3 vb = normalize(vec3(0, u_terrainScale.y * (s12-s10), 2));
-	v_normal = mul(u_terrainMatrix, cross(vb,va) ).xyz;
-	
-	v_tangent = normalize(cross(v_normal, mul(u_terrainMatrix, vb)));
-	v_bitangent = normalize(cross(v_normal, v_tangent));
-	
 	v_wpos.y = u_terrainScale.y * texture2DLod(u_texHeightmap, uv, 0).x;
 	v_wpos.x *= u_terrainScale.x;
 	v_wpos.z *= u_terrainScale.z;

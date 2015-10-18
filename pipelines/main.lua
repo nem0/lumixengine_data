@@ -54,49 +54,43 @@ function renderShadowmapDebug(pipeline)
 end
  
 function render(pipeline)
-	if hasScene(pipeline) then
+	setPass(pipeline, "SHADOW")         
+		--disableRGBWrite(pipeline)
+		--disableAlphaWrite(pipeline)
+		setFramebuffer(pipeline, "shadowmap")
+		renderShadowmap(pipeline, 1, "editor") 
 
-		setPass(pipeline, "SHADOW")         
-			--disableRGBWrite(pipeline)
-			--disableAlphaWrite(pipeline)
-			setFramebuffer(pipeline, "shadowmap")
-			renderShadowmap(pipeline, 1, "editor") 
+		renderLocalLightsShadowmaps(pipeline, 1, {"point_light_shadowmap", "point_light2_shadowmap"}, "editor")
 
-			renderLocalLightsShadowmaps(pipeline, 1, {"point_light_shadowmap", "point_light2_shadowmap"}, "editor")
+	setPass(pipeline, "MAIN")
+		clear(pipeline, "all", 0xbbd3edff)
+		enableRGBWrite(pipeline)
+		setFramebuffer(pipeline, "default")
+		applyCamera(pipeline, "editor")
+		renderModels(pipeline, 1, false)
+--		executeCustomCommand(pipeline, "render_physics");
+		renderDebugShapes(pipeline)
 
-		setPass(pipeline, "MAIN")
-			clear(pipeline, "all")
-			enableRGBWrite(pipeline)
-			setFramebuffer(pipeline, "default")
-			applyCamera(pipeline, "editor")
-			renderModels(pipeline, 1, false)
-	--		executeCustomCommand(pipeline, "render_physics");
-			renderDebugShapes(pipeline)
+	setPass(pipeline, "SKY")
+		--disableBlending(pipeline)
+		--drawQuad(pipeline, -1, -1, 2, 2, sky_material);
 
-		setPass(pipeline, "SKY")
-			--disableBlending(pipeline)
-			--drawQuad(pipeline, -1, -1, 2, 2, sky_material);
+	setPass(pipeline, "POINT_LIGHT")
+		disableDepthWrite(pipeline)
+		enableBlending(pipeline)
+		applyCamera(pipeline, "editor")
+		renderModels(pipeline, 1, true)
 
-		setPass(pipeline, "POINT_LIGHT")
-			disableDepthWrite(pipeline)
-			enableBlending(pipeline)
-			applyCamera(pipeline, "editor")
-			renderModels(pipeline, 1, true)
-
-		setPass(pipeline, "EDITOR")
-			enableDepthWrite(pipeline)
-			disableBlending(pipeline)
-			clear(pipeline, "depth")
-			applyCamera(pipeline, "editor")
-			executeCustomCommand(pipeline, "render_gizmos")
-			executeCustomCommand(pipeline, "render_physics")
-			--renderDebugTexts(pipeline)     
-		
-		--renderShadowmapDebug(pipeline)
-	else
-		setPass(pipeline, "IMGUI")
-			clear(pipeline, "all")
-	end
+	setPass(pipeline, "EDITOR")
+		enableDepthWrite(pipeline)
+		disableBlending(pipeline)
+		clear(pipeline, "depth", 0)
+		applyCamera(pipeline, "editor")
+		executeCustomCommand(pipeline, "render_gizmos")
+		executeCustomCommand(pipeline, "render_physics")
+		--renderDebugTexts(pipeline)     
 	
+	--renderShadowmapDebug(pipeline)
+
 	--print(80, 0, string.format("FPS: %.2f", getFPS(pipeline))	)
 end

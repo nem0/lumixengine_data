@@ -1,4 +1,4 @@
-$input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_texcoord1, v_common, v_common2 // in...
+$input v_wpos, v_view, v_texcoord0, v_texcoord1, v_common, v_common2 // in...
 
 #include "common.sh"
 
@@ -22,8 +22,9 @@ uniform vec4 u_materialSpecularShininess;
 uniform vec4 detail_texture_distance;
 uniform vec4 texture_scale;
 uniform vec4 u_attenuationParams;
-uniform vec4 u_relCamPos;
 uniform vec4 u_fogParams;
+uniform vec4 u_terrainScale;
+uniform mat4 u_terrainMatrix;
 
 
 vec3 shadePointLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
@@ -110,10 +111,25 @@ void main()
 	#else
 		vec2 detail_uv = v_texcoord0.xy * texture_scale.x;
 
+		vec2 uv = v_texcoord1;
+		float tex_size = u_terrainParams.x;
+		vec3 off = vec3(-0.5 / tex_size, 0.0, 0.5 / tex_size);
+		
+		float s01 = texture2D(u_texHeightmap, uv + off.xy).x;
+		float s21 = texture2D(u_texHeightmap, uv + off.zy).x;
+		float s10 = texture2D(u_texHeightmap, uv + off.yx).x;
+		float s12 = texture2D(u_texHeightmap, uv + off.yz).x;
+		vec3 va = normalize(vec3(1, (s21-s01) * u_terrainScale.y, 0));
+		vec3 vb = normalize(vec3(0, (s12-s10) * u_terrainScale.y, 1));
+		vec3 terrain_normal = mul(u_terrainMatrix, cross(vb,va) ).xyz;
+	
+		vec3 terrain_tangent = normalize(cross(terrain_normal, mul(u_terrainMatrix, vb)));
+		vec3 terrain_bitangent = normalize(cross(terrain_normal, terrain_tangent));
+		
 		mat3 tbn = mat3(
-					normalize(v_tangent),
-					normalize(v_normal),
-					normalize(v_bitangent)
+					normalize(terrain_tangent),
+					normalize(terrain_normal),
+					normalize(terrain_bitangent)
 					);
 		tbn = transpose(tbn);
 
@@ -230,11 +246,14 @@ void main()
 				diffuse = diffuse * pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), u_lightDirFov.w); 
 			#endif
 		#else
+			float ndl = -dot(mul(tbn, normal), u_lightDirFov.xyz);
 			diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, mul(tbn, normal));
 			diffuse = diffuse.xyz * color.rgb;
-			diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0)); 			
+			float ndotl = -dot(mul(tbn, normal), u_lightDirFov.xyz);
+			diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 	
 		#endif
 
+		
 		#ifdef MAIN
 			vec3 ambient = u_ambientColor.rgb * color.rgb;
 		#else

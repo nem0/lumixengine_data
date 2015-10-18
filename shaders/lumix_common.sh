@@ -188,7 +188,7 @@ float pointLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec4 posi
 }
 
 
-float directionalLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec4 position)
+float directionalLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec4 position, float ndotl)
 {
 	vec3 shadow_coord[4];
 	shadow_coord[0] = mul(shadowmapMatrices[0], position).xyz;
@@ -202,7 +202,6 @@ float directionalLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec
 	tt[2] = vec2(shadow_coord[2].x * 0.5, 0.5 + shadow_coord[2].y * 0.5);
 	tt[3] = vec2(0.5 + shadow_coord[3].x * 0.5, 0.5 + shadow_coord[3].y * 0.5);
 
-	float bias = 0.0;
 	int split_index = 3;
 	if(step(shadow_coord[0].x, 0.99) * step(shadow_coord[0].y, 0.99)
 		* step(0.01, shadow_coord[0].x)	* step(0.01, shadow_coord[0].y) > 0.0)
@@ -227,11 +226,14 @@ float directionalLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec
 	else
 		return 1.0;
 
-	const float offsets[4] = {0.00001, 0.00001, 0.00001, 0.0001};
+	const float offsets[4] = {0.00001, 0.00001, 0.0001, 0.0001};
+	float bias = offsets[split_index]*tan(acos(ndotl)); 
+	bias = clamp(bias, 0,0.01);		
+		
 		
 	return  
 		//VSM(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), 0.001, 450, 0.0002);
-		ESM(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), offsets[split_index], 90000);
+		ESM(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), bias, 5000);
 		//hardShadow(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), bias);
 		//PCF(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), bias, vec4(1, 1, 1, 1), vec2(1/1024.0,1/1024.0));
 		//step(shadow_coord[split_index].z, 1) * smoothShadow(shadowmap, tt[split_index], shadow_coord[split_index].z);

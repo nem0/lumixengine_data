@@ -93,7 +93,8 @@ void main()
 		#else
 			diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, mul(tbn, normal));
 			diffuse = diffuse.xyz * color.rgb;
-			diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0)); 
+			float ndotl = -dot(mul(tbn, normal), u_lightDirFov.xyz);
+			diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 
 		#endif
 
 		#ifdef MAIN

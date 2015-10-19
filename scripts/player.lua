@@ -1,6 +1,6 @@
--- LUMIX PROPERTY CAMERA_ENTITY
--- LUMIX PROPERTY PLAYER_SPEED
--- LUMIX PROPERTY MOUSE_SENSITIVITY
+-- LUMIX PROPERTY CAMERA_ENTITY entity
+-- LUMIX PROPERTY PLAYER_SPEED float
+-- LUMIX PROPERTY MOUSE_SENSITIVITY float
 
 cmp = API_createComponent(API_getScene(g_universe_context, "physics"), "physical_controller", this)
 

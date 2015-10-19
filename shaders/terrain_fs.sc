@@ -200,7 +200,7 @@ void main()
 		float ma = max(a00, a01);
 		ma = max(ma, a10);
 		ma = max(ma, a11); 
-		ma = ma - 0.05;
+		ma = ma * 0.5;
 		
 		float b1 = max(a00 - ma, 0);
 		float b2 = max(a01 - ma, 0);

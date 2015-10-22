@@ -21,7 +21,7 @@ void main()
 		vec4 normal = a_normal * 2.0 - 1.0;
 		vec4 tangent = a_tangent * 2.0 - 1.0;
 
-		v_normal = mul(model, vec4(normal.xyz, 0.0) ).xyz;
+		v_normal = mul(model, normalize(vec4(a_position.x, 2.0, a_position.z, 0.0))).xyz;
 		v_tangent = mul(model, vec4(tangent.xyz, 0.0) ).xyz;
 		v_bitangent = cross(v_normal, v_tangent);
 		v_texcoord0 = a_texcoord0;

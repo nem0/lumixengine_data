@@ -1,0 +1,9 @@
+{
+	"shader" : "shaders/rigid.shd"
+	, "texture" : {
+		"source" : "diffuse.dds"
+ }
+	, "texture" : {
+		"source" : "normal.dds"
+ }
+}

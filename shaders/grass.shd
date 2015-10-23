@@ -18,13 +18,7 @@ texture_slots = {
 		uniform = "u_texColor"
 	},
 	{
-		name = "Normal",
-		uniform = "u_texNormal",
-		define = "NORMAL_MAPPING"
-	},
-	{
-		name = "Specular",
-		uniform = "u_texSpecular",
-		define = "SPECULAR_TEXTURE"
+		name = "Noise",
+		uniform = "u_texNoise"
 	}
 }

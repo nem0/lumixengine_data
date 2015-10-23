@@ -3,13 +3,7 @@ $input v_wpos, v_common, v_texcoord0
 #include "common.sh"
 
 SAMPLER2D(u_texColor, 0);
-#ifdef NORMAL_MAPPING
-	SAMPLER2D(u_texNormal, 1);
-#endif
-#ifdef SPECULAR_TEXTURE
-	SAMPLER2D(u_texSpecular, 2);
-#endif
-SAMPLER2D(u_texShadowmap, 3);
+SAMPLER2D(u_texShadowmap, 2);
 
 uniform vec4 u_lightPosRadius;
 uniform vec4 u_lightRgbInnerR;
@@ -55,7 +49,6 @@ void main()
 	#ifdef POINT_LIGHT
 		vec3 shading = calcLight(u_lightDirFov, v_wpos);
 		diffuse = color * v_common * shading;
-		//diffuse = diffuse.xyz * color.rgb;
 		vec3 ambient = vec3(0, 0, 0);
 	#else
 		vec3 shadow = directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), 1.0);;

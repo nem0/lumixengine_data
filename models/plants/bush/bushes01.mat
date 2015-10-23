@@ -1,6 +1,10 @@
 {"shader" : "shaders/grass.shd",
 "texture" : {"source" : "texture0.dds"},
-"uniforms" : [],
+"texture" : {"source" : "noise.dds"},
+"uniforms" : [
+{"name" : "u_time",
+"time" : "true"}
+],
 "backface_culling" : false,
 "alpha_cutout" : false,
 "shadow_receiver" : true,

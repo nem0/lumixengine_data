@@ -35,23 +35,34 @@ framebuffers = {
 		renderbuffers = {
 			{format = "depth32"}
 		}
-	}
-
+	},
+--[[
+	{
+		name = "blur",
+		width = 2048,
+		height = 2048,
+		renderbuffers = {
+			{format = "r32f"}
+		}
+	},]]--
 }
  
 function init(pipeline)
 	shadowmap_uniform = createUniform(pipeline, "u_texShadowmap")
-	shadowmap2_uniform = createUniform(pipeline, "u_texShadowmap2")
+	texture_uniform = createUniform(pipeline, "u_texture")
+	--blur_material = loadMaterial(pipeline, "pipelines/blur.mat")
 	sky_material = loadMaterial(pipeline, "models/sky/sky.mat")
 	screen_space_material = loadMaterial(pipeline, "models/editor/screen_space.mat")
 end
 
+
 function renderShadowmapDebug(pipeline)
 	setPass(pipeline, "SCREEN_SPACE")
-		bindFramebufferTexture(pipeline, "point_light_shadowmap", 0, shadowmap2_uniform)
-		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
-		drawQuad(pipeline, 0.5, 0.98, 0.48, -0.48, screen_space_material)
+		setFramebuffer(pipeline, "default")
+		bindFramebufferTexture(pipeline, "shadowmap", 0, texture_uniform)
+		drawQuad(pipeline, 0.48, 0.48, 0.5, 0.5, screen_space_material);
 end
+
  
 function render(pipeline)
 	setPass(pipeline, "SHADOW")         
@@ -62,6 +73,19 @@ function render(pipeline)
 
 		renderLocalLightsShadowmaps(pipeline, 1, {"point_light_shadowmap", "point_light2_shadowmap"}, "editor")
 
+	--[[setPass(pipeline, "SHADOW_BLUR_H")
+		setFramebuffer(pipeline, "blur")
+		disableDepthWrite(pipeline)
+		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
+		drawQuad(pipeline, -1, -1, 2, 2, blur_material);
+		enableDepthWrite(pipeline)]]--
+		
+--[[	setPass(pipeline, "SHADOW_BLUR_V")
+		setFramebuffer(pipeline, "shadowmap")
+		clear(pipeline, "depth", 0)
+		bindFramebufferTexture(pipeline, "blur", 0, shadowmap_uniform)
+		drawQuad(pipeline, -1, -1, 2, 2, blur_material);]]--
+	
 	setPass(pipeline, "MAIN")
 		clear(pipeline, "all", 0xbbd3edff)
 		enableRGBWrite(pipeline)
@@ -71,7 +95,7 @@ function render(pipeline)
 --		executeCustomCommand(pipeline, "render_physics");
 		renderDebugShapes(pipeline)
 
-	setPass(pipeline, "SKY")
+	--setPass(pipeline, "SKY")
 		--disableBlending(pipeline)
 		--drawQuad(pipeline, -1, -1, 2, 2, sky_material);
 
@@ -90,7 +114,7 @@ function render(pipeline)
 		executeCustomCommand(pipeline, "render_physics")
 		--renderDebugTexts(pipeline)     
 	
-	--renderShadowmapDebug(pipeline)
+	renderShadowmapDebug(pipeline)
 
 	--print(80, 0, string.format("FPS: %.2f", getFPS(pipeline))	)
 end

@@ -1,4 +1,4 @@
-passes = {"SCREEN_SPACE"}
+passes = {"BLUR_V", "BLUR_H"}
 vs_combinations = { 
 	{}
 }

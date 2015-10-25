@@ -1,4 +1,4 @@
-{"shader" : "shaders/screenspace.shd",
+{"shader" : "shaders/blur.shd",
 "uniforms" : [],
 "backface_culling" : true,
 "alpha_cutout" : false,

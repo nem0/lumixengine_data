@@ -36,7 +36,7 @@ framebuffers = {
 			{format = "depth32"}
 		}
 	},
---[[
+
 	{
 		name = "blur",
 		width = 2048,
@@ -44,13 +44,13 @@ framebuffers = {
 		renderbuffers = {
 			{format = "r32f"}
 		}
-	},]]--
+	},
 }
  
 function init(pipeline)
 	shadowmap_uniform = createUniform(pipeline, "u_texShadowmap")
 	texture_uniform = createUniform(pipeline, "u_texture")
-	--blur_material = loadMaterial(pipeline, "pipelines/blur.mat")
+	blur_material = loadMaterial(pipeline, "pipelines/blur.mat")
 	sky_material = loadMaterial(pipeline, "models/sky/sky.mat")
 	screen_space_material = loadMaterial(pipeline, "models/editor/screen_space.mat")
 end
@@ -61,6 +61,7 @@ function renderShadowmapDebug(pipeline)
 		setFramebuffer(pipeline, "default")
 		bindFramebufferTexture(pipeline, "shadowmap", 0, texture_uniform)
 		drawQuad(pipeline, 0.48, 0.48, 0.5, 0.5, screen_space_material);
+		--drawQuad(pipeline, -1.0, -1.0, 2, 2, screen_space_material);
 end
 
  
@@ -73,18 +74,21 @@ function render(pipeline)
 
 		renderLocalLightsShadowmaps(pipeline, 1, {"point_light_shadowmap", "point_light2_shadowmap"}, "editor")
 
-	--[[setPass(pipeline, "SHADOW_BLUR_H")
-		setFramebuffer(pipeline, "blur")
-		disableDepthWrite(pipeline)
-		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
-		drawQuad(pipeline, -1, -1, 2, 2, blur_material);
-		enableDepthWrite(pipeline)]]--
+	if true then
+		setPass(pipeline, "BLUR_H")
+			setFramebuffer(pipeline, "blur")
+			disableDepthWrite(pipeline)
+			bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
+			drawQuad(pipeline, -1, -1, 2, 2, blur_material);
+			enableDepthWrite(pipeline)
 		
---[[	setPass(pipeline, "SHADOW_BLUR_V")
-		setFramebuffer(pipeline, "shadowmap")
-		clear(pipeline, "depth", 0)
-		bindFramebufferTexture(pipeline, "blur", 0, shadowmap_uniform)
-		drawQuad(pipeline, -1, -1, 2, 2, blur_material);]]--
+		setPass(pipeline, "BLUR_V")
+			setFramebuffer(pipeline, "shadowmap")
+			disableDepthWrite(pipeline)
+			bindFramebufferTexture(pipeline, "blur", 0, shadowmap_uniform)
+			drawQuad(pipeline, -1, -1, 2, 2, blur_material);
+			enableDepthWrite(pipeline)
+	end
 	
 	setPass(pipeline, "MAIN")
 		clear(pipeline, "all", 0xbbd3edff)
@@ -104,7 +108,7 @@ function render(pipeline)
 		enableBlending(pipeline)
 		applyCamera(pipeline, "editor")
 		renderModels(pipeline, 1, true)
-
+		
 	setPass(pipeline, "EDITOR")
 		enableDepthWrite(pipeline)
 		disableBlending(pipeline)
@@ -113,7 +117,7 @@ function render(pipeline)
 		executeCustomCommand(pipeline, "render_gizmos")
 		executeCustomCommand(pipeline, "render_physics")
 		--renderDebugTexts(pipeline)     
-	
+
 	renderShadowmapDebug(pipeline)
 
 	--print(80, 0, string.format("FPS: %.2f", getFPS(pipeline))	)

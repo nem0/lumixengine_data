@@ -79,7 +79,7 @@ function render(pipeline)
 			setFramebuffer(pipeline, "blur")
 			disableDepthWrite(pipeline)
 			bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
-			drawQuad(pipeline, -1, -1, 2, 2, blur_material);
+			drawQuad(pipeline, -1, -1, 2, 2, blur_material)
 			enableDepthWrite(pipeline)
 		
 		setPass(pipeline, "BLUR_V")

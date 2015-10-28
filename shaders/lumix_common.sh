@@ -203,36 +203,46 @@ float directionalLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec
 	tt[3] = vec2(0.5 + shadow_coord[3].x * 0.5, 0.5 + shadow_coord[3].y * 0.5);
 
 	int split_index = 3;
+	float weight = 0;
 	if(step(shadow_coord[0].x, 0.99) * step(shadow_coord[0].y, 0.99)
-		* step(0.01, shadow_coord[0].x)	* step(0.01, shadow_coord[0].y) > 0.0)
+		* step(0.01, shadow_coord[0].x) * step(0.01, shadow_coord[0].y) > 0.0)
 	{
+		weight = max(max(abs(shadow_coord[0].x - 0.5) - 0.3, 0), max(abs(shadow_coord[0].y - 0.5) - 0.3, 0)) * 5.0;
 		split_index = 0;
 	}
 	else if(step(shadow_coord[1].x, 0.99) * step(shadow_coord[1].y, 0.99)
 		* step(0.01, shadow_coord[1].x)	* step(0.01, shadow_coord[1].y) > 0.0)
 	{
+		weight = max(max(abs(shadow_coord[1].x - 0.5) - 0.3, 0), max(abs(shadow_coord[1].y - 0.5) - 0.3, 0)) * 5.0;
 		split_index = 1;
 	}
 	else if(step(shadow_coord[2].x, 0.99) * step(shadow_coord[2].y, 0.99)
 		* step(0.01, shadow_coord[2].x)	* step(0.01, shadow_coord[2].y) > 0.0)
 	{
+		weight = max(max(abs(shadow_coord[2].x - 0.5) - 0.3, 0), max(abs(shadow_coord[2].y - 0.5) - 0.3, 0)) * 5.0;
 		split_index = 2;
 	}
 	else if(step(shadow_coord[3].x, 0.99) * step(shadow_coord[3].y, 0.99)
 		* step(0.01, shadow_coord[3].x)	* step(0.01, shadow_coord[3].y) > 0.0)
 	{
+		weight = max(max(abs(shadow_coord[3].x - 0.5) - 0.3, 0), max(abs(shadow_coord[3].y - 0.5) - 0.3, 0)) * 5.0;
 		split_index = 3;
 	}
 	else
 		return 1.0;
 
-	const float offsets[4] = {0.00001, 0.00001, 0.0001, 0.0001};
+	const float offsets[5] = {0.00001, 0.00001, 0.00005, 0.0001, -1};
 	float bias = offsets[split_index]*tan(acos(ndotl)); 
-	bias = clamp(bias, 0,0.01);		
-		
-	return  
+	bias = clamp(bias, 0,0.1);		
+	float next_bias = offsets[split_index+1]*tan(acos(ndotl)); 
+	next_bias = clamp(next_bias, 0,0.1);		
+
+	float v1 = ESM(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), bias, 90000);
+	float v2 = split_index == 3 ? 1.0 : ESM(shadowmap, vec4(tt[split_index + 1].xy, shadow_coord[split_index + 1].z, 1.0), next_bias, 90000);
+	return mix(v1, v2, weight);
+	
+	
 		//VSM(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), 0.001, 450, 0.0002);
-		ESM(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), bias, 15000);
 		//hardShadow(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), bias);
 		//PCF(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), bias, vec4(1, 1, 1, 1), vec2(1/1024.0,1/1024.0));
 		//step(shadow_coord[split_index].z, 1) * smoothShadow(shadowmap, tt[split_index], shadow_coord[split_index].z);

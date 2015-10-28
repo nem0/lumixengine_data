@@ -249,7 +249,7 @@ void main()
 			float ndl = -dot(mul(tbn, normal), u_lightDirFov.xyz);
 			diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, mul(tbn, normal));
 			diffuse = diffuse.xyz * color.rgb;
-			float ndotl = -dot(mul(tbn, normal), u_lightDirFov.xyz);
+			float ndotl = -dot(terrain_normal, u_lightDirFov.xyz);
 			diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 	
 		#endif
 

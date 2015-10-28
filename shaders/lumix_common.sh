@@ -231,7 +231,7 @@ float directionalLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec
 	else
 		return 1.0;
 
-	const float offsets[5] = {0.00001, 0.00001, 0.00005, 0.0001, -1};
+	const float offsets[5] = {0.0000005, 0.00001, 0.00005, 0.0001, -1};
 	float bias = offsets[split_index]*tan(acos(ndotl)); 
 	bias = clamp(bias, 0,0.1);		
 	float next_bias = offsets[split_index+1]*tan(acos(ndotl)); 

@@ -118,7 +118,7 @@ function render(pipeline)
 		executeCustomCommand(pipeline, "render_physics")
 		--renderDebugTexts(pipeline)     
 
-	renderShadowmapDebug(pipeline)
+	--renderShadowmapDebug(pipeline)
 
 	--print(80, 0, string.format("FPS: %.2f", getFPS(pipeline))	)
 end

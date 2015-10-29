@@ -1,0 +1,9 @@
+{
+	"shader" : "shaders/rigid.shd"
+	, "texture" : {
+		"source" : "spnza_bricks_a_diff.dds"
+ }
+	, "texture" : {
+		"source" : "spnza_bricks_a_diff.dds"
+ }
+}

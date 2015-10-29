@@ -1,0 +1,9 @@
+{
+	"shader" : "shaders/rigid.shd"
+	, "texture" : {
+		"source" : "sponza_column_b_diff.dds"
+ }
+	, "texture" : {
+		"source" : "sponza_column_b_ddn.dds"
+ }
+}

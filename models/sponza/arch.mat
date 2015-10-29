@@ -1,0 +1,6 @@
+{
+	"shader" : "shaders/rigid.shd"
+	, "texture" : {
+		"source" : "sponza_arch_diff.dds"
+ }
+}

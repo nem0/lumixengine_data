@@ -1,0 +1,9 @@
+{
+	"shader" : "shaders/rigid.shd"
+	, "texture" : {
+		"source" : "vase_round.dds"
+ }
+	, "texture" : {
+		"source" : "vase_round_ddn.dds"
+ }
+}

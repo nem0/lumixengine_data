@@ -1,0 +1,9 @@
+{
+	"shader" : "shaders/rigid.shd"
+	, "texture" : {
+		"source" : "lion.dds"
+ }
+	, "texture" : {
+		"source" : "lion_ddn.dds"
+ }
+}

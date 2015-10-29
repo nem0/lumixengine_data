@@ -1,10 +1,12 @@
 passes = {"BLUR_V", "BLUR_H"}
 vs_combinations = { 
+	{},
 	{}
 }
 
 fs_combinations =               
 {
+	{},
 	{}
 }
    

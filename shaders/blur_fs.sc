@@ -14,7 +14,7 @@ void main()
 #define _BLUR9_NORMALIZE (_BLUR9_WEIGHT_0+2.0*(_BLUR9_WEIGHT_1+_BLUR9_WEIGHT_2+_BLUR9_WEIGHT_3+_BLUR9_WEIGHT_4) )
 #define BLUR9_WEIGHT(_x) (_BLUR9_WEIGHT_##_x/_BLUR9_NORMALIZE)
 
-#if BLUR_H	
+#ifdef BLUR_H	
 	vec4 color = texture2D(u_texShadowmap, v_texcoord0) * BLUR9_WEIGHT(0)
 		+ texture2D(u_texShadowmap, v_texcoord0 + vec2(1/2048.0, 0)) * BLUR9_WEIGHT(1)
 		+ texture2D(u_texShadowmap, v_texcoord0 + vec2(2/2048.0, 0)) * BLUR9_WEIGHT(2)

@@ -237,8 +237,8 @@ float directionalLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec
 	float next_bias = offsets[split_index+1]*tan(acos(ndotl)); 
 	next_bias = clamp(next_bias, 0,0.1);		
 
-	float v1 = ESM(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), bias, 90000);
-	float v2 = split_index == 3 ? 1.0 : ESM(shadowmap, vec4(tt[split_index + 1].xy, shadow_coord[split_index + 1].z, 1.0), next_bias, 90000);
+	float v1 = ESM(shadowmap, vec4(tt[split_index].xy, shadow_coord[split_index].z, 1.0), bias, 15000);
+	float v2 = split_index == 3 ? 1.0 : ESM(shadowmap, vec4(tt[split_index + 1].xy, shadow_coord[split_index + 1].z, 1.0), next_bias, 15000);
 	return mix(v1, v2, weight);
 	
 	

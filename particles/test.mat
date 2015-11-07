@@ -1,0 +1,7 @@
+{
+	"shader" : "shaders/particles.shd"
+	, "texture" : {
+		"source" : "default.dds"
+	},
+	"alpha_blending" : true
+}

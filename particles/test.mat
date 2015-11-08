@@ -3,5 +3,5 @@
 	, "texture" : {
 		"source" : "default.dds"
 	},
-	"alpha_blending" : true
+	"alpha_blending" : "alpha"
 }

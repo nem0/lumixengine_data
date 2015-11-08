@@ -2,6 +2,6 @@
 "uniforms" : [],
 "backface_culling" : false,
 "alpha_cutout" : false,
-"alpha_blending" : true,
+"alpha_blending" : "alpha",
 "shadow_receiver" : true,
 "z_test" : true}

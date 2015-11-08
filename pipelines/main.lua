@@ -99,6 +99,11 @@ function render(pipeline)
 --		executeCustomCommand(pipeline, "render_physics");
 		renderDebugShapes(pipeline)
 
+	setPass(pipeline, "PARTICLES")
+		disableDepthWrite(pipeline)
+		applyCamera(pipeline, "editor")
+		renderParticles(pipeline)
+		
 	--setPass(pipeline, "SKY")
 		--disableBlending(pipeline)
 		--drawQuad(pipeline, -1, -1, 2, 2, sky_material);

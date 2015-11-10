@@ -24,7 +24,7 @@ vec4 getViewPos(vec2 texCoord)
 void main()
 {
 
-	const float CAP_MIN_DISTANCE = 0.0001;
+	const float CAP_MIN_DISTANCE = 0.000001;
 	const float CAP_MAX_DISTANCE = 0.005;
 
 	vec4 view_pos = getViewPos(v_texcoord0);
@@ -33,7 +33,7 @@ void main()
 	float occlusion = 0;
 	
 	const int KERNEL_SIZE = 24;
-	const float RADIUS = 1 / 256.0f;
+	const float RADIUS = 1 / 128.0f;
 	const vec3 SAMPLES[KERNEL_SIZE] = {
 		vec3(-RADIUS, 0, 			0),
 		vec3(0, -RADIUS, 			0),
@@ -83,6 +83,8 @@ void main()
 		}
 	}
 	
-	gl_FragColor.rgb = vec3_splat(occlusion / KERNEL_SIZE);
-	gl_FragColor.w = 1.0;
+	occlusion = clamp(occlusion - KERNEL_SIZE/2, 0, KERNEL_SIZE);
+	
+	gl_FragColor.rgb = vec3_splat(1 - occlusion / KERNEL_SIZE);
+	gl_FragColor.w = 1;
 }

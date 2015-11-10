@@ -68,6 +68,16 @@ framebuffers = {
 	},
 }
 
+
+parameters = {
+	particles_enabled = true,
+	blur_shadowmap = true,
+	render_shadowmap_debug = false,
+	render_gizmos = true,
+	SSAO = false,
+	SSAO_debug = false
+}
+
  
 function init(pipeline)
 	shadowmap_uniform = createUniform(pipeline, "u_texShadowmap")
@@ -79,116 +89,145 @@ function init(pipeline)
 end
 
 
-function renderShadowmapDebug(pipeline)
-	setPass(pipeline, "SCREEN_SPACE")
+function shadowmapDebug(pipeline)
+	if parameters.render_shadowmap_debug then
+		setPass(pipeline, "SCREEN_SPACE")
 		setFramebuffer(pipeline, "default")
 		bindFramebufferTexture(pipeline, "shadowmap", 0, texture_uniform)
 		drawQuad(pipeline, 0.48, 0.48, 0.5, 0.5, screen_space_material);
 		--drawQuad(pipeline, -1.0, -1.0, 2, 2, screen_space_material);
+	end
 end
 
 
 function renderSSAODebug(pipeline)
-	setPass(pipeline, "SCREEN_SPACE")
+	if parameters.SSAO_debug then
+		setPass(pipeline, "SCREEN_SPACE")
 		--enableBlending(pipeline)
 		disableDepthWrite(pipeline)
 		setFramebuffer(pipeline, "default")
 		bindFramebufferTexture(pipeline, "SSAO", 0, texture_uniform)
-		--drawQuad(pipeline, 0.48, 0.48, 0.5, 0.5, screen_space_material);
-		drawQuad(pipeline, -1.0, -1.0, 2, 2, screen_space_material);
+		drawQuad(pipeline, 0.48, 0.48, 0.5, 0.5, screen_space_material);
+		--drawQuad(pipeline, -1.0, -1.0, 2, 2, screen_space_material);
+	end
 end
 
 
 function SSAO(pipeline)
-	setPass(pipeline, "SSAO")
+	if parameters.SSAO then
+		setPass(pipeline, "SSAO")
 		disableDepthWrite(pipeline)
 		setFramebuffer(pipeline, "SSAO")
 		bindFramebufferTexture(pipeline, "default", 1, texture_uniform)
 		drawQuad(pipeline, -1, -1, 2, 2, ssao_material);		
 
-	local blur_ssao = false
-	if blur_ssao then
-		setPass(pipeline, "BLUR_H")
-			beginNewView(pipeline, "h");
-			setFramebuffer(pipeline, "blur")
-			disableDepthWrite(pipeline)
-			bindFramebufferTexture(pipeline, "SSAO", 0, shadowmap_uniform)
-			drawQuad(pipeline, -1, -1, 2, 2, blur_material)
-			enableDepthWrite(pipeline)
-		
-		setPass(pipeline, "BLUR_V")
-			beginNewView(pipeline, "v");
-			setFramebuffer(pipeline, "SSAO")
-			disableDepthWrite(pipeline)
-			bindFramebufferTexture(pipeline, "blur", 0, shadowmap_uniform)
-			drawQuad(pipeline, -1, -1, 2, 2, blur_material);
-			enableDepthWrite(pipeline)		
+		local blur_ssao = false
+		if blur_ssao then
+			setPass(pipeline, "BLUR_H")
+				beginNewView(pipeline, "h");
+				setFramebuffer(pipeline, "blur")
+				disableDepthWrite(pipeline)
+				bindFramebufferTexture(pipeline, "SSAO", 0, shadowmap_uniform)
+				drawQuad(pipeline, -1, -1, 2, 2, blur_material)
+				enableDepthWrite(pipeline)
+			
+			setPass(pipeline, "BLUR_V")
+				beginNewView(pipeline, "v");
+				setFramebuffer(pipeline, "SSAO")
+				disableDepthWrite(pipeline)
+				bindFramebufferTexture(pipeline, "blur", 0, shadowmap_uniform)
+				drawQuad(pipeline, -1, -1, 2, 2, blur_material);
+				enableDepthWrite(pipeline)		
+		end
 	end
 end
 
  
-function render(pipeline)
+function shadowmap(pipeline)
 	setPass(pipeline, "SHADOW")         
-		--disableRGBWrite(pipeline)
-		--disableAlphaWrite(pipeline)
-		setFramebuffer(pipeline, "shadowmap")
-		renderShadowmap(pipeline, 1, "editor") 
+	--disableRGBWrite(pipeline)
+	--disableAlphaWrite(pipeline)
+	setFramebuffer(pipeline, "shadowmap")
+	renderShadowmap(pipeline, 1, "editor") 
 
-		renderLocalLightsShadowmaps(pipeline, 1, {"point_light_shadowmap", "point_light2_shadowmap"}, "editor")
+	renderLocalLightsShadowmaps(pipeline, 1, {"point_light_shadowmap", "point_light2_shadowmap"}, "editor")
 
-	if true then
+	if parameters.blur_shadowmap then
 		setPass(pipeline, "BLUR_H")
-			setFramebuffer(pipeline, "blur")
-			disableDepthWrite(pipeline)
-			bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
-			drawQuad(pipeline, -1, -1, 2, 2, blur_material)
-			enableDepthWrite(pipeline)
+		setFramebuffer(pipeline, "blur")
+		disableDepthWrite(pipeline)
+		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
+		drawQuad(pipeline, -1, -1, 2, 2, blur_material)
+		enableDepthWrite(pipeline)
 		
 		setPass(pipeline, "BLUR_V")
-			setFramebuffer(pipeline, "shadowmap")
-			disableDepthWrite(pipeline)
-			bindFramebufferTexture(pipeline, "blur", 0, shadowmap_uniform)
-			drawQuad(pipeline, -1, -1, 2, 2, blur_material);
-			enableDepthWrite(pipeline)
+		setFramebuffer(pipeline, "shadowmap")
+		disableDepthWrite(pipeline)
+		bindFramebufferTexture(pipeline, "blur", 0, shadowmap_uniform)
+		drawQuad(pipeline, -1, -1, 2, 2, blur_material);
+		enableDepthWrite(pipeline)
 	end
-	
-	setPass(pipeline, "MAIN")
-		clear(pipeline, "all", 0xbbd3edff)
-		enableRGBWrite(pipeline)
-		setFramebuffer(pipeline, "default")
-		applyCamera(pipeline, "editor")
-		renderModels(pipeline, 1, false)
---		executeCustomCommand(pipeline, "render_physics");
-		renderDebugShapes(pipeline)
+end
 
-	setPass(pipeline, "PARTICLES")
+
+function main(pipeline)
+	setPass(pipeline, "MAIN")
+	clear(pipeline, "all", 0xbbd3edff)
+	enableRGBWrite(pipeline)
+	setFramebuffer(pipeline, "default")
+	applyCamera(pipeline, "editor")
+	renderModels(pipeline, 1, false)
+--		executeCustomCommand(pipeline, "render_physics");
+	renderDebugShapes(pipeline)
+end
+
+
+function particles(pipeline)
+	if parameters.particles_enabled then
+		setPass(pipeline, "PARTICLES")
 		disableDepthWrite(pipeline)
 		applyCamera(pipeline, "editor")
 		renderParticles(pipeline)
-		
-	--SSAO(pipeline)
+	end	
+end
 
-	--setPass(pipeline, "SKY")
-		--disableBlending(pipeline)
-		--drawQuad(pipeline, -1, -1, 2, 2, sky_material);
 
+function pointLight(pipeline)
 	setPass(pipeline, "POINT_LIGHT")
-		disableDepthWrite(pipeline)
-		enableBlending(pipeline)
-		applyCamera(pipeline, "editor")
-		renderModels(pipeline, 1, true)
+	disableDepthWrite(pipeline)
+	enableBlending(pipeline)
+	applyCamera(pipeline, "editor")
+	renderModels(pipeline, 1, true)
+end
 
-	setPass(pipeline, "EDITOR")
+
+function editor(pipeline)
+	if parameters.render_gizmos then
+		setPass(pipeline, "EDITOR")
 		enableDepthWrite(pipeline)
 		disableBlending(pipeline)
 		clear(pipeline, "depth", 0)
 		applyCamera(pipeline, "editor")
 		executeCustomCommand(pipeline, "render_gizmos")
 		executeCustomCommand(pipeline, "render_physics")
-		--renderDebugTexts(pipeline)     
+	end
+end
+
+ 
+function render(pipeline)
+	shadowmap(pipeline)
+	main(pipeline)
+	particles(pipeline)
+	SSAO(pipeline)
+	--setPass(pipeline, "SKY")
+		--disableBlending(pipeline)
+		--drawQuad(pipeline, -1, -1, 2, 2, sky_material);
+
+	pointLight(pipeline)		
+	editor(pipeline)
 	
-	--renderShadowmapDebug(pipeline)
-	--renderSSAODebug(pipeline)
-	
+	shadowmapDebug(pipeline)
+	renderSSAODebug(pipeline)
 	--print(80, 0, string.format("FPS: %.2f", getFPS(pipeline))	)
 end
+

@@ -5,9 +5,30 @@ framebuffers = {
 		height = 768,
 		renderbuffers = {
 			{format="rgba8"},
+			{format = "depth32"}
+		}
+	},
+
+	{
+		name = "SSAO",
+		width = 1024,
+		height = 768,
+		renderbuffers = {
+			{format="rgba8"},
 			{format = "depth24"}
 		}
 	},
+
+	{
+		name = "SSAO_blurred",
+		width = 1024,
+		height = 768,
+		renderbuffers = {
+			{format="rgba8"},
+			{format = "depth24"}
+		}
+	},
+
 	
 	{
 		name = "shadowmap",
@@ -46,6 +67,7 @@ framebuffers = {
 		}
 	},
 }
+
  
 function init(pipeline)
 	shadowmap_uniform = createUniform(pipeline, "u_texShadowmap")
@@ -53,6 +75,7 @@ function init(pipeline)
 	blur_material = loadMaterial(pipeline, "pipelines/blur.mat")
 	sky_material = loadMaterial(pipeline, "models/sky/sky.mat")
 	screen_space_material = loadMaterial(pipeline, "models/editor/screen_space.mat")
+	ssao_material = loadMaterial(pipeline, "pipelines/ssao.mat")
 end
 
 
@@ -62,6 +85,45 @@ function renderShadowmapDebug(pipeline)
 		bindFramebufferTexture(pipeline, "shadowmap", 0, texture_uniform)
 		drawQuad(pipeline, 0.48, 0.48, 0.5, 0.5, screen_space_material);
 		--drawQuad(pipeline, -1.0, -1.0, 2, 2, screen_space_material);
+end
+
+
+function renderSSAODebug(pipeline)
+	setPass(pipeline, "SCREEN_SPACE")
+		--enableBlending(pipeline)
+		disableDepthWrite(pipeline)
+		setFramebuffer(pipeline, "default")
+		bindFramebufferTexture(pipeline, "SSAO", 0, texture_uniform)
+		--drawQuad(pipeline, 0.48, 0.48, 0.5, 0.5, screen_space_material);
+		drawQuad(pipeline, -1.0, -1.0, 2, 2, screen_space_material);
+end
+
+
+function SSAO(pipeline)
+	setPass(pipeline, "SSAO")
+		disableDepthWrite(pipeline)
+		setFramebuffer(pipeline, "SSAO")
+		bindFramebufferTexture(pipeline, "default", 1, texture_uniform)
+		drawQuad(pipeline, -1, -1, 2, 2, ssao_material);		
+
+	local blur_ssao = false
+	if blur_ssao then
+		setPass(pipeline, "BLUR_H")
+			beginNewView(pipeline, "h");
+			setFramebuffer(pipeline, "blur")
+			disableDepthWrite(pipeline)
+			bindFramebufferTexture(pipeline, "SSAO", 0, shadowmap_uniform)
+			drawQuad(pipeline, -1, -1, 2, 2, blur_material)
+			enableDepthWrite(pipeline)
+		
+		setPass(pipeline, "BLUR_V")
+			beginNewView(pipeline, "v");
+			setFramebuffer(pipeline, "SSAO")
+			disableDepthWrite(pipeline)
+			bindFramebufferTexture(pipeline, "blur", 0, shadowmap_uniform)
+			drawQuad(pipeline, -1, -1, 2, 2, blur_material);
+			enableDepthWrite(pipeline)		
+	end
 end
 
  
@@ -104,6 +166,8 @@ function render(pipeline)
 		applyCamera(pipeline, "editor")
 		renderParticles(pipeline)
 		
+	--SSAO(pipeline)
+
 	--setPass(pipeline, "SKY")
 		--disableBlending(pipeline)
 		--drawQuad(pipeline, -1, -1, 2, 2, sky_material);
@@ -113,7 +177,7 @@ function render(pipeline)
 		enableBlending(pipeline)
 		applyCamera(pipeline, "editor")
 		renderModels(pipeline, 1, true)
-		
+
 	setPass(pipeline, "EDITOR")
 		enableDepthWrite(pipeline)
 		disableBlending(pipeline)
@@ -122,8 +186,9 @@ function render(pipeline)
 		executeCustomCommand(pipeline, "render_gizmos")
 		executeCustomCommand(pipeline, "render_physics")
 		--renderDebugTexts(pipeline)     
-
+	
 	--renderShadowmapDebug(pipeline)
-
+	--renderSSAODebug(pipeline)
+	
 	--print(80, 0, string.format("FPS: %.2f", getFPS(pipeline))	)
 end

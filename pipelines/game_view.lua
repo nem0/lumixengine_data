@@ -75,7 +75,7 @@ function render(pipeline)
 		drawQuad(pipeline, -1, -1, 2, 2, sky_material);
 		
 	setPass(pipeline, "POINT_LIGHT")
-		enableBlending(pipeline)
+		enableBlending(pipeline, "add")
 		applyCamera(pipeline, "main")
 		renderModels(pipeline, 1, true)
 		disableBlending(pipeline)

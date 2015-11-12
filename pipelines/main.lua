@@ -74,8 +74,9 @@ parameters = {
 	blur_shadowmap = true,
 	render_shadowmap_debug = false,
 	render_gizmos = true,
-	SSAO = false,
-	SSAO_debug = false
+	SSAO = true,
+	SSAO_debug = false,
+	SSAO_blur = true
 }
 
  
@@ -100,15 +101,26 @@ function shadowmapDebug(pipeline)
 end
 
 
-function renderSSAODebug(pipeline)
+function renderSSAODDebug(pipeline)
 	if parameters.SSAO_debug then
 		setPass(pipeline, "SCREEN_SPACE")
-		--enableBlending(pipeline)
+		disableBlending(pipeline)
 		disableDepthWrite(pipeline)
 		setFramebuffer(pipeline, "default")
 		bindFramebufferTexture(pipeline, "SSAO", 0, texture_uniform)
 		drawQuad(pipeline, 0.48, 0.48, 0.5, 0.5, screen_space_material);
-		--drawQuad(pipeline, -1.0, -1.0, 2, 2, screen_space_material);
+	end
+end
+
+
+function renderSSAODPostprocess(pipeline)
+	if parameters.SSAO then
+		setPass(pipeline, "SCREEN_SPACE")
+		enableBlending(pipeline, "multiply")
+		disableDepthWrite(pipeline)
+		setFramebuffer(pipeline, "default")
+		bindFramebufferTexture(pipeline, "SSAO", 0, texture_uniform)
+		drawQuad(pipeline, -1.0, -1.0, 2, 2, screen_space_material);
 	end
 end
 
@@ -116,13 +128,13 @@ end
 function SSAO(pipeline)
 	if parameters.SSAO then
 		setPass(pipeline, "SSAO")
+		disableBlending(pipeline)
 		disableDepthWrite(pipeline)
 		setFramebuffer(pipeline, "SSAO")
 		bindFramebufferTexture(pipeline, "default", 1, texture_uniform)
 		drawQuad(pipeline, -1, -1, 2, 2, ssao_material);		
 
-		local blur_ssao = false
-		if blur_ssao then
+		if parameters.SSAO_blur then
 			setPass(pipeline, "BLUR_H")
 				beginNewView(pipeline, "h");
 				setFramebuffer(pipeline, "blur")
@@ -195,7 +207,7 @@ end
 function pointLight(pipeline)
 	setPass(pipeline, "POINT_LIGHT")
 	disableDepthWrite(pipeline)
-	enableBlending(pipeline)
+	enableBlending(pipeline, "add")
 	applyCamera(pipeline, "editor")
 	renderModels(pipeline, 1, true)
 end
@@ -218,16 +230,12 @@ function render(pipeline)
 	shadowmap(pipeline)
 	main(pipeline)
 	particles(pipeline)
-	SSAO(pipeline)
-	--setPass(pipeline, "SKY")
-		--disableBlending(pipeline)
-		--drawQuad(pipeline, -1, -1, 2, 2, sky_material);
-
 	pointLight(pipeline)		
+	SSAO(pipeline)
+	renderSSAODPostprocess(pipeline)
 	editor(pipeline)
-	
+
+	renderSSAODDebug(pipeline)
 	shadowmapDebug(pipeline)
-	renderSSAODebug(pipeline)
-	--print(80, 0, string.format("FPS: %.2f", getFPS(pipeline))	)
 end
 

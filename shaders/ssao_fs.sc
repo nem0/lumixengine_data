@@ -3,6 +3,8 @@ $input v_wpos, v_texcoord0 // in...
 #include "common.sh"
 
 SAMPLER2D(u_texture, 0);
+uniform vec4 u_intensity; 
+uniform vec4 u_radius; 
 
 vec4 getViewPos(vec2 texCoord)
 {
@@ -33,7 +35,7 @@ void main()
 	float occlusion = 0;
 	
 	const int KERNEL_SIZE = 24;
-	const float RADIUS = 1 / 128.0f;
+	const float RADIUS = u_radius.x;
 	const vec3 SAMPLES[KERNEL_SIZE] = {
 		vec3(-RADIUS, 0, 			0),
 		vec3(0, -RADIUS, 			0),
@@ -83,7 +85,7 @@ void main()
 		}
 	}
 	
-	occlusion = clamp(occlusion - KERNEL_SIZE/2, 0, KERNEL_SIZE);
+	occlusion = clamp(occlusion - KERNEL_SIZE/2, 0, KERNEL_SIZE) * u_intensity.x;
 	
 	gl_FragColor.rgb = vec3_splat(1 - occlusion / KERNEL_SIZE);
 	gl_FragColor.w = 1;

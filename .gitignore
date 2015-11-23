@@ -9,7 +9,8 @@ scripts/*.pdb
 /*.exe
 *_autosave.unv
 *.unv.lst
-shaders/compiled
+shaders/compiled/*.shb
+shaders/compiled/*.d
 metadata.bin
 minidump.dmp
 fulldump.dmp

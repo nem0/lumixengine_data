@@ -9,6 +9,7 @@ scripts/*.pdb
 /*.exe
 *_autosave.unv
 *.unv.lst
+*.unv.bkp
 shaders/compiled/*.shb
 shaders/compiled/*.d
 metadata.bin

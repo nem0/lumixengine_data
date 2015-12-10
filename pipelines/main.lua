@@ -157,6 +157,7 @@ end
  
 function shadowmap(pipeline)
 	setPass(pipeline, "SHADOW")         
+	applyCamera(pipeline, "editor")
 	--disableRGBWrite(pipeline)
 	--disableAlphaWrite(pipeline)
 	setFramebuffer(pipeline, "shadowmap")

@@ -74,9 +74,9 @@ parameters = {
 	blur_shadowmap = true,
 	render_shadowmap_debug = false,
 	render_gizmos = true,
-	SSAO = true,
+	SSAO = false,
 	SSAO_debug = false,
-	SSAO_blur = true
+	SSAO_blur = false
 }
 
  

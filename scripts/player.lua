@@ -35,17 +35,7 @@ Engine.addInputAction(g_engine, CONTROLLER_ROT_Y, 7, 0, 0)
 Engine.addInputAction(g_engine, CONTROLLER_MOVE_X, 4, 0, 0)
 Engine.addInputAction(g_engine, CONTROLLER_MOVE_Y, 5, 0, 0)
 
---local s = API_playSound(g_scene_audio, this, "test", false)
---API_setEcho(g_scene_audio, s, 50, 50, 500, 500)
-
-local ETA = 0
-
 function update(dt)
-		ETA = ETA - dt
-		if ETA < 0 then
-			ETA = 2.0
-			local s = Audio.playSound(g_scene_audio, this, "test", false)
-		end
 
 	yaw = yaw + Engine.getInputActionValue(g_engine, ROT_H_ACTION) * -0.01 * MOUSE_SENSITIVITY;
 	pitch = pitch + Engine.getInputActionValue(g_engine, ROT_V_ACTION) * -0.01 * MOUSE_SENSITIVITY;

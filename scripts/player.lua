@@ -36,7 +36,6 @@ Engine.addInputAction(g_engine, CONTROLLER_MOVE_X, 4, 0, 0)
 Engine.addInputAction(g_engine, CONTROLLER_MOVE_Y, 5, 0, 0)
 
 function update(dt)
-
 	yaw = yaw + Engine.getInputActionValue(g_engine, ROT_H_ACTION) * -0.01 * MOUSE_SENSITIVITY;
 	pitch = pitch + Engine.getInputActionValue(g_engine, ROT_V_ACTION) * -0.01 * MOUSE_SENSITIVITY;
 	
@@ -54,32 +53,32 @@ function update(dt)
 		speed = speed * 3
 	end
 	
-	Engine.setEntityLocalRotation(g_scene_hierarchy, CAMERA_ENTITY, 1, 0, 0, pitch)
+	Engine.setEntityLocalRotation(g_scene_hierarchy, CAMERA_ENTITY, {1, 0, 0}, pitch)
 	
-	Engine.setEntityRotation(g_universe, this, 0, 1, 0, yaw);
+	Engine.setEntityRotation(g_universe, this, {0, 1, 0}, yaw);
 
 	local scene = g_scene_physics;
 
-	local v = Engine.multVecQuat(Engine.getInputActionValue(g_engine, CONTROLLER_MOVE_X) * 0.1, 0, 0, 0, 1, 0, yaw)
-	Physics.moveController(scene, cmp, v[0], v[1], v[2], dt)
+	local v = Engine.multVecQuat({Engine.getInputActionValue(g_engine, CONTROLLER_MOVE_X) * 0.1, 0, 0}, {0, 1, 0}, yaw)
+	Physics.moveController(scene, cmp, v, dt)
 
-	local v = Engine.multVecQuat(0, 0, -Engine.getInputActionValue(g_engine, CONTROLLER_MOVE_Y) * 0.1, 0, 1, 0, yaw)
-	Physics.moveController(scene, cmp, v[0], v[1], v[2], dt)
+	local v = Engine.multVecQuat({0, 0, -Engine.getInputActionValue(g_engine, CONTROLLER_MOVE_Y) * 0.1}, {0, 1, 0}, yaw)
+	Physics.moveController(scene, cmp, v, dt)
 	
 	if Engine.getInputActionValue(g_engine, LEFT_ACTION) > 0 then
-		local v = Engine.multVecQuat(-speed, 0, 0, 0, 1, 0, yaw)
-		Physics.moveController(scene, cmp, v[0], v[1], v[2], dt)
+		local v = Engine.multVecQuat({-speed, 0, 0}, {0, 1, 0}, yaw)
+		Physics.moveController(scene, cmp, v, dt)
 	end
 	if Engine.getInputActionValue(g_engine, RIGHT_ACTION) > 0 then
-		local v = Engine.multVecQuat(speed, 0, 0, 0, 1, 0, yaw)
-		Physics.moveController(scene, cmp, v[0], v[1], v[2], dt)
+		local v = Engine.multVecQuat({speed, 0, 0}, {0, 1, 0}, yaw)
+		Physics.moveController(scene, cmp, v, dt)
 	end
 	if Engine.getInputActionValue(g_engine, FORWARD_ACTION) > 0 then
-		local v = Engine.multVecQuat(0, 0, -speed, 0, 1, 0, yaw)
-		Physics.moveController(scene, cmp, v[0], v[1], v[2], dt)
+		local v = Engine.multVecQuat({0, 0, -speed}, {0, 1, 0}, yaw)
+		Physics.moveController(scene, cmp, v, dt)
 	end
 	if Engine.getInputActionValue(g_engine, BACK_ACTION) > 0 then
-		local v = Engine.multVecQuat(0, 0, speed, 0, 1, 0, yaw)
-		Physics.moveController(scene, cmp, v[0], v[1], v[2], dt)
+		local v = Engine.multVecQuat({0, 0, speed}, {0, 1, 0}, yaw)
+		Physics.moveController(scene, cmp, v, dt)
 	end
 end

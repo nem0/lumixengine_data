@@ -12,6 +12,7 @@ scripts/*.pdb
 *.unv.bkp
 shaders/compiled/*.shb
 shaders/compiled/*.d
+render_tests/*_res.tga
 metadata.bin
 minidump.dmp
 fulldump.dmp

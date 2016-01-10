@@ -1,0 +1,1 @@
+Editor.compileShaders(g_editor, true)

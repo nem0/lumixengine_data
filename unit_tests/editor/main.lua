@@ -5,6 +5,13 @@ local tests = {
 	"unit_tests/editor/terrain" 
 }
 
+local success = Editor.runTest(g_editor, "unit_tests/editor/mismatch.json", "unit_tests/editor/mismatch.unv")
+if success then
+	failed_count = 1
+	Editor.logError(g_editor, "Test mismatch.json should have failed, but it did not.");
+end
+
+
 for index,test in ipairs(tests) do
 	local success = Editor.runTest(g_editor, test .. ".json", test .. ".unv")
 	if not success then

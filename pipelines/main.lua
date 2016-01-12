@@ -221,8 +221,7 @@ function editor(pipeline)
 		disableBlending(pipeline)
 		clear(pipeline, "depth", 0)
 		applyCamera(pipeline, "editor")
-		executeCustomCommand(pipeline, "render_gizmos")
-		executeCustomCommand(pipeline, "render_physics")
+		renderGizmos(pipeline)
 	end
 end
 

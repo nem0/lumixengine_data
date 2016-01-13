@@ -1,3 +1,3 @@
 Editor.logInfo(g_editor, "Compiling shaders...")
-Editor.compileShaders(g_editor, true)
+compileShaders(g_shader_compiler, true)
 Editor.exit(g_editor, 0)

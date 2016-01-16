@@ -18,7 +18,7 @@ for index,test in ipairs(tests) do
 		failed_count = failed_count + 1
 		Editor.logError(g_editor, "Test " .. index .. " failed.");
 	else
-		Editor.logError(g_editor, "Test " .. index .. " succeeded.");
+		Editor.logInfo(g_editor, "Test " .. index .. " succeeded.");
 	end
 end
 

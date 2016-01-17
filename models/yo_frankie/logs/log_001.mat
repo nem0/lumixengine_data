@@ -1,0 +1,9 @@
+{
+	"shader" : "shaders/rigid.shd"
+	, "texture" : {
+		"source" : "texture1.dds"
+ }
+	, "texture" : {
+		"source" : "texture0.dds"
+ }
+}

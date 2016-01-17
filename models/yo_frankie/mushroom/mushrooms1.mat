@@ -1,0 +1,9 @@
+{
+	"shader" : "shaders/rigid.shd"
+	, "texture" : {
+		"source" : "prop_mushrooms_001_col.dds"
+ }
+	, "texture" : {
+		"source" : "texture2.dds"
+ }
+}

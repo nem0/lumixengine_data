@@ -38,7 +38,7 @@ function render(pipeline)
 	if not cameraExists(pipeline, "main") then
 		setPass(pipeline, "MAIN")
 			setFramebuffer(pipeline, "default")
-			clear(pipeline, "all", 0)
+			clear(pipeline, "all", 0xbbd3edff)
 
 		return
 	end
@@ -64,7 +64,7 @@ function render(pipeline)
 	end
 		
 	setPass(pipeline, "MAIN")
-		clear(pipeline, "all", 0x000000ff)
+		clear(pipeline, "all", 0xbbd3edff)
 		setFramebuffer(pipeline, "default")
 		applyCamera(pipeline, "main")
 		renderModels(pipeline, 1, false)

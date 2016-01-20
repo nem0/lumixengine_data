@@ -4,7 +4,7 @@
 function toWorldPos(i, j, selected)
 	local x = -3.5 + (i - 1)
 	local z = -3.5 + (j - 1)
-	local y = 0
+	local y = 0.36
 	if selected then
 		y = 2
 	end
@@ -51,25 +51,29 @@ for side = 1,2 do
 			black_pieces[i] = piece
 			j = i % 2 == 0 and 8 or 7
 		end
-		piece.entity = Engine.createEntity(g_universe)
 		board[j][i] = piece
 		piece.x = i
 		piece.y = j
-		Engine.setEntityPosition(g_universe, piece.entity, toWorldPos(i, j))
-		piece.cmp = Engine.createComponent(g_scene_renderer, "renderable", piece.entity)
-		local path = "models/manmade/chessboard/pawn.msh"
-		Engine.setRenderablePath(g_scene_renderer, piece.cmp, path)
+		piece.entity = Engine.createEntityEx(g_engine, g_universe, 
+		{
+			position = toWorldPos(i, j),
+			renderable = {
+				Source = "models/manmade/chessboard/pawn.msh"
+			}
+		})
 	end
 end
 	
 -- cursor
 local cursor = {}
-cursor.entity = Engine.createEntity(g_universe)
 cursor.pos = {0, 0, 0}
-Engine.setEntityPosition(g_universe, cursor.entity, cursor.pos)
-cursor.cmp = Engine.createComponent(g_scene_renderer, "renderable", cursor.entity)
-local path = "models/utils/cube/cube.msh"
-Engine.setRenderablePath(g_scene_renderer, cursor.cmp, path)
+cursor.entity = Engine.createEntityEx(g_engine, g_universe,
+{
+	position = cursor.pos,
+	renderable = {
+		Source = "models/utils/cube/cube.msh"
+	}
+})
 
 local LEFT_MOUSE_BUTTON = 1
 local X_ACTION = 0

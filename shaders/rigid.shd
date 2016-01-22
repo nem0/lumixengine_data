@@ -1,4 +1,4 @@
-passes = {"MAIN", "SHADOW", "POINT_LIGHT"}
+passes = {"DEFERRED", "MAIN", "SHADOW", "POINT_LIGHT"}
 vs_combinations = { 
 	{},
 	{},                                                

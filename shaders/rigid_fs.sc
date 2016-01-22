@@ -56,60 +56,83 @@ vec3 calcLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 
 void main()
 {     
-	#ifdef SHADOW
+	#ifdef DEFERRED
 		vec4 color = texture2D(u_texColor, v_texcoord0);
-		if(color.a < 0.3)
-			discard;
-		float depth = v_common2.z/v_common2.w;
-		gl_FragColor = vec4_splat(depth);
-	#else
-		mat3 tbn = mat3(
-					normalize(v_tangent),
-					normalize(v_normal),
-					normalize(v_bitangent)
-					);
-		tbn = transpose(tbn);
-					
-		vec3 normal;
+		if(color.a < 0.3) discard;
+		gl_FragData[0] = color;
 		#ifdef NORMAL_MAPPING
+			mat3 tbn = mat3(
+				normalize(v_tangent),
+				normalize(v_normal),
+				normalize(v_bitangent)
+				);
+			tbn = transpose(tbn);
+			vec3 normal;
 			normal.xz = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
-			normal.y = sqrt(1.0 - dot(normal.xz, normal.xz) );
+			normal.y = sqrt(1.0 - dot(normal.xz, normal.xz));
+			gl_FragData[1].xyz = mul(tbn, normal); // todo: store only xz 
 		#else
-			normal = vec3(0.0, 1.0, 0.0);
+			gl_FragData[1].xyz = v_normal;
 		#endif
-		vec3 view = normalize(v_view);
-
-		vec4 color = /*toLinear*/(texture2D(u_texColor, v_texcoord0) );
-		if(color.a < 0.3)
-			discard;
-					 
-		vec3 diffuse;
-		#ifdef POINT_LIGHT
-			diffuse = calcLight(u_lightDirFov, v_wpos, mul(tbn, normal), view, v_texcoord0);
-			diffuse = diffuse.xyz * color.rgb;
-			#ifdef HAS_SHADOWMAP
-				diffuse = diffuse * pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), u_lightDirFov.w); 
+		gl_FragData[1].w = 1;
+		//gl_FragData[1].xyz = vec3(1, 0, 0);
+		gl_FragData[2] = vec4(1, 1, 1, 1);
+	#else
+		#ifdef SHADOW
+			vec4 color = texture2D(u_texColor, v_texcoord0);
+			if(color.a < 0.3)
+				discard;
+			float depth = v_common2.z/v_common2.w;
+			gl_FragColor = vec4_splat(depth);
+		#else
+			mat3 tbn = mat3(
+						normalize(v_tangent),
+						normalize(v_normal),
+						normalize(v_bitangent)
+						);
+			tbn = transpose(tbn);
+						
+			vec3 normal;
+			#ifdef NORMAL_MAPPING
+				normal.xz = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
+				normal.y = sqrt(1.0 - dot(normal.xz, normal.xz) );
+			#else
+				normal = vec3(0.0, 1.0, 0.0);
 			#endif
-		#else
-			diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, mul(tbn, normal));
-			diffuse = diffuse.xyz * color.rgb;
-			float ndotl = -dot(mul(tbn, normal), u_lightDirFov.xyz);
-			diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 
-		#endif
+			vec3 view = normalize(v_view);
 
-		#ifdef MAIN
-			vec3 ambient = u_ambientColor.rgb * color.rgb;
-		#else
-			vec3 ambient = vec3(0, 0, 0);
-		#endif  
+			vec4 color = /*toLinear*/(texture2D(u_texColor, v_texcoord0) );
+			if(color.a < 0.3)
+				discard;
+						 
+			vec3 diffuse;
+			#ifdef POINT_LIGHT
+				diffuse = calcLight(u_lightDirFov, v_wpos, mul(tbn, normal), view, v_texcoord0);
+				diffuse = diffuse.xyz * color.rgb;
+				#ifdef HAS_SHADOWMAP
+					diffuse = diffuse * pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), u_lightDirFov.w); 
+				#endif
+			#else
+				diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, mul(tbn, normal));
+				diffuse = diffuse.xyz * color.rgb;
+				float ndotl = -dot(mul(tbn, normal), u_lightDirFov.xyz);
+				diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 
+			#endif
 
-		vec4 view_pos = mul(u_view, vec4(v_wpos, 1.0));
-		float fog_factor = getFogFactor(view_pos.z / view_pos.w, u_fogColorDensity.w, v_wpos.y, u_fogParams);
-		#ifdef POINT_LIGHT
-			gl_FragColor.xyz = (1 - fog_factor) * (diffuse + ambient);
-		#else
-			gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
-		#endif
-		gl_FragColor.w = 1.0;
-	#endif                  
+			#ifdef MAIN
+				vec3 ambient = u_ambientColor.rgb * color.rgb;
+			#else
+				vec3 ambient = vec3(0, 0, 0);
+			#endif  
+
+			vec4 view_pos = mul(u_view, vec4(v_wpos, 1.0));
+			float fog_factor = getFogFactor(view_pos.z / view_pos.w, u_fogColorDensity.w, v_wpos.y, u_fogParams);
+			#ifdef POINT_LIGHT
+				gl_FragColor.xyz = (1 - fog_factor) * (diffuse + ambient);
+			#else
+				gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
+			#endif
+			gl_FragColor.w = 1.0;
+		#endif       
+	#endif		
 }

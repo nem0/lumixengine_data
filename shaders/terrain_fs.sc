@@ -207,9 +207,6 @@ void main()
 		float b3 = max(a10 - ma, 0);
 		float b4 = max(a11 - ma, 0);
 		
-		gl_FragColor = vec4(v_texcoord1.x, 0, 0, 1);
-		//return;
-		
 		vec4 color = 
 			texture2D(u_texColormap, v_texcoord1) * 
 			vec4((c00.rgb * b1 + c01.rgb * b2 + c10.rgb * b3 + c11.rgb * b4) / (b1 + b2 + b3 + b4), 1);
@@ -231,43 +228,49 @@ void main()
 		// without height blend
 		//color = (c00 * u_opposite  + c10  * u_ratio) * v_opposite + (c01 * u_opposite  + c11 * u_ratio) * v_ratio;
 
-		vec3 view = normalize(v_view);
 		
 		float dist = length(v_view);
-		
 		float t = (dist - detail_texture_distance.x) / detail_texture_distance.x;
 		color = mix(color, texture2D(u_texSatellitemap, v_texcoord1), clamp(t, 0, 1));
-					 
-		vec3 diffuse;
-		#ifdef POINT_LIGHT
-			diffuse = shadePointLight(u_lightDirFov, v_wpos, mul(tbn, normal), view, detail_uv.xy);
-			diffuse = diffuse.xyz * color.rgb;
-			#ifdef HAS_SHADOWMAP
-				diffuse = diffuse * pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), u_lightDirFov.w); 
+
+		#ifdef DEFERRED
+				gl_FragData[0] = color;
+				gl_FragData[1].xyz = mul(tbn, normal);
+				gl_FragData[1].w = 1;
+				gl_FragData[2] = vec4(1, 1, 1, 1);
+		#else
+			vec3 view = normalize(v_view);
+			vec3 diffuse;
+			#ifdef POINT_LIGHT
+				diffuse = shadePointLight(u_lightDirFov, v_wpos, mul(tbn, normal), view, detail_uv.xy);
+				diffuse = diffuse.xyz * color.rgb;
+				#ifdef HAS_SHADOWMAP
+					diffuse = diffuse * pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), u_lightDirFov.w); 
+				#endif
+			#else
+				float ndl = -dot(mul(tbn, normal), u_lightDirFov.xyz);
+				diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, mul(tbn, normal));
+				diffuse = diffuse.xyz * color.rgb;
+				float ndotl = -dot(terrain_normal, u_lightDirFov.xyz);
+				diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 	
 			#endif
-		#else
-			float ndl = -dot(mul(tbn, normal), u_lightDirFov.xyz);
-			diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, mul(tbn, normal));
-			diffuse = diffuse.xyz * color.rgb;
-			float ndotl = -dot(terrain_normal, u_lightDirFov.xyz);
-			diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 	
+
+			
+			#ifdef MAIN
+				vec3 ambient = u_ambientColor.rgb * color.rgb;
+			#else
+				vec3 ambient = vec3(0, 0, 0);
+			#endif  
+
+			vec4 view_pos = mul(u_view, vec4(v_wpos, 1.0));
+			float fog_factor = getFogFactor(view_pos.z / view_pos.w, u_fogColorDensity.w, v_wpos.y, u_fogParams);
+
+			#ifdef POINT_LIGHT
+				gl_FragColor.xyz = (1 - fog_factor) * (diffuse + ambient);
+			#else
+				gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
+			#endif
+			gl_FragColor.w = 1.0;
 		#endif
-
-		
-		#ifdef MAIN
-			vec3 ambient = u_ambientColor.rgb * color.rgb;
-		#else
-			vec3 ambient = vec3(0, 0, 0);
-		#endif  
-
-		vec4 view_pos = mul(u_view, vec4(v_wpos, 1.0));
-		float fog_factor = getFogFactor(view_pos.z / view_pos.w, u_fogColorDensity.w, v_wpos.y, u_fogParams);
-
-		#ifdef POINT_LIGHT
-			gl_FragColor.xyz = (1 - fog_factor) * (diffuse + ambient);
-		#else
-			gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
-		#endif
-		gl_FragColor.w = 1.0;
 	#endif // else SHADOW
 }

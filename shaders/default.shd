@@ -1,0 +1,16 @@
+passes = {"MAIN", "SHADOW", "POINT_LIGHT"}
+vs_combinations = { 
+	{},
+	{},                                                
+	{}
+}
+
+fs_combinations =               
+{
+	{ },
+	{ },
+	{ },
+}
+   
+texture_slots = {
+}

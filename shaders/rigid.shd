@@ -1,7 +1,8 @@
-passes = {"DEFERRED", "MAIN", "SHADOW", "POINT_LIGHT"}
+passes = {"MAIN", "SHADOW", "POINT_LIGHT", "DEFERRED"}
 vs_combinations = { 
 	{},
 	{},                                                
+	{},
 	{}
 }
 
@@ -9,7 +10,8 @@ fs_combinations =
 {
 	{ "NORMAL_MAPPING" },
 	{ },
-	{ "NORMAL_MAPPING", "SPECULAR_TEXTURE", "HAS_SHADOWMAP"  },
+	{ "NORMAL_MAPPING", "SPECULAR_TEXTURE", "HAS_SHADOWMAP" },
+	{ "NORMAL_MAPPING", "SPECULAR_TEXTURE", "HAS_SHADOWMAP" }
 }
    
 texture_slots = {

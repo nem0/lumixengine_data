@@ -2,10 +2,11 @@ $input v_wpos, v_texcoord0 // in...
 
 #include "common.sh"
 
-SAMPLER2D(gbuffer0, 0);
-SAMPLER2D(gbuffer1, 1);
-SAMPLER2D(gbuffer2, 2);
-SAMPLER2D(u_texShadowmap, 3);
+SAMPLER2D(u_gbuffer0, 0);
+SAMPLER2D(u_gbuffer1, 1);
+SAMPLER2D(u_gbuffer2, 2);
+SAMPLER2D(u_gbuffer_depth, 3);
+SAMPLER2D(u_texShadowmap, 4);
 
 uniform vec4 u_lightPosRadius;
 uniform vec4 u_lightRgbInnerR;
@@ -15,17 +16,40 @@ uniform mat4 u_shadowmapMatrices[4];
 uniform vec4 u_fogColorDensity; 
 uniform vec4 u_lightSpecular;
 uniform vec4 u_fogParams;
+uniform mat4 u_camInvViewProj;
+
+
+vec4 getViewPos(vec2 texCoord)
+{
+	float z = texture2D(u_gbuffer_depth, texCoord).r;
+	#if BGFX_SHADER_LANGUAGE_HLSL
+		z = z;
+	#else
+		z = z * 2.0 - 1.0;
+	#endif // BGFX_SHADER_LANGUAGE_HLSL
+	vec4 posProj = vec4(texCoord * 2 - 1, z, 1.0);
+	#if BGFX_SHADER_LANGUAGE_HLSL
+		posProj.y = -posProj.y;
+	#endif // BGFX_SHADER_LANGUAGE_HLSL
+	
+	vec4 posView = mul(u_camInvViewProj, posProj);
+	
+	posView /= posView.w;
+	return posView;
+}
 
 void main()
 {
 	v_texcoord0.y = 1 - v_texcoord0.y; // todo
-	vec3 normal = texture2D(gbuffer1, v_texcoord0) * 2 - 1;
-	vec4 color = texture2D(gbuffer0, v_texcoord0);
+	vec3 normal = texture2D(u_gbuffer1, v_texcoord0) * 2 - 1;
+	vec4 color = texture2D(u_gbuffer0, v_texcoord0);
 
 	vec3 diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, normal) * color.rgb;
 
+	vec4 wpos = getViewPos(v_texcoord0);
+	
 	float ndotl = -dot(normal, u_lightDirFov.xyz);
-	//diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 
+	diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, wpos, ndotl); 
 
 	vec3 ambient = u_ambientColor.rgb * color.rgb;
 	float fog_factor = 0; // todo

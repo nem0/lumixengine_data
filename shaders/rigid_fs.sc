@@ -70,9 +70,9 @@ void main()
 			vec3 normal;
 			normal.xz = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
 			normal.y = sqrt(1.0 - dot(normal.xz, normal.xz));
-			gl_FragData[1].xyz = mul(tbn, normal); // todo: store only xz 
+			gl_FragData[1].xyz = (normalize(mul(tbn, normal)) + 1) * 0.5; // todo: store only xz 
 		#else
-			gl_FragData[1].xyz = v_normal;
+			gl_FragData[1].xyz = (v_normal + 1) * 0.5;
 		#endif
 		gl_FragData[1].w = 1;
 		//gl_FragData[1].xyz = vec3(1, 0, 0);

@@ -48,7 +48,9 @@ parameters = {
 	debug_gbuffer1 = false,
 	debug_gbuffer2 = false,
 	debug_gbuffer_depth = false,
-	blur_shadowmap = true
+	blur_shadowmap = true,
+	particles_enabled = true,
+	render_shadowmap_debug = false
 }
 
 
@@ -140,6 +142,16 @@ function editor(pipeline)
 		renderGizmos(pipeline)
 end
 
+function shadowmapDebug(pipeline)
+	if parameters.render_shadowmap_debug then
+		setPass(pipeline, "SCREEN_SPACE")
+		setFramebuffer(pipeline, "default")
+		bindFramebufferTexture(pipeline, "shadowmap", 0, texture_uniform)
+		drawQuad(pipeline, 0.48, 0.48, 0.5, 0.5, screen_space_material);
+		--drawQuad(pipeline, -1.0, -1.0, 2, 2, screen_space_material);
+	end
+end
+
 function debugDeferred(pipeline)
 	setPass(pipeline, "SCREEN_SPACE")
 	local x = 0.5
@@ -173,11 +185,22 @@ function debugDeferred(pipeline)
 end
 
 
+function particles(pipeline)
+	if parameters.particles_enabled then
+		setPass(pipeline, "PARTICLES")
+		disableDepthWrite(pipeline)
+		applyCamera(pipeline, "editor")
+		renderParticles(pipeline)
+	end	
+end
+
+
 function render(pipeline)
 	shadowmap(pipeline)
 	deferred(pipeline)
 	renderDebugShapes(pipeline)
-	
+	particles(pipeline)
 	editor(pipeline)
 	debugDeferred(pipeline)
+	shadowmapDebug(pipeline)
 end

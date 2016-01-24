@@ -1,0 +1,6 @@
+{"shader" : "shaders/blur.shd",
+"uniforms" : [],
+"backface_culling" : true,
+"alpha_cutout" : false,
+"shadow_receiver" : true,
+"z_test" : true}

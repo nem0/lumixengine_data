@@ -6,15 +6,12 @@ SAMPLER2D(u_texture, 0);
 uniform vec4 u_intensity; 
 uniform vec4 u_radius; 
 
+// todo: make it same as in deferred_fs.sc
 vec4 getViewPos(vec2 texCoord)
 {
-	float x = texCoord.x * 2.0 - 1.0;
-	float y = texCoord.y * 2.0 - 1.0;
+	float z = texture2D(u_texture, texCoord).r * 2.0 - 1.0; 
 	
-	// Assume we have a normal depth range between 0.0 and 1.0
-	float z = texture2D(u_texture, texCoord).r * 2.0 - 1.0;
-	
-	vec4 posProj = vec4(x, y, z, 1.0);
+	vec4 posProj = vec4(texCoord * 2 - 1, z, 1.0);
 	
 	vec4 posView = mul(u_invProj, posProj);
 	

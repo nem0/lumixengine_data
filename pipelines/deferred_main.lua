@@ -4,8 +4,8 @@ framebuffers = {
 		width = 1024,
 		height = 1024,
 		renderbuffers = {
-			{format="rgba8"},
-			{format = "depth32"}
+			{ format = "rgba8" },
+			{ format = "depth32" }
 		}
 	},
 
@@ -15,10 +15,10 @@ framebuffers = {
 		height = 1024,
 		screen_size = true,
 		renderbuffers = {
-			{format="rgba8"},
-			{format="rgba8"},
-			{format="rgba8"},
-			{format = "depth32"}
+			{ format = "rgba8" },
+			{ format = "rgba8" },
+			{ format = "rgba8" },
+			{ format = "depth32" }
 		}
 	},
 	
@@ -27,8 +27,8 @@ framebuffers = {
 		width = 2048,
 		height = 2048,
 		renderbuffers = {
-			{format="r32f"},
-			{format = "depth32"}
+			{ format = "r32f" },
+			{ format = "depth32" }
 		}
 	},
 	
@@ -37,7 +37,7 @@ framebuffers = {
 		width = 2048,
 		height = 2048,
 		renderbuffers = {
-			{format = "r32f"}
+			{ format = "r32f" }
 		}
 	}
 }
@@ -59,9 +59,10 @@ function init(pipeline)
 	gbuffer2_uniform = createUniform(pipeline, "u_gbuffer2")
 	gbuffer_depth_uniform = createUniform(pipeline, "u_gbuffer_depth")
 	shadowmap_uniform = createUniform(pipeline, "u_texShadowmap")
-	blur_material = loadMaterial(pipeline, "pipelines/blur.mat")
-	deferred_material = loadMaterial(pipeline, "models/deferred.mat")
-	screen_space_material = loadMaterial(pipeline, "models/editor/screen_space.mat")
+	blur_material = loadMaterial(pipeline, "shaders/blur.mat")
+	deferred_material = loadMaterial(pipeline, "shaders/deferred.mat")
+	screen_space_material = loadMaterial(pipeline, "shaders/screen_space.mat")
+	deferred_point_light_material =loadMaterial(pipeline, "shaders/deferredpointlight.mat")
 end
 
 
@@ -97,7 +98,9 @@ function deferred(pipeline)
 		clear(pipeline, "all", 0xbbd3edff)
 		renderModels(pipeline, 1, false)
 
-
+	beginNewView(pipeline, "copyRenderbuffer");
+		copyRenderbuffer(pipeline, "g_buffer", 3, "default", 1)
+		
 	setPass(pipeline, "MAIN")
 		setFramebuffer(pipeline, "default")
 		applyCamera(pipeline, "editor")
@@ -110,7 +113,21 @@ function deferred(pipeline)
 		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
 		drawQuad(pipeline, -1, -1, 2, 2, deferred_material);
 		
-		--deferredLocalLightLoop(pipeline, screen_space_material)
+	beginNewView(pipeline, "DEFERRED_LOCAL_LIGHT")
+		setFramebuffer(pipeline, "default")
+		disableDepthWrite(pipeline)
+		enableBlending(pipeline, "add")
+		applyCamera(pipeline, "editor")
+		local bufs = {
+			{ "g_buffer", 0, gbuffer0_uniform },
+			{ "g_buffer", 1, gbuffer1_uniform },
+			{ "g_buffer", 2, gbuffer2_uniform },
+			{ "g_buffer", 3, gbuffer_depth_uniform },
+			{ "shadowmap", 0, shadowmap_uniform }
+		}
+		deferredLocalLightLoop(pipeline, deferred_point_light_material, bufs)
+		
+		disableBlending(pipeline)
 end
 
 function editor(pipeline)
@@ -159,6 +176,7 @@ end
 function render(pipeline)
 	shadowmap(pipeline)
 	deferred(pipeline)
+	renderDebugShapes(pipeline)
 	
 	editor(pipeline)
 	debugDeferred(pipeline)

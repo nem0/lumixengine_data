@@ -83,10 +83,10 @@ parameters = {
 function init(pipeline)
 	shadowmap_uniform = createUniform(pipeline, "u_texShadowmap")
 	texture_uniform = createUniform(pipeline, "u_texture")
-	blur_material = loadMaterial(pipeline, "pipelines/blur.mat")
+	blur_material = loadMaterial(pipeline, "shaders/blur.mat")
 	sky_material = loadMaterial(pipeline, "models/sky/sky.mat")
-	screen_space_material = loadMaterial(pipeline, "models/editor/screen_space.mat")
-	ssao_material = loadMaterial(pipeline, "pipelines/ssao.mat")
+	screen_space_material = loadMaterial(pipeline, "shaders/screen_space.mat")
+	ssao_material = loadMaterial(pipeline, "shaders/ssao.mat")
 end
 
 

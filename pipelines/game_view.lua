@@ -31,7 +31,7 @@ framebuffers = {
 function init(pipeline)
 	shadowmap_uniform = createUniform(pipeline, "u_texShadowmap")
 	sky_material = loadMaterial(pipeline, "models/sky/sky.mat")
-	blur_material = loadMaterial(pipeline, "pipelines/blur.mat")
+	blur_material = loadMaterial(pipeline, "shaders/blur.mat")
 end
 
 function render(pipeline)

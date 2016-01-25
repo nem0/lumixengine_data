@@ -60,22 +60,21 @@ void main()
 		vec4 color = texture2D(u_texColor, v_texcoord0);
 		if(color.a < 0.3) discard;
 		gl_FragData[0] = color;
+		mat3 tbn = mat3(
+			normalize(v_tangent),
+			normalize(v_normal),
+			normalize(v_bitangent)
+			);
+		tbn = transpose(tbn);
+		vec3 normal;
 		#ifdef NORMAL_MAPPING
-			mat3 tbn = mat3(
-				normalize(v_tangent),
-				normalize(v_normal),
-				normalize(v_bitangent)
-				);
-			tbn = transpose(tbn);
-			vec3 normal;
 			normal.xz = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
 			normal.y = sqrt(1.0 - dot(normal.xz, normal.xz));
-			gl_FragData[1].xyz = (normalize(mul(tbn, normal)) + 1) * 0.5; // todo: store only xz 
 		#else
-			gl_FragData[1].xyz = (v_normal + 1) * 0.5;
+			normal = vec3(0.0, 1.0, 0.0);
 		#endif
+		gl_FragData[1].xyz = (normalize(mul(tbn, normal)) + 1) * 0.5; // todo: store only xz 
 		gl_FragData[1].w = 1;
-		//gl_FragData[1].xyz = vec3(1, 0, 0);
 		gl_FragData[2] = vec4(1, 1, 1, 1);
 	#else
 		#ifdef SHADOW

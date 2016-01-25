@@ -17,6 +17,7 @@ uniform vec4 u_fogColorDensity;
 uniform vec4 u_lightSpecular;
 uniform vec4 u_fogParams;
 uniform mat4 u_camInvViewProj;
+uniform mat4 u_camView;
 
 
 vec4 getViewPos(vec2 texCoord)
@@ -52,7 +53,10 @@ void main()
 	diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, wpos, ndotl); 
 
 	vec3 ambient = u_ambientColor.rgb * color.rgb;
-	float fog_factor = 0; // todo
+
+	vec4 view_pos = mul(u_camView, wpos);
+
+	float fog_factor = getFogFactor(view_pos.z / view_pos.w, u_fogColorDensity.w, wpos.y, u_fogParams);
 	gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
 	gl_FragColor.w = 1;
 }

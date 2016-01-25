@@ -235,7 +235,7 @@ void main()
 
 		#ifdef DEFERRED
 				gl_FragData[0] = color;
-				gl_FragData[1].xyz = mul(tbn, normal);
+				gl_FragData[1].xyz = (normalize(mul(tbn, normal)) + 1) * 0.5;
 				gl_FragData[1].w = 1;
 				gl_FragData[2] = vec4(1, 1, 1, 1);
 		#else

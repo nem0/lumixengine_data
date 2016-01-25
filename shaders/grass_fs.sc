@@ -40,28 +40,33 @@ vec3 calcLight(vec4 dirFov, vec3 _wpos)
 }
 
 void main()
-{     
+{
 	vec4 color = /*toLinear*/(texture2D(u_texColor, v_texcoord0) );
 	if(color.a < 0.3)
 		discard;
-				 
-	vec3 diffuse;
-	#ifdef POINT_LIGHT
-		vec3 shading = calcLight(u_lightDirFov, v_wpos);
-		diffuse = color * v_common * shading;
-		vec3 ambient = vec3(0, 0, 0);
+	#ifdef DEFERRED
+		gl_FragData[0] = color * vec4(v_common, 1);
+		gl_FragData[1].xyzw = vec4(0, 1, 0, 1);
+		gl_FragData[2] = vec4(1, 1, 1, 1);
 	#else
-		vec3 shadow = directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), 1.0);;
-		diffuse = color * v_common *  shadow * u_lightRgbInnerR.rgb;
-		vec3 ambient = u_ambientColor.rgb * color.rgb;
-	#endif
+		vec3 diffuse;
+		#ifdef POINT_LIGHT
+			vec3 shading = calcLight(u_lightDirFov, v_wpos);
+			diffuse = color * v_common * shading;
+			vec3 ambient = vec3(0, 0, 0);
+		#else
+			vec3 shadow = directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), 1.0);;
+			diffuse = color * v_common *  shadow * u_lightRgbInnerR.rgb;
+			vec3 ambient = u_ambientColor.rgb * color.rgb;
+		#endif
 
-	vec4 view_pos = mul(u_view, vec4(v_wpos, 1.0));
-	float fog_factor = getFogFactor(view_pos.z / view_pos.w, u_fogColorDensity.w, v_wpos.y, u_fogParams);
-	#ifdef POINT_LIGHT
-		gl_FragColor.xyz = (1 - fog_factor) * (diffuse + ambient);
-	#else
-		gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
+		vec4 view_pos = mul(u_view, vec4(v_wpos, 1.0));
+		float fog_factor = getFogFactor(view_pos.z / view_pos.w, u_fogColorDensity.w, v_wpos.y, u_fogParams);
+		#ifdef POINT_LIGHT
+			gl_FragColor.xyz = (1 - fog_factor) * (diffuse + ambient);
+		#else
+			gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
+		#endif
+		gl_FragColor.w = 1.0;
 	#endif
-	gl_FragColor.w = 1.0;
 }

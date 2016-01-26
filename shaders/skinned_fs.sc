@@ -95,23 +95,21 @@ void main()
 			#else
 				normal = vec3(0.0, 1.0, 0.0);
 			#endif
-			gl_FragColor = vec4(mul(tbn, normal), 1);
-			return;
+			normal = mul(tbn, normal);
 			vec3 view = normalize(v_view);
 
 			vec4 color = /*toLinear*/(texture2D(u_texColor, v_texcoord0) );
-					 
 			vec3 diffuse;
 			#ifdef POINT_LIGHT
-				diffuse = calcLight(u_lightDirFov, v_wpos, mul(tbn, normal), view, v_texcoord0);
+				diffuse = calcLight(u_lightDirFov, v_wpos, normal, view, v_texcoord0);
 				diffuse = diffuse.xyz * color.rgb;
 				#ifdef HAS_SHADOWMAP
 					diffuse = diffuse * pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), u_lightDirFov.w); 
 				#endif
 			#else
-				diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbAttenuation.rgb, mul(tbn, normal));
+				diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbAttenuation.rgb, normal);
 				diffuse = diffuse.xyz * color.rgb;
-				float ndotl = -dot(mul(tbn, normal), u_lightDirFov.xyz);
+				float ndotl = -dot(normal, u_lightDirFov.xyz);
 				diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 
 			#endif
 

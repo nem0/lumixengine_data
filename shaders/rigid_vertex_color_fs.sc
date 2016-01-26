@@ -11,7 +11,7 @@ SAMPLER2D(u_texColor, 0);
 #endif
 SAMPLER2D(u_texShadowmap, 3);
 uniform vec4 u_lightPosRadius;
-uniform vec4 u_lightRgbInnerR;
+uniform vec4 u_lightRgbAttenuation;
 uniform vec4 u_ambientColor;
 uniform vec4 u_lightDirFov; 
 uniform mat4 u_shadowmapMatrices[4];
@@ -27,7 +27,7 @@ vec3 calcLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 	vec3 lp = u_lightPosRadius.xyz - _wpos;
 	float radius = u_lightPosRadius.w;
 	float dist = length(lp);
-	float attn = pow(max(0, 1 - dist / u_attenuationParams.x), u_attenuationParams.y);
+	float attn = pow(max(0, 1 - dist / u_lightPosRadius.w), u_lightRgbAttenuation.w);
 	
 	vec3 toLightDir = normalize(lp);
 	
@@ -44,7 +44,7 @@ vec3 calcLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
    vec2 bln = blinn(toLightDir, _normal, _view);
 	vec4 lc = lit(bln.x, bln.y, u_materialSpecularShininess.w);
 	vec3 rgb = 
-		attn * (u_lightRgbInnerR.xyz * saturate(lc.y) 
+		attn * (u_lightRgbAttenuation.xyz * saturate(lc.y) 
 		+ u_lightSpecular.xyz * u_materialSpecularShininess.xyz *
 		#ifdef SPECULAR_TEXTURE
 			texture2D(u_texSpecular, uv).rgb * 
@@ -91,7 +91,7 @@ void main()
 				diffuse = diffuse * pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), u_lightDirFov.w); 
 			#endif
 		#else
-			diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, mul(tbn, normal));
+			diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbAttenuation.rgb, mul(tbn, normal));
 			diffuse = diffuse.xyz * color.rgb;
 			float ndotl = -dot(mul(tbn, normal), u_lightDirFov.xyz);
 			diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 

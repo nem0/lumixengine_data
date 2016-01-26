@@ -9,7 +9,7 @@ SAMPLER2D(u_gbuffer_depth, 3);
 SAMPLER2D(u_texShadowmap, 4);
 
 uniform vec4 u_lightPosRadius;
-uniform vec4 u_lightRgbInnerR;
+uniform vec4 u_lightRgbAttenuation;
 uniform vec4 u_ambientColor;
 uniform vec4 u_lightDirFov; 
 uniform mat4 u_shadowmapMatrices[4];
@@ -45,7 +45,7 @@ void main()
 	vec3 normal = texture2D(u_gbuffer1, v_texcoord0) * 2 - 1;
 	vec4 color = texture2D(u_gbuffer0, v_texcoord0);
 
-	vec3 diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbInnerR.rgb, normal) * color.rgb;
+	vec3 diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbAttenuation.rgb, normal) * color.rgb;
 
 	vec4 wpos = getViewPos(v_texcoord0);
 	

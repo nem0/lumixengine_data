@@ -6,7 +6,7 @@ SAMPLER2D(u_texColor, 0);
 SAMPLER2D(u_texShadowmap, 2);
 
 uniform vec4 u_lightPosRadius;
-uniform vec4 u_lightRgbInnerR;
+uniform vec4 u_lightRgbAttenuation;
 uniform vec4 u_ambientColor;
 uniform vec4 u_lightDirFov; 
 uniform mat4 u_shadowmapMatrices[4];
@@ -22,7 +22,7 @@ vec3 calcLight(vec4 dirFov, vec3 _wpos)
 	vec3 lp = u_lightPosRadius.xyz - _wpos;
 	float radius = u_lightPosRadius.w;
 	float dist = length(lp);
-	float attn = pow(max(0, 1 - dist / u_attenuationParams.x), u_attenuationParams.y);
+	float attn = pow(max(0, 1 - dist / u_lightPosRadius.x), u_lightRgbAttenuation.w);
 	
 	vec3 toLightDir = normalize(lp);
 	
@@ -36,7 +36,7 @@ vec3 calcLight(vec4 dirFov, vec3 _wpos)
 		attn *= (cosDir - cosCone) / (1 - cosCone);
 	}
 		
-	return attn * u_lightRgbInnerR.xyz;
+	return attn * u_lightRgbAttenuation.xyz;
 }
 
 void main()
@@ -56,7 +56,7 @@ void main()
 			vec3 ambient = vec3(0, 0, 0);
 		#else
 			vec3 shadow = directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), 1.0);;
-			diffuse = color * v_common *  shadow * u_lightRgbInnerR.rgb;
+			diffuse = color * v_common *  shadow * u_lightRgbAttenuation.rgb;
 			vec3 ambient = u_ambientColor.rgb * color.rgb;
 		#endif
 

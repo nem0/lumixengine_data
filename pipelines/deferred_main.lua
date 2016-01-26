@@ -44,6 +44,7 @@ framebuffers = {
 
 
 parameters = {
+	render_gizmos = true,
 	debug_gbuffer0 = false,
 	debug_gbuffer1 = false,
 	debug_gbuffer2 = false,
@@ -71,9 +72,9 @@ end
 
 function shadowmap(pipeline)
 	setPass(pipeline, "SHADOW")         
-	applyCamera(pipeline, "editor")
-	setFramebuffer(pipeline, "shadowmap")
-	renderShadowmap(pipeline, 1, "editor") 
+		applyCamera(pipeline, "editor")
+		setFramebuffer(pipeline, "shadowmap")
+		renderShadowmap(pipeline, 1, "editor") 
 	
 	if parameters.blur_shadowmap then
 		setPass(pipeline, "BLUR_H")
@@ -133,13 +134,15 @@ function deferred(pipeline)
 end
 
 function editor(pipeline)
-	setPass(pipeline, "EDITOR")
-		setFramebuffer(pipeline, "default")
-		enableDepthWrite(pipeline)
-		disableBlending(pipeline)
-		clear(pipeline, "depth", 0)
-		applyCamera(pipeline, "editor")
-		renderGizmos(pipeline)
+	if parameters.render_gizmos then
+		setPass(pipeline, "EDITOR")
+			setFramebuffer(pipeline, "default")
+			enableDepthWrite(pipeline)
+			disableBlending(pipeline)
+			clear(pipeline, "depth", 0)
+			applyCamera(pipeline, "editor")
+			renderGizmos(pipeline)
+	end
 end
 
 function shadowmapDebug(pipeline)

@@ -1,4 +1,4 @@
-$input a_position, a_normal, a_tangent, a_texcoord0, a_weight, a_indices
+$input a_weight, a_indices, a_position, a_normal, a_tangent, a_texcoord0
 $output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0
 
 /*

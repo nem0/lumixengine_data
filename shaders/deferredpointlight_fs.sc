@@ -1,4 +1,4 @@
-$input v_wpos, v_texcoord0, v_view // in...
+$input v_wpos, v_texcoord0, v_view, v_pos_radius, v_color_attn, v_dir_fov, v_specular // in...
 
 #include "common.sh"
 
@@ -8,18 +8,10 @@ SAMPLER2D(u_gbuffer2, 2);
 SAMPLER2D(u_gbuffer_depth, 3);
 SAMPLER2D(u_texShadowmap, 4);
 
-uniform vec4 u_lightPosRadius;
-uniform vec4 u_lightRgbInnerR;
-uniform vec4 u_ambientColor;
-uniform vec4 u_lightDirFov; 
 uniform mat4 u_shadowmapMatrices[4];
 uniform vec4 u_fogColorDensity; 
-uniform vec4 u_lightSpecular;
 uniform vec4 u_fogParams;
 uniform mat4 u_camInvViewProj;
-uniform vec4 u_attenuationParams;
-uniform vec4 u_materialSpecularShininess;
-
 
 vec4 getViewPos(vec2 texCoord)
 {
@@ -41,12 +33,19 @@ vec4 getViewPos(vec2 texCoord)
 }
 
 
-vec3 calcLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
+vec3 calcLight(vec4 dirFov, vec3 _wpos
+	, vec3 _normal
+	, vec3 _view
+	, vec2 uv
+	, vec3 light_pos
+	, float light_radius
+	, vec3 light_color
+	, float attn_param
+	, vec3 light_specular)
 {
-	vec3 lp = u_lightPosRadius.xyz - _wpos;
-	float radius = u_lightPosRadius.w;
+	vec3 lp = light_pos.xyz - _wpos;
 	float dist = length(lp);
-	float attn = pow(max(0, 1 - dist / u_attenuationParams.x), u_attenuationParams.y);
+	float attn = pow(max(0, 1 - dist / light_radius), attn_param);
 	
 	vec3 toLightDir = normalize(lp);
 	
@@ -64,8 +63,8 @@ vec3 calcLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 	vec2 bln = blinn(toLightDir, _normal, _view);
 	vec4 lc = lit(bln.x, bln.y, materialSpecularShininess.w);
 	vec3 rgb = 
-		attn * (u_lightRgbInnerR.xyz * saturate(lc.y) 
-		+ u_lightSpecular.xyz * materialSpecularShininess.xyz *
+		attn * (light_color * saturate(lc.y) 
+		+ light_specular.xyz * materialSpecularShininess.xyz *
 		#ifdef SPECULAR_TEXTURE
 			texture2D(u_texSpecular, uv).rgb * 
 		#endif
@@ -86,9 +85,17 @@ void main()
 
 	vec4 wpos = getViewPos((prj.xy + 1) * 0.5);
 	
-	float ndotl = -dot(normal, u_lightDirFov.xyz);
+	float ndotl = -dot(normal, v_dir_fov.xyz);
 	vec3 view = normalize(v_view);
-	vec3 diffuse = color.rgb * calcLight(u_lightDirFov, wpos, normal, view, prj.xy); 
+	vec3 diffuse = color.rgb * calcLight(v_dir_fov
+		, wpos, normal
+		, view
+		, prj.xy
+		, v_pos_radius.xyz
+		, v_pos_radius.w
+		, v_color_attn.xyz
+		, v_color_attn.w
+		, v_specular.xyz); 
 
 	gl_FragColor.xyz = diffuse;
 	gl_FragColor.w = 1;

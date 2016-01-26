@@ -11,7 +11,7 @@ fs_combinations =
 	{ "NORMAL_MAPPING" },
 	{ },
 	{ "NORMAL_MAPPING", "SPECULAR_TEXTURE", "HAS_SHADOWMAP" },
-	{ "NORMAL_MAPPING", "SPECULAR_TEXTURE", "HAS_SHADOWMAP" }
+	{ "NORMAL_MAPPING" }
 }
    
 texture_slots = {

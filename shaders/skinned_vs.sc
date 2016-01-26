@@ -1,10 +1,5 @@
-$input a_weight, a_indices, a_position, a_normal, a_tangent, a_texcoord0
+$input a_position, a_normal, a_tangent, a_texcoord0, a_weight, a_indices
 $output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0
-
-/*
- * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
- */
 
 #include "common.sh"
 

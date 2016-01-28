@@ -13,7 +13,7 @@ framebuffers = {
 		height = 768,
 		screen_size = true,
 		renderbuffers = {
-			{format = "rgba16"},
+			{format = "rgba16f"},
 			{format = "depth24"}
 		}
 	},

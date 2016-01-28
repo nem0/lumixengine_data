@@ -27,35 +27,6 @@ uniform vec4 u_terrainScale;
 uniform mat4 u_terrainMatrix;
 
 
-vec3 shadePointLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
-{
-	vec3 lp = u_lightPosRadius.xyz - _wpos;
-	float dist = length(lp);
-	float attn = pow(max(0, 1 - dist / u_lightPosRadius.w), u_lightRgbAttenuation.w);
-	
-	vec3 toLightDir = normalize(lp);
-	if(dirFov.w < 3.14159)
-	{
-		float cosDir = dot(normalize(dirFov.xyz), normalize(-toLightDir));
-		float cosCone = cos(dirFov.w * 0.5);
-	
-		if(cosDir < cosCone)
-			discard;
-		attn *= (cosDir - cosCone) / (1 - cosCone);
-	}
-	
-	vec2 lc = lit(toLightDir, _normal, _view, u_materialSpecularShininess.w);
-	vec3 rgb = 
-		attn * (u_lightRgbAttenuation.xyz * saturate(lc.x) 
-		+ u_lightSpecular.xyz * u_materialSpecularShininess.xyz *
-		#ifdef SPECULAR_TEXTURE
-			texture2D(u_texSpecular, uv).rgb * 
-		#endif
-		saturate(lc.y));
-	return rgb;
-}
-
-
 vec2 getSubtextureUV4(vec2 uv, int z)
 {
 	static const float o = 1.0/(2.0*2*2);
@@ -210,18 +181,19 @@ void main()
 			texture2D(u_texColormap, v_texcoord1) * 
 			vec4((c00.rgb * b1 + c01.rgb * b2 + c10.rgb * b3 + c11.rgb * b4) / (b1 + b2 + b3 + b4), 1);
 			
-		vec3 normal;
+		vec3 wnormal;
 		#ifdef NORMAL_MAPPING
 			vec4 n00 = texture2DLod(u_texNormal, duv00, mipmap_level);
 			vec4 n01 = texture2DLod(u_texNormal, duv01, mipmap_level);
 			vec4 n10 = texture2DLod(u_texNormal, duv10, mipmap_level);
 			vec4 n11 = texture2DLod(u_texNormal, duv11, mipmap_level);
-			normal.xz = (n00.xy * b1 + n01.xy * b2 + n10.xy * b3 + n11.xy * b4) / (b1 + b2 + b3 + b4);
-			normal.xz = normal.xz * 2.0 - 1.0;
-			normal.y = sqrt(1 - dot(normal.xz, normal.xz));
+			wnormal.xz = (n00.xy * b1 + n01.xy * b2 + n10.xy * b3 + n11.xy * b4) / (b1 + b2 + b3 + b4);
+			wnormal.xz = wnormal.xz * 2.0 - 1.0;
+			wnormal.y = sqrt(1 - dot(wnormal.xz, wnormal.xz));
 		#else
-			normal = vec3(0.0, 1.0, 0.0);
+			wnormal = vec3(0.0, 1.0, 0.0);
 		#endif
+		wnormal = normalize(mul(tbn, wnormal));
 
 		// http://www.gamasutra.com/blogs/AndreyMishkinis/20130716/196339/Advanced_Terrain_Texture_Splatting.php
 		// without height blend
@@ -234,21 +206,44 @@ void main()
 
 		#ifdef DEFERRED
 				gl_FragData[0] = color;
-				gl_FragData[1].xyz = (normalize(mul(tbn, normal)) + 1) * 0.5;
+				gl_FragData[1].xyz = (wnormal + 1) * 0.5;
 				gl_FragData[1].w = 1;
 				gl_FragData[2] = vec4(1, 1, 1, 1);
 		#else
 			vec3 view = normalize(v_view);
 			vec3 diffuse;
+			vec3 texture_specular = 
+			#ifdef SPECULAR_TEXTURE
+				texture2D(u_texSpecular, v_texcoord0).rgb;
+			#else
+				vec3(1, 1, 1);
+			#endif
 			#ifdef POINT_LIGHT
-				diffuse = shadePointLight(u_lightDirFov, v_wpos, mul(tbn, normal), view, detail_uv.xy);
+				diffuse = 
+				shadePointLight(u_lightDirFov
+				, v_wpos
+				, wnormal
+				, view
+				, detail_uv.xy
+				, u_lightPosRadius
+				, u_lightRgbAttenuation
+				, u_materialSpecularShininess
+				, u_lightSpecular
+				, texture_specular
+				);
+				
 				diffuse = diffuse.xyz * color.rgb;
 				#ifdef HAS_SHADOWMAP
 					diffuse = diffuse * pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), u_lightDirFov.w); 
 				#endif
 			#else
-				float ndl = -dot(mul(tbn, normal), u_lightDirFov.xyz);
-				diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbAttenuation.rgb, mul(tbn, normal));
+				diffuse = shadeDirectionalLight(u_lightDirFov.xyz
+					, view
+					, u_lightRgbAttenuation.rgb
+					, u_lightSpecular.rgb
+					, wnormal
+					, u_materialSpecularShininess
+					, texture_specular);
 				diffuse = diffuse.xyz * color.rgb;
 				float ndotl = -dot(terrain_normal, u_lightDirFov.xyz);
 				diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 	

@@ -16,6 +16,46 @@ vec2 lit(vec3 _lightDir, vec3 _normal, vec3 _viewDir, float shininess)
 }
 
 
+vec3 shadePointLight(
+	vec4 dirFov, 
+	vec3 wpos, 
+	vec3 normal, 
+	vec3 view, 
+	vec2 uv,
+	vec4 light_pos_radius,
+	vec4 light_color_attenuation,
+	vec4 material_specular_shininess,
+	vec3 light_specular,
+	vec3 texture_specular
+	)
+{
+	vec3 lp = light_pos_radius.xyz - wpos;
+	float dist = length(lp);
+	float attn = pow(max(0, 1 - dist / light_pos_radius.w), light_color_attenuation.w);
+	
+	vec3 toLightDir = normalize(lp);
+	
+	if(dirFov.w < 3.14159)
+	{
+		float cosDir = dot(normalize(dirFov.xyz), normalize(-toLightDir));
+		float cosCone = cos(dirFov.w * 0.5);
+	
+		if(cosDir < cosCone)
+			discard;
+		attn *= (cosDir - cosCone) / (1 - cosCone);
+	}
+	
+	vec2 lc = lit(toLightDir, normal, view, material_specular_shininess.w);
+	vec3 rgb = 
+		attn * (light_color_attenuation.rgb * saturate(lc.x) 
+		+ light_specular 
+			* material_specular_shininess.rgb 
+			* texture_specular 
+			* saturate(lc.y));
+	return rgb;
+}
+
+
 float getFogFactor(float fog_coord, float fog_density, float fragment_height, vec4 fog_params) 
 { 
 	float fResult = exp(-pow(fog_density * fog_coord, 2.0)); 
@@ -26,9 +66,25 @@ float getFogFactor(float fog_coord, float fog_density, float fragment_height, ve
 }
 
 
-vec3 calcGlobalLight(vec3 light_dir, vec3 _light_color, vec3 _normal)
+vec3 shadeDirectionalLight(vec3 light_dir
+	, vec3 view_dir
+	, vec3 light_color
+	, vec3 light_specular
+	, vec3 normal
+	, vec4 material_specular_shininess
+	, vec3 texture_specular)
 {
-	return max(0.0, dot(-light_dir, _normal)) * _light_color;	
+	float ndotl = dot(normal, light_dir);
+	vec3 reflected = light_dir - 2.0 * ndotl * normal;
+	float rdotv = max(0.0, dot(-reflected, view_dir));
+
+	float spec = step(0.0, ndotl) * pow(max(0.0, rdotv), material_specular_shininess.w);
+	vec3 col = max(0.0, -ndotl) * light_color
+		+ light_specular 
+			* material_specular_shininess.rgb 
+			* texture_specular 
+			* step(1.0, material_specular_shininess.w) * spec;
+	return col;	
 }
 
 

@@ -45,7 +45,7 @@ void main()
 	vec3 normal = texture2D(u_gbuffer1, v_texcoord0) * 2 - 1;
 	vec4 color = texture2D(u_gbuffer0, v_texcoord0);
 
-	vec3 diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbAttenuation.rgb, normal) * color.rgb;
+	vec3 diffuse = vec3(1, 0, 0); //calcGlobalLight(u_lightDirFov.xyz, u_lightRgbAttenuation.rgb, normal) * color.rgb;
 
 	vec4 wpos = getViewPos(v_texcoord0);
 	

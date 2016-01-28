@@ -22,37 +22,6 @@ uniform vec4 u_attenuationParams;
 uniform vec4 u_fogParams;
 
 
-vec3 calcLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
-{
-	vec3 lp = u_lightPosRadius.xyz - _wpos;
-	float radius = u_lightPosRadius.w;
-	float dist = length(lp);
-	float attn = pow(max(0, 1 - dist / u_lightPosRadius.w), u_lightRgbAttenuation.w);
-	
-	vec3 toLightDir = normalize(lp);
-	
-	if(dirFov.w < 3.14159)
-	{
-		float cosDir = dot(normalize(dirFov.xyz), normalize(-toLightDir));
-		float cosCone = cos(dirFov.w * 0.5);
-	
-		if(cosDir < cosCone)
-			discard;
-		attn *= (cosDir - cosCone) / (1 - cosCone);
-	}
-		
-   vec2 lc = lit(toLightDir, _normal, _view, u_materialSpecularShininess.w);
-	vec3 rgb = 
-		attn * (u_lightRgbAttenuation.xyz * saturate(lc.x) 
-		+ u_lightSpecular.xyz * u_materialSpecularShininess.xyz *
-		#ifdef SPECULAR_TEXTURE
-			texture2D(u_texSpecular, uv).rgb * 
-		#endif
-		saturate(lc.y));
-	return rgb;
-}
-
-
 void main()
 {     
 	#ifdef DEFERRED
@@ -87,28 +56,50 @@ void main()
 						);
 			tbn = transpose(tbn);
 						
-			vec3 normal;
+			vec3 wnormal;
 			#ifdef NORMAL_MAPPING
-				normal.xz = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
-				normal.y = sqrt(1.0 - dot(normal.xz, normal.xz) );
+				wnormal.xz = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
+				wnormal.y = sqrt(1.0 - dot(wnormal.xz, wnormal.xz) );
 			#else
-				normal = vec3(0.0, 1.0, 0.0);
+				wnormal = vec3(0.0, 1.0, 0.0);
 			#endif
-			normal = mul(tbn, normal);
+			wnormal = mul(tbn, wnormal);
 			vec3 view = normalize(v_view);
 
 			vec4 color = /*toLinear*/(texture2D(u_texColor, v_texcoord0) );
+			vec3 texture_specular = 
+			#ifdef SPECULAR_TEXTURE
+				texture2D(u_texSpecular, v_texcoord0).rgb;
+			#else
+				vec3(1, 1, 1);
+			#endif
 			vec3 diffuse;
 			#ifdef POINT_LIGHT
-				diffuse = calcLight(u_lightDirFov, v_wpos, normal, view, v_texcoord0);
+				diffuse = shadePointLight(u_lightDirFov
+				, v_wpos
+				, wnormal
+				, view
+				, v_texcoord0
+				, u_lightPosRadius
+				, u_lightRgbAttenuation
+				, u_materialSpecularShininess
+				, u_lightSpecular
+				, texture_specular
+				);
 				diffuse = diffuse.xyz * color.rgb;
 				#ifdef HAS_SHADOWMAP
 					diffuse = diffuse * pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), u_lightDirFov.w); 
 				#endif
 			#else
-				diffuse = calcGlobalLight(u_lightDirFov.xyz, u_lightRgbAttenuation.rgb, normal);
+				diffuse = shadeDirectionalLight(u_lightDirFov.xyz
+					, view
+					, u_lightRgbAttenuation.rgb
+					, u_lightSpecular.rgb
+					, wnormal
+					, u_materialSpecularShininess
+					, texture_specular);
 				diffuse = diffuse.xyz * color.rgb;
-				float ndotl = -dot(normal, u_lightDirFov.xyz);
+				float ndotl = -dot(wnormal, u_lightDirFov.xyz);
 				diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 
 			#endif
 

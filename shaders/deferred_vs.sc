@@ -3,6 +3,7 @@ $output v_wpos, v_texcoord0
 
 #include "common.sh"
 
+
 void main()
 {
 	vec3 wpos = mul(u_model[0], vec4(a_position, 1.0) ).xyz;

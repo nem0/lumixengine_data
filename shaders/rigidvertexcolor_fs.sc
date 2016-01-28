@@ -84,7 +84,7 @@ void main()
 				, u_materialSpecularShininess
 				, texture_specular);
 			diffuse = diffuse.xyz * color.rgb;
-			float ndotl = -dot(mul(tbn, wnormal), u_lightDirFov.xyz);
+			float ndotl = -dot(wnormal, u_lightDirFov.xyz);
 			diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 
 		#endif
 

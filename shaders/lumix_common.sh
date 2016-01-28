@@ -33,11 +33,11 @@ vec3 shadePointLight(
 	float dist = length(lp);
 	float attn = pow(max(0, 1 - dist / light_pos_radius.w), light_color_attenuation.w);
 	
-	vec3 toLightDir = normalize(lp);
+	vec3 toLightDir = lp / dist;
 	
 	if(dirFov.w < 3.14159)
 	{
-		float cosDir = dot(normalize(dirFov.xyz), normalize(-toLightDir));
+		float cosDir = dot(normalize(dirFov.xyz), -toLightDir);
 		float cosCone = cos(dirFov.w * 0.5);
 	
 		if(cosDir < cosCone)
@@ -76,14 +76,14 @@ vec3 shadeDirectionalLight(vec3 light_dir
 {
 	float ndotl = dot(normal, light_dir);
 	vec3 reflected = light_dir - 2.0 * ndotl * normal;
-	float rdotv = max(0.0, dot(-reflected, view_dir));
-
-	float spec = step(0.0, ndotl) * pow(max(0.0, rdotv), material_specular_shininess.w);
-	vec3 col = max(0.0, -ndotl) * light_color
-		+ light_specular 
-			* material_specular_shininess.rgb 
-			* texture_specular 
-			* step(1.0, material_specular_shininess.w) * spec;
+	float rdotv = max(0.0, dot(reflected, view_dir));
+	float spec = pow(max(0.0, rdotv), material_specular_shininess.w);
+	vec3 col = step(0.0, -ndotl) * 
+		(-ndotl * light_color
+			+ light_specular 
+				* material_specular_shininess.rgb 
+				* texture_specular 
+				* step(1.0, material_specular_shininess.w) * spec);
 	return col;	
 }
 

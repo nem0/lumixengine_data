@@ -18,6 +18,8 @@ uniform vec4 u_lightSpecular;
 uniform vec4 u_fogParams;
 uniform mat4 u_camInvViewProj;
 uniform mat4 u_camView;
+uniform mat4 u_invCamView;
+
 
 
 vec4 getViewPos(vec2 texCoord)
@@ -39,16 +41,51 @@ vec4 getViewPos(vec2 texCoord)
 	return posView;
 }
 
+vec3 shadeDirectionalLight2(vec3 light_dir
+	, vec3 view_dir
+	, vec3 light_color
+	, vec3 light_specular
+	, vec3 normal
+	, vec4 material_specular_shininess
+	, vec3 texture_specular)
+{
+	float ndotl = dot(normal, light_dir);
+	vec3 reflected = light_dir - 2.0 * ndotl * normal;
+	float rdotv = max(0.0, dot(reflected, view_dir));
+	return view_dir;
+	float spec = pow(max(0.0, rdotv), material_specular_shininess.w);
+	vec3 col = step(0.0, -ndotl) * 
+		(-ndotl * light_color
+			+ light_specular 
+				* material_specular_shininess.rgb 
+				* texture_specular 
+				* step(1.0, material_specular_shininess.w) * spec);
+	return col;	
+}
+
 void main()
 {
 	v_texcoord0.y = 1 - v_texcoord0.y; // todo
 	vec3 normal = texture2D(u_gbuffer1, v_texcoord0) * 2 - 1;
 	vec4 color = texture2D(u_gbuffer0, v_texcoord0);
 
-	vec3 diffuse = vec3(1, 0, 0); //calcGlobalLight(u_lightDirFov.xyz, u_lightRgbAttenuation.rgb, normal) * color.rgb;
-
 	vec4 wpos = getViewPos(v_texcoord0);
+	vec3 texture_specular = vec3(1, 1, 1); // todo
+
+	vec3 view = normalize(mul(u_invCamView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - wpos);
+	vec4 mat_specular_shininess = vec4(1, 1, 1, 4);
 	
+	
+	vec3 diffuse = shadeDirectionalLight(u_lightDirFov.xyz
+					, view
+					, u_lightRgbAttenuation.rgb
+					, u_lightSpecular.rgb
+					, normal
+					, mat_specular_shininess
+					, texture_specular);
+	diffuse = diffuse * color;
+					
+					
 	float ndotl = -dot(normal, u_lightDirFov.xyz);
 	diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, wpos, ndotl); 
 

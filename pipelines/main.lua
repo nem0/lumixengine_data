@@ -5,7 +5,17 @@ framebuffers = {
 		height = 768,
 		renderbuffers = {
 			{format="rgba8"},
-			{format = "depth32"}
+		}
+	},
+
+	{
+		name = "hdr",
+		width = 1024,
+		height = 1024,
+		screen_size = true;
+		renderbuffers = {
+			{ format = "rgba16f" },
+			{ format = "depth32" }
 		}
 	},
 
@@ -84,9 +94,10 @@ function init(pipeline)
 	shadowmap_uniform = createUniform(pipeline, "u_texShadowmap")
 	texture_uniform = createUniform(pipeline, "u_texture")
 	blur_material = loadMaterial(pipeline, "shaders/blur.mat")
-	sky_material = loadMaterial(pipeline, "models/sky/sky.mat")
 	screen_space_material = loadMaterial(pipeline, "shaders/screen_space.mat")
 	ssao_material = loadMaterial(pipeline, "shaders/ssao.mat")
+	hdr_buffer_uniform = createUniform(pipeline, "u_hdrBuffer")
+	hdr_material = loadMaterial(pipeline, "shaders/hdr.mat")
 end
 
 
@@ -118,7 +129,7 @@ function renderSSAODPostprocess(pipeline)
 		setPass(pipeline, "SCREEN_SPACE")
 		enableBlending(pipeline, "multiply")
 		disableDepthWrite(pipeline)
-		setFramebuffer(pipeline, "default")
+		setFramebuffer(pipeline, "hdr")
 		bindFramebufferTexture(pipeline, "SSAO", 0, texture_uniform)
 		drawQuad(pipeline, -1.0, -1.0, 2, 2, screen_space_material);
 	end
@@ -187,7 +198,7 @@ function main(pipeline)
 	setPass(pipeline, "MAIN")
 	clear(pipeline, "all", 0xbbd3edff)
 	enableRGBWrite(pipeline)
-	setFramebuffer(pipeline, "default")
+	setFramebuffer(pipeline, "hdr")
 	applyCamera(pipeline, "editor")
 	renderModels(pipeline, 1, false)
 --		executeCustomCommand(pipeline, "render_physics");
@@ -207,22 +218,36 @@ end
 
 function pointLight(pipeline)
 	setPass(pipeline, "POINT_LIGHT")
-	disableDepthWrite(pipeline)
-	enableBlending(pipeline, "add")
-	applyCamera(pipeline, "editor")
-	renderModels(pipeline, 1, true)
+		setFramebuffer(pipeline, "hdr")
+		disableDepthWrite(pipeline)
+		enableBlending(pipeline, "add")
+		applyCamera(pipeline, "editor")
+		renderModels(pipeline, 1, true)
 end
 
 
 function editor(pipeline)
 	if parameters.render_gizmos then
 		setPass(pipeline, "EDITOR")
+		setFramebuffer(pipeline, "default")
 		enableDepthWrite(pipeline)
 		disableBlending(pipeline)
 		clear(pipeline, "depth", 0)
 		applyCamera(pipeline, "editor")
 		renderGizmos(pipeline)
 	end
+end
+
+
+function hdr(pipeline)
+	setPass(pipeline, "HDR")
+		setFramebuffer(pipeline, "default")
+		disableBlending(pipeline)
+		applyCamera(pipeline, "editor")
+		disableDepthWrite(pipeline)
+		clear(pipeline, "all", 0xbbd3edff)
+		bindFramebufferTexture(pipeline, "hdr", 0, hdr_buffer_uniform)
+		drawQuad(pipeline, -1, -1, 2, 2, hdr_material)
 end
 
  
@@ -233,8 +258,9 @@ function render(pipeline)
 	pointLight(pipeline)		
 	SSAO(pipeline)
 	renderSSAODPostprocess(pipeline)
-	editor(pipeline)
 
+	hdr(pipeline)
+	editor(pipeline)
 	renderSSAODDebug(pipeline)
 	shadowmapDebug(pipeline)
 end

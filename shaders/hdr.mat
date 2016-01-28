@@ -1,0 +1,7 @@
+{"shader" : "shaders/hdr.shd",
+"uniforms" : [{"name" : "exposure",
+"float_value" : 1.00000000}],
+"backface_culling" : false,
+"alpha_cutout" : false,
+"shadow_receiver" : false,
+"z_test" : false}

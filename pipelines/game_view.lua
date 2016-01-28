@@ -5,6 +5,15 @@ framebuffers = {
 		height = 768,
 		renderbuffers = {
 			{format = "rgba8"},
+		}
+	},
+	{
+		name = "hdr",
+		width = 1024,
+		height = 768,
+		screen_size = true,
+		renderbuffers = {
+			{format = "rgba16"},
 			{format = "depth24"}
 		}
 	},
@@ -30,8 +39,19 @@ framebuffers = {
 
 function init(pipeline)
 	shadowmap_uniform = createUniform(pipeline, "u_texShadowmap")
-	sky_material = loadMaterial(pipeline, "models/sky/sky.mat")
 	blur_material = loadMaterial(pipeline, "shaders/blur.mat")
+	hdr_buffer_uniform = createUniform(pipeline, "u_hdrBuffer")
+	hdr_material = loadMaterial(pipeline, "shaders/hdr.mat")
+end
+
+
+function hdr(pipeline)
+	setPass(pipeline, "HDR")
+		setFramebuffer(pipeline, "default")
+		applyCamera(pipeline, "editor")
+		clear(pipeline, "all", 0xbbd3edff)
+		bindFramebufferTexture(pipeline, "hdr", 0, hdr_buffer_uniform)
+		drawQuad(pipeline, -1, -1, 2, 2, hdr_material)
 end
 
 function render(pipeline)
@@ -65,19 +85,9 @@ function render(pipeline)
 		
 	setPass(pipeline, "MAIN")
 		clear(pipeline, "all", 0xbbd3edff)
-		setFramebuffer(pipeline, "default")
+		setFramebuffer(pipeline, "hdr")
 		applyCamera(pipeline, "main")
 		renderModels(pipeline, 1, false)
-		--renderDebugLines(pipeline)
---[[
-	setPass(pipeline, "SKY")
-		--disableBlending(pipeline)
-		drawQuad(pipeline, -1, -1, 2, 2, sky_material);
 		
-	setPass(pipeline, "POINT_LIGHT")
-		enableBlending(pipeline, "add")
-		applyCamera(pipeline, "main")
-		renderModels(pipeline, 1, true)
-		disableBlending(pipeline)
-]]--
+	hdr(pipeline)
 end

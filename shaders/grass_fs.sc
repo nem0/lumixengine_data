@@ -41,7 +41,7 @@ vec3 calcLight(vec4 dirFov, vec3 _wpos)
 
 void main()
 {
-	vec4 color = /*toLinear*/(texture2D(u_texColor, v_texcoord0) );
+	vec4 color = toLinear(texture2D(u_texColor, v_texcoord0));
 	if(color.a < 0.3)
 		discard;
 	#ifdef DEFERRED

@@ -1,0 +1,14 @@
+passes = {"HDR"}
+vs_combinations = { 
+	{},
+	{}
+}
+
+fs_combinations =               
+{
+	{},
+	{}
+}
+   
+texture_slots = {
+}

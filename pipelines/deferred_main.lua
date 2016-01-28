@@ -5,10 +5,21 @@ framebuffers = {
 		height = 1024,
 		renderbuffers = {
 			{ format = "rgba8" },
+		}
+	},
+
+	{
+		name = "hdr",
+		width = 1024,
+		height = 1024,
+		screen_size = true;
+		renderbuffers = {
+			{ format = "rgba16f" },
 			{ format = "depth32" }
 		}
 	},
 
+	
 	{
 		name = "g_buffer",
 		width = 1024,
@@ -66,6 +77,8 @@ function init(pipeline)
 	deferred_material = loadMaterial(pipeline, "shaders/deferred.mat")
 	screen_space_material = loadMaterial(pipeline, "shaders/screen_space.mat")
 	deferred_point_light_material =loadMaterial(pipeline, "shaders/deferredpointlight.mat")
+	hdr_buffer_uniform = createUniform(pipeline, "u_hdrBuffer")
+	hdr_material = loadMaterial(pipeline, "shaders/hdr.mat")
 end
 
 
@@ -102,10 +115,10 @@ function deferred(pipeline)
 		renderModels(pipeline, 1, false)
 
 	beginNewView(pipeline, "copyRenderbuffer");
-		copyRenderbuffer(pipeline, "g_buffer", 3, "default", 1)
+		copyRenderbuffer(pipeline, "g_buffer", 3, "hdr", 1)
 		
 	setPass(pipeline, "MAIN")
-		setFramebuffer(pipeline, "default")
+		setFramebuffer(pipeline, "hdr")
 		applyCamera(pipeline, "editor")
 		clear(pipeline, "all", 0xbbd3edff)
 		
@@ -117,7 +130,7 @@ function deferred(pipeline)
 		drawQuad(pipeline, -1, -1, 2, 2, deferred_material);
 		
 	beginNewView(pipeline, "DEFERRED_LOCAL_LIGHT")
-		setFramebuffer(pipeline, "default")
+		setFramebuffer(pipeline, "hdr")
 		disableDepthWrite(pipeline)
 		enableBlending(pipeline, "add")
 		applyCamera(pipeline, "editor")
@@ -197,12 +210,22 @@ function particles(pipeline)
 	end	
 end
 
+function hdr(pipeline)
+	setPass(pipeline, "HDR")
+		setFramebuffer(pipeline, "default")
+		applyCamera(pipeline, "editor")
+		clear(pipeline, "all", 0xbbd3edff)
+		bindFramebufferTexture(pipeline, "hdr", 0, hdr_buffer_uniform)
+		drawQuad(pipeline, -1, -1, 2, 2, hdr_material)
+end
 
 function render(pipeline)
 	shadowmap(pipeline)
 	deferred(pipeline)
 	renderDebugShapes(pipeline)
 	particles(pipeline)
+	hdr(pipeline)
+
 	editor(pipeline)
 	debugDeferred(pipeline)
 	shadowmapDebug(pipeline)

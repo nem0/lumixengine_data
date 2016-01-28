@@ -2,22 +2,17 @@
 #define __LUMIX_COMMON_SH__
 
 
-vec4 lit(float _ndotl, float _rdotv, float shininess)
-{
-	float diff = max(0.0, _ndotl);
-	
-	float _exp = shininess;
-	float spec = step(0.0, _ndotl) * pow(max(0.0, _rdotv), _exp);
-	return vec4(1.0, diff, step(1.0, shininess) * spec, 1.0);
-}
-
-
-vec2 blinn(vec3 _lightDir, vec3 _normal, vec3 _viewDir)
+vec2 lit(vec3 _lightDir, vec3 _normal, vec3 _viewDir, float shininess)
 {
 	float ndotl = dot(_normal, _lightDir);
 	vec3 reflected = _lightDir - 2.0 * ndotl * _normal;
 	float rdotv = max(0.0, dot(-reflected, _viewDir));
-	return vec2(ndotl, rdotv);
+
+	float diff = max(0.0, ndotl);
+	
+	float _exp = shininess;
+	float spec = step(0.0, ndotl) * pow(max(0.0, rdotv), _exp);
+	return vec2(diff, step(1.0, shininess) * spec);
 }
 
 

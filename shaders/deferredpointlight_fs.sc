@@ -60,15 +60,14 @@ vec3 calcLight(vec4 dirFov, vec3 _wpos
 	}
 
 	vec4 materialSpecularShininess = vec4(1, 1, 1, 4); // todo use uniform
-	vec2 bln = blinn(toLightDir, _normal, _view);
-	vec4 lc = lit(bln.x, bln.y, materialSpecularShininess.w);
+	vec2 lc = lit(toLightDir, _normal, _view, materialSpecularShininess.w);
 	vec3 rgb = 
-		attn * (light_color * saturate(lc.y) 
+		attn * (light_color * saturate(lc.x) 
 		+ light_specular.xyz * materialSpecularShininess.xyz *
 		#ifdef SPECULAR_TEXTURE
 			texture2D(u_texSpecular, uv).rgb * 
 		#endif
-		saturate(lc.z));
+		saturate(lc.y));
 	return rgb;
 }
 

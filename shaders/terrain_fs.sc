@@ -44,15 +44,14 @@ vec3 shadePointLight(vec4 dirFov, vec3 _wpos, vec3 _normal, vec3 _view, vec2 uv)
 		attn *= (cosDir - cosCone) / (1 - cosCone);
 	}
 	
-	vec2 bln = blinn(toLightDir, _normal, _view);
-	vec4 lc = lit(bln.x, bln.y, u_materialSpecularShininess.w);
+	vec2 lc = lit(toLightDir, _normal, _view, u_materialSpecularShininess.w);
 	vec3 rgb = 
-		attn * (u_lightRgbAttenuation.xyz * saturate(lc.y) 
+		attn * (u_lightRgbAttenuation.xyz * saturate(lc.x) 
 		+ u_lightSpecular.xyz * u_materialSpecularShininess.xyz *
 		#ifdef SPECULAR_TEXTURE
 			texture2D(u_texSpecular, uv).rgb * 
 		#endif
-		saturate(lc.z));
+		saturate(lc.y));
 	return rgb;
 }
 

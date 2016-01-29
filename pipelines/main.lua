@@ -104,10 +104,10 @@ end
 function shadowmapDebug(pipeline)
 	if parameters.render_shadowmap_debug then
 		setPass(pipeline, "SCREEN_SPACE")
+		beginNewView(pipeline, "SHADOWMAP_DEBUG")
 		setFramebuffer(pipeline, "default")
 		bindFramebufferTexture(pipeline, "shadowmap", 0, texture_uniform)
 		drawQuad(pipeline, 0.48, 0.48, 0.5, 0.5, screen_space_material);
-		--drawQuad(pipeline, -1.0, -1.0, 2, 2, screen_space_material);
 	end
 end
 
@@ -115,6 +115,7 @@ end
 function renderSSAODDebug(pipeline)
 	if parameters.SSAO_debug then
 		setPass(pipeline, "SCREEN_SPACE")
+		beginNewView(pipeline, "SHADOWMAP_DEBUG")
 		disableBlending(pipeline)
 		disableDepthWrite(pipeline)
 		setFramebuffer(pipeline, "default")
@@ -142,7 +143,7 @@ function SSAO(pipeline)
 		disableBlending(pipeline)
 		disableDepthWrite(pipeline)
 		setFramebuffer(pipeline, "SSAO")
-		bindFramebufferTexture(pipeline, "default", 1, texture_uniform)
+		bindFramebufferTexture(pipeline, "hdr", 1, texture_uniform)
 		drawQuad(pipeline, -1, -1, 2, 2, ssao_material);		
 
 		if parameters.SSAO_blur then

@@ -1,0 +1,16 @@
+passes = {"HDR_LUMINANCE", "HDR_AVG_LUMINANCE", "LUM1"}
+vs_combinations = { 
+	{},
+	{},
+	{}
+}
+
+fs_combinations =               
+{
+	{},
+	{},
+	{}
+}
+   
+texture_slots = {
+}

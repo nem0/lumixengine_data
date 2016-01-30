@@ -22,15 +22,15 @@ void main()
 	vec3 rgb6 = texture2D(s_texColor, v_texcoord0 + u_offset[6].xy).rgb;
 	vec3 rgb7 = texture2D(s_texColor, v_texcoord0 + u_offset[7].xy).rgb;
 	vec3 rgb8 = texture2D(s_texColor, v_texcoord0 + u_offset[8].xy).rgb;
-	float avg = (1e-5 + luma(rgb0).r)
-			  + (1e-5 + luma(rgb1).r)
-			  + (1e-5 + luma(rgb2).r)
-			  + (1e-5 + luma(rgb3).r)
-			  + (1e-5 + luma(rgb4).r)
-			  + (1e-5 + luma(rgb5).r)
-			  + (1e-5 + luma(rgb6).r)
-			  + (1e-5 + luma(rgb7).r)
-			  + (1e-5 + luma(rgb8).r)
+	float avg = log(1e-5 + luma(rgb0).r)
+			  + log(1e-5 + luma(rgb1).r)
+			  + log(1e-5 + luma(rgb2).r)
+			  + log(1e-5 + luma(rgb3).r)
+			  + log(1e-5 + luma(rgb4).r)
+			  + log(1e-5 + luma(rgb5).r)
+			  + log(1e-5 + luma(rgb6).r)
+			  + log(1e-5 + luma(rgb7).r)
+			  + log(1e-5 + luma(rgb8).r)
 			  ;
 	avg *= 1.0/9.0;
 

@@ -42,7 +42,61 @@ framebuffers = {
 			{ format = "depth32" }
 		}
 	},
+		
+	{
+		name = "lum128",
+		width = 128,
+		height = 128,
+		renderbuffers = {
+			{ format = "r32f" }
+		}
+	},
 	
+	{
+		name = "lum64",
+		width = 64,
+		height = 64,
+		renderbuffers = {
+			{ format = "r32f" }
+		}
+	},
+	
+	{
+		name = "lum16",
+		width = 16,
+		height = 16,
+		renderbuffers = {
+			{ format = "r32f" }
+		}
+	},
+
+	{
+		name = "lum4",
+		width = 4,
+		height = 4,
+		renderbuffers = {
+			{ format = "r32f" }
+		}
+	},
+
+	{
+		name = "lum1a",
+		width = 1,
+		height = 1,
+		renderbuffers = {
+			{ format = "r32f" }
+		}
+	},
+
+	{
+		name = "lum1b",
+		width = 1,
+		height = 1,
+		renderbuffers = {
+			{ format = "r32f" }
+		}
+	},
+
 	{
 		name = "blur",
 		width = 2048,
@@ -50,11 +104,13 @@ framebuffers = {
 		renderbuffers = {
 			{ format = "r32f" }
 		}
-	}
+	},
+	
 }
 
 
 parameters = {
+	hdr = true,
 	render_gizmos = true,
 	debug_gbuffer0 = false,
 	debug_gbuffer1 = false,
@@ -64,6 +120,32 @@ parameters = {
 	particles_enabled = true,
 	render_shadowmap_debug = false
 }
+
+
+local lum_uniforms = {}
+
+function computeLumUniforms()
+	local sizes = {64, 16, 4, 1 }
+	for key,value in ipairs(sizes) do
+		lum_uniforms[value] = {}
+		for j = 0,3 do
+			for i = 0,3 do
+				local x = (i) / value; 
+				local y = (j) / value; 
+				lum_uniforms[value][1 + i + j * 4] = {x, y, 0, 0}
+			end
+		end
+	end
+
+	lum_uniforms[128] = {}
+	for j = 0,1 do
+		for i = 0,1 do
+			local x = i / 128; 
+			local y = j / 128; 
+			lum_uniforms[128][1 + i + j * 4] = {x, y, 0, 0}
+		end
+	end
+end
 
 
 function init(pipeline)
@@ -77,8 +159,13 @@ function init(pipeline)
 	deferred_material = loadMaterial(pipeline, "shaders/deferred.mat")
 	screen_space_material = loadMaterial(pipeline, "shaders/screen_space.mat")
 	deferred_point_light_material =loadMaterial(pipeline, "shaders/deferredpointlight.mat")
+	avg_luminance_uniform = createUniform(pipeline, "u_avgLuminance")
 	hdr_buffer_uniform = createUniform(pipeline, "u_hdrBuffer")
 	hdr_material = loadMaterial(pipeline, "shaders/hdr.mat")
+	lum_material = loadMaterial(pipeline, "shaders/hdrlum.mat")
+	lum_size_uniform = createVec4ArrayUniform(pipeline, "u_offset", 16)
+	
+	computeLumUniforms()
 end
 
 
@@ -111,7 +198,7 @@ function deferred(pipeline)
 	setPass(pipeline, "DEFERRED")
 		setFramebuffer(pipeline, "g_buffer")
 		applyCamera(pipeline, "editor")
-		clear(pipeline, "all", 0xbbd3edff)
+		clear(pipeline, "all", 0x00000000)
 		renderModels(pipeline, 1, false)
 
 	beginNewView(pipeline, "copyRenderbuffer");
@@ -120,7 +207,7 @@ function deferred(pipeline)
 	setPass(pipeline, "MAIN")
 		setFramebuffer(pipeline, "hdr")
 		applyCamera(pipeline, "editor")
-		clear(pipeline, "all", 0xbbd3edff)
+		clear(pipeline, "all", 0x00000000)
 		
 		bindFramebufferTexture(pipeline, "g_buffer", 0, gbuffer0_uniform)
 		bindFramebufferTexture(pipeline, "g_buffer", 1, gbuffer1_uniform)
@@ -150,9 +237,13 @@ function editor(pipeline)
 	if parameters.render_gizmos then
 		setPass(pipeline, "EDITOR")
 			setFramebuffer(pipeline, "default")
-			enableDepthWrite(pipeline)
+			disableDepthWrite(pipeline)
 			disableBlending(pipeline)
-			clear(pipeline, "depth", 0)
+			applyCamera(pipeline, "editor")
+			renderIcons(pipeline)
+
+		beginNewView(pipeline, "gizmo")
+			setFramebuffer(pipeline, "default")
 			applyCamera(pipeline, "editor")
 			renderGizmos(pipeline)
 	end
@@ -210,13 +301,57 @@ function particles(pipeline)
 	end	
 end
 
+local current_lum1 = "lum1a"
+
 function hdr(pipeline)
+	setPass(pipeline, "HDR_LUMINANCE")
+		setFramebuffer(pipeline, "lum128")
+		disableDepthWrite(pipeline)
+		setUniform(pipeline, lum_size_uniform, lum_uniforms[128])
+		bindFramebufferTexture(pipeline, "hdr", 0, hdr_buffer_uniform)
+		drawQuad(pipeline, -1, -1, 2, 2, lum_material)
+	
+	setPass(pipeline, "HDR_AVG_LUMINANCE")
+		setFramebuffer(pipeline, "lum64")
+		setUniform(pipeline, lum_size_uniform, lum_uniforms[64])
+		bindFramebufferTexture(pipeline, "lum128", 0, hdr_buffer_uniform)
+		drawQuad(pipeline, -1, -1, 2, 2, lum_material)
+
+	beginNewView(pipeline, "lum16")
+		setFramebuffer(pipeline, "lum16")
+		setUniform(pipeline, lum_size_uniform, lum_uniforms[16])
+		bindFramebufferTexture(pipeline, "lum64", 0, hdr_buffer_uniform)
+		drawQuad(pipeline, -1, -1, 2, 2, lum_material)
+	
+	beginNewView(pipeline, "lum4")
+		setFramebuffer(pipeline, "lum4")
+		setUniform(pipeline, lum_size_uniform, lum_uniforms[4])
+		bindFramebufferTexture(pipeline, "lum16", 0, hdr_buffer_uniform)
+		drawQuad(pipeline, -1, -1, 2, 2, lum_material)
+
+	local old_lum1 = "lum1b"
+	if current_lum1 == "lum1a" then 
+		current_lum1 = "lum1b" 
+		old_lum1 = "lum1a"
+	else 
+		current_lum1 = "lum1a" 
+	end
+
+	setPass(pipeline, "LUM1")
+		setFramebuffer(pipeline, current_lum1)
+		setUniform(pipeline, lum_size_uniform, lum_uniforms[1])
+		bindFramebufferTexture(pipeline, "lum4", 0, hdr_buffer_uniform)
+		bindFramebufferTexture(pipeline, old_lum1, 0, avg_luminance_uniform)
+		drawQuad(pipeline, -1, -1, 2, 2, lum_material)
+
 	setPass(pipeline, "HDR")
 		setFramebuffer(pipeline, "default")
 		applyCamera(pipeline, "editor")
-		clear(pipeline, "all", 0xbbd3edff)
+		clear(pipeline, "all", 0x00000000)
 		bindFramebufferTexture(pipeline, "hdr", 0, hdr_buffer_uniform)
+		bindFramebufferTexture(pipeline, current_lum1, 0, avg_luminance_uniform)
 		drawQuad(pipeline, -1, -1, 2, 2, hdr_material)
+	
 end
 
 function render(pipeline)

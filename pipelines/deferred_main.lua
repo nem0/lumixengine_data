@@ -174,7 +174,7 @@ function shadowmap(pipeline)
 	setPass(pipeline, "SHADOW")         
 		applyCamera(pipeline, "editor")
 		setFramebuffer(pipeline, "shadowmap")
-		renderShadowmap(pipeline, 1, "editor") 
+		renderShadowmap(pipeline, 1) 
 	
 	if parameters.blur_shadowmap then
 		setPass(pipeline, "BLUR_H")

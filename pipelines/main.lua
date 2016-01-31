@@ -259,7 +259,7 @@ function shadowmap(pipeline)
 		--disableRGBWrite(pipeline)
 		--disableAlphaWrite(pipeline)
 		setFramebuffer(pipeline, "shadowmap")
-		renderShadowmap(pipeline, 1, "editor") 
+		renderShadowmap(pipeline, 1) 
 
 	renderLocalLightsShadowmaps(pipeline, 1, {"point_light_shadowmap", "point_light2_shadowmap"}, "editor")
 

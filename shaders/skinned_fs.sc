@@ -25,7 +25,7 @@ uniform vec4 u_fogParams;
 void main()
 {     
 	#ifdef DEFERRED
-		vec4 color = toLinear(texture2D(u_texColor, v_texcoord0));
+		vec4 color = texture2D(u_texColor, v_texcoord0);
 		gl_FragData[0] = color;
 		mat3 tbn = mat3(
 			normalize(v_tangent),
@@ -45,7 +45,7 @@ void main()
 		gl_FragData[2] = vec4(1, 1, 1, 1);
 	#else
 		#ifdef SHADOW
-			vec4 color = toLinear(texture2D(u_texColor, v_texcoord0));
+			vec4 color = texture2D(u_texColor, v_texcoord0);
 			float depth = v_common2.z/v_common2.w;
 			gl_FragColor = vec4_splat(depth);
 		#else
@@ -66,7 +66,7 @@ void main()
 			wnormal = mul(tbn, wnormal);
 			vec3 view = normalize(v_view);
 
-			vec4 color = toLinear(texture2D(u_texColor, v_texcoord0));
+			vec4 color = texture2D(u_texColor, v_texcoord0);
 			vec3 texture_specular = 
 			#ifdef SPECULAR_TEXTURE
 				texture2D(u_texSpecular, v_texcoord0).rgb;

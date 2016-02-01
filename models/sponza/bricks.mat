@@ -1,7 +1,7 @@
 {
 	"shader" : "shaders/rigid.shd"
 	, "texture" : {
-		"source" : "spnza_bricks_a_diff.dds"
+		"source" : "spnza_bricks_a_diff.dds", "srgb" : true
  }
 	, "texture" : {
 		"source" : "spnza_bricks_a_diff.dds"

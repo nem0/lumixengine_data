@@ -1,6 +1,6 @@
 {
 	"shader" : "shaders/rigid.shd"
 	, "texture" : {
-		"source" : "sponza_curtain_blue_diff.dds"
+		"source" : "sponza_curtain_blue_diff.dds", "srgb" : true
  }
 }

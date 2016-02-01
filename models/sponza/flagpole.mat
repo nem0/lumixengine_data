@@ -1,6 +1,6 @@
 {
 	"shader" : "shaders/rigid.shd"
 	, "texture" : {
-		"source" : "sponza_flagpole_diff.dds"
+		"source" : "sponza_flagpole_diff.dds", "srgb" : true
  }
 }

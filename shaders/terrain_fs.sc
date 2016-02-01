@@ -150,10 +150,10 @@ void main()
 	
 		mipmap_level = min(mipmap_level, log2(detail_size) - 1);
 		
-		vec4 c00 = toLinear(texture2DLod(u_texColor, duv00, mipmap_level));
-		vec4 c01 = toLinear(texture2DLod(u_texColor, duv01, mipmap_level));
-		vec4 c10 = toLinear(texture2DLod(u_texColor, duv10, mipmap_level));
-		vec4 c11 = toLinear(texture2DLod(u_texColor, duv11, mipmap_level));
+		vec4 c00 = texture2DLod(u_texColor, duv00, mipmap_level);
+		vec4 c01 = texture2DLod(u_texColor, duv01, mipmap_level);
+		vec4 c10 = texture2DLod(u_texColor, duv10, mipmap_level);
+		vec4 c11 = texture2DLod(u_texColor, duv11, mipmap_level);
 
 		vec4 bicoef = vec4(
 			u_opposite * v_opposite,
@@ -178,7 +178,7 @@ void main()
 		float b4 = max(a11 - ma, 0);
 		
 		vec4 color = 
-			toLinear(texture2D(u_texColormap, v_texcoord1)) * 
+			texture2D(u_texColormap, v_texcoord1) * 
 			vec4((c00.rgb * b1 + c01.rgb * b2 + c10.rgb * b3 + c11.rgb * b4) / (b1 + b2 + b3 + b4), 1);
 			
 		vec3 wnormal;
@@ -202,7 +202,7 @@ void main()
 		
 		float dist = length(v_view);
 		float t = (dist - detail_texture_distance.x) / detail_texture_distance.x;
-		color = mix(color, toLinear(texture2D(u_texSatellitemap, v_texcoord1)), clamp(t, 0, 1));
+		color = mix(color, texture2D(u_texSatellitemap, v_texcoord1), clamp(t, 0, 1));
 
 		#ifdef DEFERRED
 				gl_FragData[0] = color;

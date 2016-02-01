@@ -25,7 +25,7 @@ uniform vec4 u_fogParams;
 void main()
 {     
 	#ifdef SHADOW
-		vec4 color = toLinear(texture2D(u_texColor, v_texcoord0));
+		vec4 color = texture2D(u_texColor, v_texcoord0);
 		if(color.a < 0.3)
 			discard;
 		float depth = v_common2.z/v_common2.w;
@@ -48,7 +48,7 @@ void main()
 		wnormal = mul(tbn, wnormal);
 		vec3 view = normalize(v_view);
 
-		vec4 color = toLinear(texture2D(u_texColor, v_texcoord0)) * v_color.rgba;
+		vec4 color = texture2D(u_texColor, v_texcoord0) * v_color.rgba;
 		if(color.a < 0.3)
 			discard;
 					 

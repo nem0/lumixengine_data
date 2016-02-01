@@ -1,5 +1,5 @@
 {"shader" : "shaders/editorobjects.shd",
-"texture" : {"source" : "phy_box_icon.dds"},
+"texture" : {"source" : "phy_box_icon.dds", "srgb" : true},
 "uniforms" : [],
 "backface_culling" : false,
 "alpha_cutout" : false,

@@ -1,7 +1,7 @@
 {
 	"shader" : "shaders/rigid.shd"
 	, "texture" : {
-		"source" : "chain_texture.dds"
+		"source" : "chain_texture.dds", "srgb" : true
  }
 	, "texture" : {
 		"source" : "chain_texture_ddn.dds"

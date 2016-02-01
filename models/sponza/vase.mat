@@ -1,6 +1,6 @@
 {
 	"shader" : "shaders/rigid.shd"
 	, "texture" : {
-		"source" : "vase_dif.dds"
+		"source" : "vase_dif.dds", "srgb" : true
  }
 }

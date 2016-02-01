@@ -1,6 +1,6 @@
 {
 	"shader" : "shaders/rigid.shd"
 	, "texture" : {
-		"source" : "./lost_empire-RGBA.dds"
+		"source" : "./lost_empire-RGBA.dds", "srgb" : true
 	}
 }

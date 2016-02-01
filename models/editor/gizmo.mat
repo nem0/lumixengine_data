@@ -1,5 +1,5 @@
 {"shader" : "shaders/editorobjects.shd",
-"texture" : {"source" : "gizmo.tga"},
+"texture" : {"source" : "gizmo.tga", "srgb" : true},
 "texture" : {"source" : ""},
 "uniforms" : [],
 "backface_culling" : true,

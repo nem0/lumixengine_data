@@ -1,5 +1,5 @@
 {"shader" : "shaders/rigid.shd",
-"texture" : {"source" : "default.tga"},
+"texture" : {"source" : "default.tga", "srgb" : true},
 "uniforms" : [],
 "backface_culling" : true,
 "alpha_cutout" : false,

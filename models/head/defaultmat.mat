@@ -1,7 +1,7 @@
 {
 	"shader" : "shaders/rigid.shd"
 	, "texture" : {
-		"source" : "lambertian.dds"
+		"source" : "lambertian.dds", "srgb" : true
  }
 	, "texture" : {
 		"source" : "bump-lowRes.dds"

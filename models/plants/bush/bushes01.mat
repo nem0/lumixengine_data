@@ -1,5 +1,5 @@
 {"shader" : "shaders/grass.shd",
-"texture" : {"source" : "texture0.dds"},
+"texture" : {"source" : "texture0.dds", "srgb" : true},
 "texture" : {"source" : "noise.dds"},
 "uniforms" : [
 {"name" : "u_time",

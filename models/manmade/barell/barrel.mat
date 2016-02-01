@@ -1,7 +1,7 @@
 {
 	"shader" : "shaders/rigid.shd"
 	, "texture" : {
-		"source" : "diffuse.dds"
+		"source" : "diffuse.dds", "srgb" : true
  }
 	, "texture" : {
 		"source" : "normal.dds"

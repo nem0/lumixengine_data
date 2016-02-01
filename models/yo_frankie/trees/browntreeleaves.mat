@@ -1,5 +1,5 @@
 {"shader" : "shaders/rigid.shd",
-"texture" : {"source" : "/models/yo_frankie/trees/texture4.dds"},
+"texture" : {"source" : "/models/yo_frankie/trees/texture4.dds", "srgb" : true},
 "uniforms" : [],
 "backface_culling" : false,
 "alpha_cutout" : false,

@@ -1,6 +1,6 @@
 {
 	"shader" : "shaders/rigid.shd"
 	, "texture" : {
-		"source" : "darkwood1_0.dds"
+		"source" : "darkwood1_0.dds", "srgb" : true
  }
 }

@@ -1,6 +1,6 @@
 {
 	"shader" : "shaders/rigid.shd"
 	, "texture" : {
-		"source" : "texture1.dds"
+		"source" : "texture1.dds", "srgb" : true
  }
 }

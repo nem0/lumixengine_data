@@ -1,7 +1,7 @@
 {
 	"shader" : "shaders/rigid.shd"
 	, "texture" : {
-		"source" : "background.dds"
+		"source" : "background.dds", "srgb" : true
  }
 	, "texture" : {
 		"source" : "background_ddn.dds"

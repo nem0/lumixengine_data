@@ -21,8 +21,8 @@ framebuffers = {
 
 	{
 		name = "SSAO",
-		width = 1024,
-		height = 768,
+		width = 512,
+		height = 512,
 		renderbuffers = {
 			{format="rgba8"},
 			{format = "depth24"}
@@ -31,8 +31,8 @@ framebuffers = {
 
 	{
 		name = "SSAO_blurred",
-		width = 1024,
-		height = 768,
+		width = 512,
+		height = 512,
 		renderbuffers = {
 			{format="rgba8"},
 			{format = "depth24"}

@@ -18,7 +18,7 @@ uniform vec4 u_lightSpecular;
 uniform vec4 u_fogParams;
 uniform mat4 u_camInvViewProj;
 uniform mat4 u_camView;
-uniform mat4 u_invCamView;
+uniform mat4 u_camInvView;
 
 
 
@@ -72,7 +72,7 @@ void main()
 	vec4 wpos = getViewPos(v_texcoord0);
 	vec3 texture_specular = vec3(1, 1, 1); // todo
 
-	vec3 view = normalize(mul(u_invCamView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - wpos);
+	vec3 view = normalize(mul(u_camInvView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - wpos);
 	vec4 mat_specular_shininess = vec4(1, 1, 1, 4);
 	
 	

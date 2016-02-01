@@ -1,11 +1,13 @@
 {"shader" : "shaders/ssao.shd",
-"uniforms" : [],
+"uniforms" : [{"name" : "u_intensity",
+"float_value" : 1.00000000},
+{"name" : "u_radius",
+"float_value" : 0.32000003}],
 "backface_culling" : true,
 "alpha_cutout" : false,
-"shadow_receiver" : true,
-"z_test" : true,
-"uniforms" : [{"name" : "u_intensity",
-"float_value" : 1.0f},
-{"name" : "u_radius",
-"float_value" : 0.01f}]
-}
+"shadow_receiver" : false,
+"shininess" : 4.00000000,
+"specular" : [1.00000000,
+1.00000000,
+1.00000000],
+"z_test" : true}

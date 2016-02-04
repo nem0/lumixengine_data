@@ -337,7 +337,7 @@ def write_skinned_model_indexed(context, f, armature, objs_to_export):
     face_counts = []
     face_counts.append(0)
     face_count = 0
-    vertex_size = 60
+    vertex_size = 52
     indices = []
     vertices = []
     vertex_attributes_offsets = []
@@ -400,7 +400,7 @@ def write_skinned_model_indexed(context, f, armature, objs_to_export):
         write_str(f, "in_weights");
         f.write(struct.pack("I", FLOAT4))
         write_str(f, "in_indices");
-        f.write(struct.pack("I", INT4))
+        f.write(struct.pack("I", SHORT4))
         write_str(f, "in_position");
         f.write(struct.pack("I", POSITION))
         write_str(f, "in_normal");
@@ -421,10 +421,10 @@ def write_skinned_model_indexed(context, f, armature, objs_to_export):
         f.write(struct.pack("f", v.w[1][0]))
         f.write(struct.pack("f", v.w[2][0]))
         f.write(struct.pack("f", v.w[3][0]))
-        f.write(struct.pack("I", v.w[0][2]))
-        f.write(struct.pack("I", v.w[1][2]))
-        f.write(struct.pack("I", v.w[2][2]))
-        f.write(struct.pack("I", v.w[3][2]))
+        f.write(struct.pack("H", v.w[0][2]))
+        f.write(struct.pack("H", v.w[1][2]))
+        f.write(struct.pack("H", v.w[2][2]))
+        f.write(struct.pack("H", v.w[3][2]))
         f.write(struct.pack("f", v.x))
         f.write(struct.pack("f", v.y))
         f.write(struct.pack("f", v.z))

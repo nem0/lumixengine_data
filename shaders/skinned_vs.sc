@@ -13,22 +13,17 @@ void main()
 	v_texcoord0 = a_texcoord0;
 	v_view = mul(u_view, vec4(0.0, 0.0, 1.0, 0.0)).xyz;
 
-	vec4 p = vec4(a_position, 1.0);
-  	vec4 pos = a_weight.x * mul(u_boneMatrices[int(a_indices.x)], p);
-	pos = pos + a_weight.y * mul(u_boneMatrices[int(a_indices.y)], p);
-	pos = pos + a_weight.z * mul(u_boneMatrices[int(a_indices.z)], p);
-	pos = pos + a_weight.w * mul(u_boneMatrices[int(a_indices.w)], p);
+	mat4 mtx = a_weight.x * u_boneMatrices[int(a_indices.x)] + 
+	a_weight.y *  u_boneMatrices[int(a_indices.y)] +
+	a_weight.z *  u_boneMatrices[int(a_indices.z)] +
+	a_weight.w * u_boneMatrices[int(a_indices.w)];
 
-  	v_normal = a_weight.x * mul(u_boneMatrices[int(a_indices.x)], normal);
-	v_normal = v_normal + a_weight.y * mul(u_boneMatrices[int(a_indices.y)], normal);
-	v_normal = v_normal + a_weight.z * mul(u_boneMatrices[int(a_indices.z)], normal);
-	v_normal = v_normal + a_weight.w * mul(u_boneMatrices[int(a_indices.w)], normal);
+  	vec4 pos = mul(mtx, vec4(a_position, 1.0));
+
+  	v_normal = mul(mtx, normal);
 	v_normal = mul(u_model[0], v_normal);
-	
-  	v_tangent = a_weight.x * mul(u_boneMatrices[int(a_indices.x)], tangent);
-	v_tangent = v_tangent + a_weight.y * mul(u_boneMatrices[int(a_indices.y)], tangent);
-	v_tangent = v_tangent + a_weight.z * mul(u_boneMatrices[int(a_indices.z)], tangent);
-	v_tangent = v_tangent + a_weight.w * mul(u_boneMatrices[int(a_indices.w)], tangent);
+
+  	v_tangent = mul(mtx, tangent);
 	v_tangent = mul(u_model[0], v_tangent);
 
     v_bitangent = cross(v_normal, v_tangent) * (a_tangent.w * 2.0 - 1.0);

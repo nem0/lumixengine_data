@@ -1,0 +1,6 @@
+{
+	"shader" : "shaders/skinned.shd"
+	, "texture" : {
+		"source" : "deer-head.dds", "srgb" : true
+ }
+}

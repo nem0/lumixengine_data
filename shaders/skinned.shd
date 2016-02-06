@@ -2,7 +2,7 @@ passes = {"MAIN", "SHADOW", "POINT_LIGHT", "DEFERRED"}
 vs_combinations = { 
 	{},
 	{},                                                
-	{},                                                
+	{},
 	{}
 }
 
@@ -10,7 +10,7 @@ fs_combinations =
 {
 	{ "NORMAL_MAPPING" },
 	{ },
-	{ "NORMAL_MAPPING" },
+	{ "NORMAL_MAPPING", "SPECULAR_TEXTURE", "HAS_SHADOWMAP" },
 	{ "NORMAL_MAPPING" }
 }
    
@@ -23,5 +23,10 @@ texture_slots = {
 		name = "Normal",
 		uniform = "u_texNormal",
 		define = "NORMAL_MAPPING"
+	},
+	{
+		name = "Specular",
+		uniform = "u_texSpecular",
+		define = "SPECULAR_TEXTURE"
 	}
 }

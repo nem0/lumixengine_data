@@ -28,8 +28,10 @@ void main()
 
 	model = transpose(model);
 	
+	const float min_dist = 10;
+	const float scale_dist = 10;
 	vec3 view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - mul(model, vec4(a_position, 1.0) ).xyz;
-	float scale = clamp(1 - (length(view) - 10)/10, 0, 1);
+	float scale = clamp(1 - (length(view) - min_dist)/scale_dist, 0, 1);
 	
 	vec3 displaced_vertex = scale*a_position;
 	 

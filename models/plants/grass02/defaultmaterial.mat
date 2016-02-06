@@ -1,0 +1,12 @@
+{"shader" : "shaders/grass.shd",
+"texture" : {"source" : "/models/plants/grass02/diffus.dds",
+"srgb" : true},
+"uniforms" : [],
+"backface_culling" : true,
+"alpha_cutout" : false,
+"shadow_receiver" : false,
+"shininess" : 4.00000000,
+"specular" : [1.00000000,
+1.00000000,
+1.00000000],
+"z_test" : true}

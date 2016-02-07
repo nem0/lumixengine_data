@@ -6,8 +6,6 @@
 "time" : "true"}
 ],
 "backface_culling" : false,
-"alpha_cutout" : false,
-"shadow_receiver" : true,
 "shininess" : 4.00000000,
 "specular" : [1.00000000,
 1.00000000,

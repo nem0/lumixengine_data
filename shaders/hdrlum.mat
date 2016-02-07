@@ -1,6 +1,4 @@
 {"shader" : "shaders/hdrlum.shd",
 "uniforms" : [],
 "backface_culling" : false,
-"alpha_cutout" : false,
-"shadow_receiver" : false,
 "z_test" : false}

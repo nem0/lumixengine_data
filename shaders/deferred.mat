@@ -1,6 +1,4 @@
 {"shader" : "shaders/deferred.shd",
 "uniforms" : [],
 "backface_culling" : false,
-"alpha_cutout" : false,
-"shadow_receiver" : true,
 "z_test" : false}

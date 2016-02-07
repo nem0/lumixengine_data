@@ -3,8 +3,6 @@
 "texture" : {"source" : "texture2.dds"},
 "uniforms" : [],
 "backface_culling" : true,
-"alpha_cutout" : false,
-"shadow_receiver" : true,
 "shininess" : 4.00000000,
 "specular" : [1.00000000,
 1.00000000,

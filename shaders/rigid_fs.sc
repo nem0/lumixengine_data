@@ -26,7 +26,9 @@ void main()
 {     
 	#ifdef DEFERRED
 		vec4 color = texture2D(u_texColor, v_texcoord0);
-		if(color.a < 0.3) discard;
+		#ifdef ALPHA_CUTOUT
+			if(color.a < 0.3) discard;
+		#endif
 		gl_FragData[0] = color;
 		mat3 tbn = mat3(
 			normalize(v_tangent),
@@ -47,8 +49,9 @@ void main()
 	#else
 		#ifdef SHADOW
 			vec4 color = texture2D(u_texColor, v_texcoord0);
-			if(color.a < 0.3)
-				discard;
+			#ifdef ALPHA_CUTOUT
+				if(color.a < 0.3) discard;
+			#endif
 			float depth = v_common2.z/v_common2.w;
 			gl_FragColor = vec4_splat(depth);
 		#else
@@ -70,8 +73,9 @@ void main()
 			vec3 view = normalize(v_view);
 
 			vec4 color = texture2D(u_texColor, v_texcoord0);
-			if(color.a < 0.3)
-				discard;
+			#ifdef ALPHA_CUTOUT
+				if(color.a < 0.3) discard;
+			#endif
 						 
 			vec3 texture_specular = 
 			#ifdef SPECULAR_TEXTURE

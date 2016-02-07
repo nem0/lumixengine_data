@@ -8,10 +8,10 @@ vs_combinations = {
 
 fs_combinations =               
 {
-	{ "NORMAL_MAPPING" },
-	{ },
-	{ "NORMAL_MAPPING", "SPECULAR_TEXTURE", "HAS_SHADOWMAP" },
-	{ "NORMAL_MAPPING" }
+	{ "NORMAL_MAPPING", "ALPHA_CUTOUT" },
+	{ "ALPHA_CUTOUT" },
+	{ "NORMAL_MAPPING", "SPECULAR_TEXTURE", "HAS_SHADOWMAP", "ALPHA_CUTOUT" },
+	{ "NORMAL_MAPPING", "ALPHA_CUTOUT" }
 }
    
 texture_slots = {

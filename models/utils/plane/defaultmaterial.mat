@@ -2,6 +2,4 @@
 "texture" : {"source" : "default.dds", "srgb" : true},
 "uniforms" : [],
 "backface_culling" : false,
-"alpha_cutout" : false,
-"shadow_receiver" : true,
 "z_test" : true}

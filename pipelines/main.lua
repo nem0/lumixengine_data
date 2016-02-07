@@ -193,7 +193,7 @@ function shadowmapDebug(pipeline)
 		beginNewView(pipeline, "SHADOWMAP_DEBUG")
 		setFramebuffer(pipeline, "default")
 		bindFramebufferTexture(pipeline, "shadowmap", 0, texture_uniform)
-		drawQuad(pipeline, 0.48, 0.48, 0.5, 0.5, screen_space_material);
+		drawQuad(pipeline, 0.48, 0.98, 0.5, -0.5, screen_space_material);
 	end
 end
 
@@ -380,7 +380,7 @@ function hdr(pipeline)
 		clear(pipeline, "all", 0x00000000)
 		bindFramebufferTexture(pipeline, "hdr", 0, hdr_buffer_uniform)
 		bindFramebufferTexture(pipeline, current_lum1, 0, avg_luminance_uniform)
-		drawQuad(pipeline, -1, -1, 2, 2, hdr_material)
+		drawQuad(pipeline, -1, 1, 2, -2, hdr_material)
 end
 
  

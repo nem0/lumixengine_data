@@ -65,7 +65,6 @@ vec3 shadeDirectionalLight2(vec3 light_dir
 
 void main()
 {
-	v_texcoord0.y = 1 - v_texcoord0.y; // todo
 	vec3 normal = texture2D(u_gbuffer1, v_texcoord0) * 2 - 1;
 	vec4 color = texture2D(u_gbuffer0, v_texcoord0);
 

@@ -27,8 +27,6 @@ vec3 Uncharted2Tonemap(vec3 x)
 
 void main()
 {
-	v_texcoord0.y = -v_texcoord0.y; // TODO
-	
 	float avg_loglum = max(0.1, exp(texture2D(u_avgLuminance, half2(0.5, 0.5)).r));
 	vec3 hdr_color = texture2D(u_hdrBuffer, v_texcoord0).xyz * exposure.x;
 	float lum = luma(hdr_color);

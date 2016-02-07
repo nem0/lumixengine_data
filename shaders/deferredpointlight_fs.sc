@@ -74,7 +74,6 @@ vec3 calcLight(vec4 dirFov, vec3 _wpos
 
 void main()
 {
-	v_texcoord0.y = 1 - v_texcoord0.y; // todo
 	vec4 prj = mul(u_viewProj, vec4(v_wpos, 1.0)); // todo: get rid of this
 	prj.y = -prj.y;
 	prj /= prj.w;

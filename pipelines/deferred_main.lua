@@ -214,7 +214,7 @@ function deferred(pipeline)
 		bindFramebufferTexture(pipeline, "g_buffer", 2, gbuffer2_uniform)
 		bindFramebufferTexture(pipeline, "g_buffer", 3, gbuffer_depth_uniform)
 		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
-		drawQuad(pipeline, -1, -1, 2, 2, deferred_material);
+		drawQuad(pipeline, -1, 1, 2, -2, deferred_material)
 		
 	beginNewView(pipeline, "DEFERRED_LOCAL_LIGHT")
 		setFramebuffer(pipeline, "hdr")
@@ -350,7 +350,7 @@ function hdr(pipeline)
 		clear(pipeline, "all", 0x00000000)
 		bindFramebufferTexture(pipeline, "hdr", 0, hdr_buffer_uniform)
 		bindFramebufferTexture(pipeline, current_lum1, 0, avg_luminance_uniform)
-		drawQuad(pipeline, -1, -1, 2, 2, hdr_material)
+		drawQuad(pipeline, -1, 1, 2, -2, hdr_material)
 	
 end
 

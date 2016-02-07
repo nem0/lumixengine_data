@@ -7,7 +7,7 @@ SAMPLER2D(s_texColor, 0);
 #ifdef LUM1
 	SAMPLER2D(s_texPrevLum, 1);
 #endif
-uniform vec4 u_offset[16]; // todo - set this
+uniform vec4 u_offset[16];
 
 
 void main()

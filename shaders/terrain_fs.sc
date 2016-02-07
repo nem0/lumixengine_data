@@ -91,16 +91,15 @@ void main()
 		float s12 = texture2D(u_texHeightmap, uv + off.yz).x;
 		vec3 va = normalize(vec3(1, (s21-s01) * u_terrainScale.y, 0));
 		vec3 vb = normalize(vec3(0, (s12-s10) * u_terrainScale.y, 1));
-		vec3 terrain_normal = mul(u_terrainMatrix, cross(vb,va) ).xyz;
-	
+		vec3 terrain_normal = normalize(mul(u_terrainMatrix, cross(vb,va) ).xyz);
 		vec3 terrain_tangent = normalize(cross(terrain_normal, mul(u_terrainMatrix, vb)));
 		vec3 terrain_bitangent = normalize(cross(terrain_normal, terrain_tangent));
 		
 		mat3 tbn = mat3(
-					normalize(terrain_tangent),
-					normalize(terrain_normal),
-					normalize(terrain_bitangent)
-					);
+			terrain_tangent,
+			terrain_normal,
+			terrain_bitangent
+			);
 		tbn = transpose(tbn);
 
 		float splatmap_size = u_terrainParams.w;

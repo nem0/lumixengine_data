@@ -1,0 +1,6 @@
+{
+	"shader" : "shaders/rigid.shd"
+	, "texture" : {
+		"source" : "3td_GreenHanger_01.dds", "srgb" : true
+ }
+}

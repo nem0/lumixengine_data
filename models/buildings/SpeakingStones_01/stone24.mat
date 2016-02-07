@@ -1,0 +1,6 @@
+{
+	"shader" : "shaders/rigid.shd"
+	, "texture" : {
+		"source" : "3td_Stone_24.dds", "srgb" : true
+ }
+}

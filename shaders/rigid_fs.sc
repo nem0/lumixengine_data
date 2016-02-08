@@ -30,20 +30,21 @@ void main()
 			if(color.a < 0.3) discard;
 		#endif
 		gl_FragData[0] = color;
-		mat3 tbn = mat3(
-			normalize(v_tangent),
-			normalize(v_normal),
-			normalize(v_bitangent)
-			);
-		tbn = transpose(tbn);
 		vec3 normal;
 		#ifdef NORMAL_MAPPING
+			mat3 tbn = mat3(
+				normalize(v_tangent),
+				normalize(v_normal),
+				normalize(v_bitangent)
+				);
+			tbn = transpose(tbn);
 			normal.xz = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
 			normal.y = sqrt(1.0 - dot(normal.xz, normal.xz));
+			normal = normalize(mul(tbn, normal));
 		#else
-			normal = vec3(0.0, 1.0, 0.0);
+			normal = v_normal;
 		#endif
-		gl_FragData[1].xyz = (normalize(mul(tbn, normal)) + 1) * 0.5; // todo: store only xz 
+		gl_FragData[1].xyz = (normal + 1) * 0.5; // todo: store only xz 
 		gl_FragData[1].w = 1;
 		gl_FragData[2] = vec4(1, 1, 1, 1);
 	#else
@@ -52,7 +53,7 @@ void main()
 			#ifdef ALPHA_CUTOUT
 				if(color.a < 0.3) discard;
 			#endif
-			float depth = v_common2.z/v_common2.w;
+			float depth = v_common2.z / v_common2.w;
 			gl_FragColor = vec4_splat(depth);
 		#else
 			mat3 tbn = mat3(

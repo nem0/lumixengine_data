@@ -1,6 +1,7 @@
 {"shader" : "shaders/rigid.shd",
 "texture" : {"source" : "/models/yo_frankie/trees/texture4.dds",
 "srgb" : true},
+"defines" : ["ALPHA_CUTOUT"],
 "uniforms" : [],
 "backface_culling" : false,
 "shininess" : 4.00000000,

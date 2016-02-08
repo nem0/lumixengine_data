@@ -51,7 +51,7 @@ function hdr(pipeline)
 		applyCamera(pipeline, "editor")
 		clear(pipeline, "all", 0xbbd3edff)
 		bindFramebufferTexture(pipeline, "hdr", 0, hdr_buffer_uniform)
-		drawQuad(pipeline, -1, -1, 2, 2, hdr_material)
+		drawQuad(pipeline, -1, 1, 2, -2, hdr_material)
 end
 
 function render(pipeline)

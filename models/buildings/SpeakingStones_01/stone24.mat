@@ -1,6 +1,12 @@
-{
-	"shader" : "shaders/rigid.shd"
-	, "texture" : {
-		"source" : "3td_Stone_24.dds", "srgb" : true
- }
-}
+{"shader" : "shaders/rigid.shd",
+"texture" : {"source" : "/models/buildings/speakingstones_01/3td_stone_24.dds",
+"srgb" : true},
+"texture" : {"source" : "/models/buildings/speakingstones_01/3td_stone_24_nrm.dds"},
+"defines" : [],
+"uniforms" : [],
+"backface_culling" : true,
+"shininess" : 4.00000000,
+"specular" : [1.00000000,
+1.00000000,
+1.00000000],
+"z_test" : true}

@@ -189,10 +189,10 @@ void main()
 			wnormal.xz = (n00.xy * b1 + n01.xy * b2 + n10.xy * b3 + n11.xy * b4) / (b1 + b2 + b3 + b4);
 			wnormal.xz = wnormal.xz * 2.0 - 1.0;
 			wnormal.y = sqrt(1 - dot(wnormal.xz, wnormal.xz));
+			wnormal = normalize(mul(tbn, wnormal));
 		#else
-			wnormal = vec3(0.0, 1.0, 0.0);
+			wnormal = terrain_normal;
 		#endif
-		wnormal = normalize(mul(tbn, wnormal));
 
 		// http://www.gamasutra.com/blogs/AndreyMishkinis/20130716/196339/Advanced_Terrain_Texture_Splatting.php
 		// without height blend
@@ -205,7 +205,7 @@ void main()
 
 		#ifdef DEFERRED
 				gl_FragData[0] = color;
-				gl_FragData[1].xyz = (wnormal + 1) * 0.5;
+				gl_FragData[1].xyz = (wnormal + vec3_splat(1)) * 0.5;
 				gl_FragData[1].w = 1;
 				gl_FragData[2] = vec4(1, 1, 1, 1);
 		#else

@@ -2,7 +2,7 @@
 "texture" : {"source" : "/models/buildings/speakingstones_01/3td_vino_04.dds",
 "srgb" : true},
 "defines" : ["ALPHA_CUTOUT"],
-"backface_culling" : true,
+"backface_culling" : false,
 "shininess" : 4.00000000,
 "specular" : [1.00000000,
 1.00000000,

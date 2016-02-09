@@ -1,5 +1,5 @@
 $input a_position, a_normal, a_tangent, a_texcoord0, i_data0, i_data1, i_data2, i_data3
-$output v_wpos, v_common, v_texcoord0
+$output v_wpos, v_common, v_texcoord0, v_view
 
 #include "common.sh"
 
@@ -34,7 +34,6 @@ void main()
 	float scale = clamp(1 - (length(view) - min_dist)/scale_dist, 0, 1);
 	
 	vec3 displaced_vertex = scale*a_position;
-	 
 	if(a_position.y>=0.1)
 	{
 		float len = length(displaced_vertex);
@@ -47,6 +46,7 @@ void main()
 		displaced_vertex.z += move_factor * cos(frequency * u_time.x * texture2DLod(u_texNoise, wpos.zx*50.0, 0).r + len) + (wind_strength * noiseFactor * wind_dir.y)/10.0;
 	}
 	v_wpos = mul(model, vec4(displaced_vertex, 1.0)).xyz;
+	v_view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - v_wpos;
 	gl_Position = mul(u_viewProj, vec4(v_wpos, 1.0));
 }
 

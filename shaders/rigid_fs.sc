@@ -42,7 +42,7 @@ void main()
 			normal.y = sqrt(1.0 - dot(normal.xz, normal.xz));
 			normal = normalize(mul(tbn, normal));
 		#else
-			normal = v_normal;
+			normal = normalize(v_normal);
 		#endif
 		gl_FragData[1].xyz = (normal + 1) * 0.5; // todo: store only xz 
 		gl_FragData[1].w = 1;

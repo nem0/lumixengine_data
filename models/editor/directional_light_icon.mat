@@ -1,5 +1,4 @@
 {"shader" : "shaders/editorobjects.shd",
 "texture" : {"source" : "directional_light_icon.dds", "srgb" : true},
-"uniforms" : [],
 "backface_culling" : false,
 "z_test" : true}

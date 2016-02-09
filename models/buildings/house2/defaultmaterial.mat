@@ -1,6 +1,5 @@
 {"shader" : "shaders/rigid.shd",
 "texture" : {"source" : "texture0.dds", "srgb" : true },
-"uniforms" : [],
 "backface_culling" : true,
 "shininess" : 4.00000000,
 "specular" : [1.00000000,

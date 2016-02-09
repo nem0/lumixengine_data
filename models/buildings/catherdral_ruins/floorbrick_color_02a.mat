@@ -2,7 +2,6 @@
 "texture" : {"source" : "/models/buildings/catherdral_ruins/2td_floorbrick_color_02a.dds",
 "srgb" : true},
 "texture" : {"source" : "/models/buildings/catherdral_ruins/2td_floorbrick_color_02_nrm.dds"},
-"uniforms" : [],
 "backface_culling" : true,
 "shininess" : 4.00000000,
 "specular" : [1.00000000,

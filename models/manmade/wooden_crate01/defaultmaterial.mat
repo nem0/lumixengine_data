@@ -2,7 +2,6 @@
 "texture" : {"source" : "/models/manmade/wooden_crate01/diffuse.dds",
 "srgb" : true},
 "texture" : {"source" : "/models/manmade/wooden_crate01/normal.dds"},
-"uniforms" : [],
 "backface_culling" : true,
 "shininess" : 4.00000000,
 "specular" : [1.00000000,

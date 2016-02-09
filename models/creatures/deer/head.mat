@@ -2,7 +2,6 @@
 "texture" : {"source" : "deer-head.dds",
 "srgb" : true},
 "texture" : {"source" : "deer-head-normal.dds"},
-"uniforms" : [],
 "backface_culling" : true,
 "shininess" : 4.00000000,
 "specular" : [1.00000000,

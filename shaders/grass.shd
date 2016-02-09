@@ -25,5 +25,5 @@ texture_slots = {
 }
 
 uniforms = {
-	{ name = "time", type="time" }
+	{ name = "u_time", type="time" }
 }

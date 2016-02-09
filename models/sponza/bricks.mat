@@ -1,9 +1,12 @@
-{
-	"shader" : "shaders/rigid.shd"
-	, "texture" : {
-		"source" : "spnza_bricks_a_diff.dds", "srgb" : true
- }
-	, "texture" : {
-		"source" : "spnza_bricks_a_diff.dds"
- }
-}
+{"shader" : "shaders/rigid.shd",
+"texture" : {"source" : "/models/sponza/spnza_bricks_a_diff.dds"},
+"texture" : {"source" : ""},
+"texture" : {"source" : "/models/sponza/spnza_bricks_a_spec.dds"},
+"defines" : ["SPECULAR_TEXTURE"],
+"uniforms" : [],
+"backface_culling" : true,
+"shininess" : 4.00000000,
+"specular" : [1.00000000,
+1.00000000,
+1.00000000],
+"z_test" : true}

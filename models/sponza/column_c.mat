@@ -1,9 +1,14 @@
-{
-	"shader" : "shaders/rigid.shd"
-	, "texture" : {
-		"source" : "sponza_column_c_diff.dds", "srgb" : true
- }
-	, "texture" : {
-		"source" : "sponza_column_c_ddn.dds"
- }
-}
+{"shader" : "shaders/rigid.shd",
+"texture" : {"source" : "/models/sponza/sponza_column_c_diff.dds",
+"srgb" : true},
+"texture" : {"source" : "/models/sponza/sponza_column_c_ddn.dds"},
+"texture" : {"source" : "/models/sponza/sponza_column_c_spec.dds"},
+"defines" : ["NORMAL_MAPPING",
+"SPECULAR_TEXTURE"],
+"uniforms" : [],
+"backface_culling" : true,
+"shininess" : 4.00000000,
+"specular" : [1.00000000,
+1.00000000,
+1.00000000],
+"z_test" : true}

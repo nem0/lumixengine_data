@@ -1,0 +1,6 @@
+{
+	"shader" : "shaders/rigid.shd"
+	, "texture" : {
+		"source" : "DeadTree_tile.dds", "srgb" : true
+ }
+}

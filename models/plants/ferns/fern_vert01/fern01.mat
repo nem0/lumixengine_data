@@ -1,0 +1,11 @@
+{"shader" : "shaders/rigid.shd",
+"texture" : {"source" : "/models/plants/ferns/fern_vert01/fern_image2.dds",
+"srgb" : true},
+"defines" : ["ALPHA_CUTOUT"],
+"uniforms" : [],
+"backface_culling" : false,
+"shininess" : 4.00000000,
+"specular" : [1.00000000,
+1.00000000,
+1.00000000],
+"z_test" : true}

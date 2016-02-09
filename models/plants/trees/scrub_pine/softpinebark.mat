@@ -1,0 +1,6 @@
+{
+	"shader" : "shaders/rigid.shd"
+	, "texture" : {
+		"source" : "Piney.dds", "srgb" : true
+ }
+}

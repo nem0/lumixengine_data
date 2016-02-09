@@ -142,7 +142,8 @@ parameters = {
 	render_gizmos = true,
 	SSAO = false,
 	SSAO_debug = false,
-	SSAO_blur = false
+	SSAO_blur = false,
+	sky_enabled = true
 }
 
 
@@ -182,6 +183,7 @@ function init(pipeline)
 	hdr_material = loadMaterial(pipeline, "shaders/hdr.mat")
 	lum_material = loadMaterial(pipeline, "shaders/hdrlum.mat")
 	lum_size_uniform = createVec4ArrayUniform(pipeline, "u_offset", 16)
+	sky_material = loadMaterial(pipeline, "shaders/sky.mat")
 	
 	computeLumUniforms()
 end
@@ -282,14 +284,26 @@ end
 
 
 function main(pipeline)
+	if parameters.sky_enabled then
+		setPass(pipeline, "SKY")
+			setFramebuffer(pipeline, "hdr")
+			setActiveDirectionalLightUniforms(pipeline)
+			disableDepthWrite(pipeline)
+			clear(pipeline, "all", 0xffffFFFF)
+			drawQuad(pipeline, -1, -1, 2, 2, sky_material)
+	end
+
 	setPass(pipeline, "MAIN")
-	clear(pipeline, "all", 0x00000000)
-	enableRGBWrite(pipeline)
-	setFramebuffer(pipeline, "hdr")
-	applyCamera(pipeline, "editor")
-	renderModels(pipeline, 1, false)
---		executeCustomCommand(pipeline, "render_physics");
-	renderDebugShapes(pipeline)
+		enableDepthWrite(pipeline)
+		if not parameters.sky_enabled then
+			clear(pipeline, "all", 0xffffFFFF)
+		end
+		enableRGBWrite(pipeline)
+		setFramebuffer(pipeline, "hdr")
+		applyCamera(pipeline, "editor")
+		renderModels(pipeline, 1, false)
+	--		executeCustomCommand(pipeline, "render_physics");
+		renderDebugShapes(pipeline)
 end
 
 

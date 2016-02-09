@@ -20,6 +20,7 @@ uniform vec4 u_lightSpecular;
 uniform vec4 u_materialSpecularShininess;
 uniform vec4 u_attenuationParams;
 uniform vec4 u_fogParams;
+uniform mat4 u_camView;
 
 
 void main()

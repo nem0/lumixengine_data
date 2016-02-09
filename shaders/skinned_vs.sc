@@ -14,7 +14,7 @@ void main()
 		a_weight.z * u_boneMatrices[int(a_indices.z)] +
 		a_weight.w * u_boneMatrices[int(a_indices.w)];
 
-    v_wpos = mul(model, vec4(a_position, 1.0) ).xyz;
+    v_wpos = mul(u_model[0], mul(model, vec4(a_position, 1.0) )).xyz;
 	#ifndef SHADOW
 		vec4 normal = a_normal * 2.0 - 1.0;
 		vec4 tangent = a_tangent * 2.0 - 1.0;
@@ -26,6 +26,6 @@ void main()
 		v_view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - v_wpos;
 	#endif
 
-	v_common2 = mul(u_modelViewProj, vec4(v_wpos, 1.0) ); 
+	v_common2 = mul(u_viewProj, vec4(v_wpos, 1.0) ); 
 	gl_Position =  v_common2;
 }

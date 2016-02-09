@@ -1,0 +1,12 @@
+{"shader" : "shaders/rigid.shd",
+"texture" : {"source" : "/models/plants/trees/oldstump/deadtree.dds",
+"srgb" : true},
+"texture" : {"source" : "/models/plants/trees/oldstump/deadtree_nrm.dds"},
+"defines" : [],
+"uniforms" : [],
+"backface_culling" : true,
+"shininess" : 4.00000000,
+"specular" : [1.00000000,
+1.00000000,
+1.00000000],
+"z_test" : true}

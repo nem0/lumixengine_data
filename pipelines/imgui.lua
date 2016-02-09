@@ -8,5 +8,5 @@ end
 function render(pipeline)
 		setPass(pipeline, "IMGUI")
 			setFramebuffer(pipeline, "default")
-			clear(pipeline, "all", 0x303030ff)
+			clear(pipeline, CLEAR_COLOR | CLEAR_DEPTH, 0x303030ff)
 end

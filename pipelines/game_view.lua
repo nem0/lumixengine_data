@@ -49,7 +49,7 @@ function hdr(pipeline)
 	setPass(pipeline, "HDR")
 		setFramebuffer(pipeline, "default")
 		applyCamera(pipeline, "editor")
-		clear(pipeline, "all", 0xbbd3edff)
+		clear(pipeline, CLEAR_COLOR | CLEAR_DEPTH, 0xbbd3edff)
 		bindFramebufferTexture(pipeline, "hdr", 0, hdr_buffer_uniform)
 		drawQuad(pipeline, -1, 1, 2, -2, hdr_material)
 end
@@ -58,7 +58,7 @@ function render(pipeline)
 	if not cameraExists(pipeline, "main") then
 		setPass(pipeline, "MAIN")
 			setFramebuffer(pipeline, "default")
-			clear(pipeline, "all", 0xbbd3edff)
+			clear(pipeline, CLEAR_COLOR | CLEAR_DEPTH, 0xbbd3edff)
 
 		return
 	end
@@ -84,7 +84,7 @@ function render(pipeline)
 	end
 		
 	setPass(pipeline, "MAIN")
-		clear(pipeline, "all", 0xbbd3edff)
+		clear(pipeline, CLEAR_COLOR | CLEAR_DEPTH, 0xbbd3edff)
 		setFramebuffer(pipeline, "hdr")
 		applyCamera(pipeline, "main")
 		renderModels(pipeline, 1, false)

@@ -118,7 +118,8 @@ parameters = {
 	debug_gbuffer_depth = false,
 	blur_shadowmap = true,
 	particles_enabled = true,
-	render_shadowmap_debug = false
+	render_shadowmap_debug = false,
+	sky_enabled = true
 }
 
 
@@ -164,6 +165,7 @@ function init(pipeline)
 	hdr_material = loadMaterial(pipeline, "shaders/hdr.mat")
 	lum_material = loadMaterial(pipeline, "shaders/hdrlum.mat")
 	lum_size_uniform = createVec4ArrayUniform(pipeline, "u_offset", 16)
+	sky_material = loadMaterial(pipeline, "shaders/sky.mat")
 	
 	computeLumUniforms()
 end
@@ -198,16 +200,26 @@ function deferred(pipeline)
 	setPass(pipeline, "DEFERRED")
 		setFramebuffer(pipeline, "g_buffer")
 		applyCamera(pipeline, "editor")
-		clear(pipeline, "all", 0x00000000)
+		clear(pipeline, CLEAR_ALL, 0x00000000)
+		
+		setStencil(pipeline, STENCIL_OP_PASS_Z_REPLACE 
+			| STENCIL_OP_FAIL_Z_KEEP 
+			| STENCIL_OP_FAIL_S_KEEP 
+			| STENCIL_TEST_ALWAYS)
+		setStencilRMask(pipeline, 0xff)
+		setStencilRef(pipeline, 1)
+		
 		renderModels(pipeline, 1, false)
-
+		clearStencil(pipeline)
+		
 	beginNewView(pipeline, "copyRenderbuffer");
+		
 		copyRenderbuffer(pipeline, "g_buffer", 3, "hdr", 1)
 		
 	setPass(pipeline, "MAIN")
 		setFramebuffer(pipeline, "hdr")
 		applyCamera(pipeline, "editor")
-		clear(pipeline, "all", 0x00000000)
+		clear(pipeline, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
 		
 		bindFramebufferTexture(pipeline, "g_buffer", 0, gbuffer0_uniform)
 		bindFramebufferTexture(pipeline, "g_buffer", 1, gbuffer1_uniform)
@@ -215,7 +227,22 @@ function deferred(pipeline)
 		bindFramebufferTexture(pipeline, "g_buffer", 3, gbuffer_depth_uniform)
 		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
 		drawQuad(pipeline, -1, 1, 2, -2, deferred_material)
-		
+
+	if parameters.sky_enabled then
+		setPass(pipeline, "SKY")
+			setStencil(pipeline, STENCIL_OP_PASS_Z_KEEP 
+				| STENCIL_OP_FAIL_Z_KEEP 
+				| STENCIL_OP_FAIL_S_KEEP 
+				| STENCIL_TEST_NOTEQUAL)
+			setStencilRMask(pipeline, 1)
+			setStencilRef(pipeline, 1)
+
+			setFramebuffer(pipeline, "hdr")
+			setActiveDirectionalLightUniforms(pipeline)
+			disableDepthWrite(pipeline)
+			drawQuad(pipeline, -1, -1, 2, 2, sky_material)
+	end
+	
 	beginNewView(pipeline, "DEFERRED_LOCAL_LIGHT")
 		setFramebuffer(pipeline, "hdr")
 		disableDepthWrite(pipeline)
@@ -347,7 +374,7 @@ function hdr(pipeline)
 	setPass(pipeline, "HDR")
 		setFramebuffer(pipeline, "default")
 		applyCamera(pipeline, "editor")
-		clear(pipeline, "all", 0x00000000)
+		clear(pipeline, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
 		bindFramebufferTexture(pipeline, "hdr", 0, hdr_buffer_uniform)
 		bindFramebufferTexture(pipeline, current_lum1, 0, avg_luminance_uniform)
 		drawQuad(pipeline, -1, 1, 2, -2, hdr_material)

@@ -152,7 +152,7 @@ end
 
 function main(pipeline)
 	setPass(pipeline, "MAIN")
-	clear(pipeline, "all", 0xffaaaaff)
+	clear(pipeline, CLEAR_COLOR | CLEAR_DEPTH, 0xffaaaaff)
 	enableRGBWrite(pipeline)
 	setFramebuffer(pipeline, "default")
 	applyCamera(pipeline, "editor")

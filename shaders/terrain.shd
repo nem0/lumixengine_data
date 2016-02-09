@@ -41,3 +41,8 @@ texture_slots = {
 		define = "NORMAL_MAPPING"
 	}
 }
+
+uniforms = {
+	{ name = "detail_texture_distance", type = "float" },
+	{ name = "texture_scale", type = "float" }
+}

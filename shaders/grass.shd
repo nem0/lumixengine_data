@@ -23,3 +23,7 @@ texture_slots = {
 		uniform = "u_texNoise"
 	}
 }
+
+uniforms = {
+	{ name = "time", type="time" }
+}

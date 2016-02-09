@@ -10,3 +10,23 @@ fs_combinations =
    
 texture_slots = {
 }
+
+
+uniforms = {
+	{
+		name = "u_airColor",
+		type = "color"
+	},
+	{
+		name = "u_brightness",
+		type = "vec3"
+	},
+	{
+		name = "u_strength",
+		type = "vec3"
+	},
+	{
+		name = "u_sunSize",
+		type = "float"
+	}
+}

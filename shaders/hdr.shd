@@ -1,5 +1,6 @@
 passes = {"HDR"}
-vs_combinations = { 
+vs_combinations =
+{ 
 	{},
 	{}
 }
@@ -11,4 +12,9 @@ fs_combinations =
 }
    
 texture_slots = {
+}
+
+uniforms = 
+{
+	{ name = "exposure", type="float" }
 }

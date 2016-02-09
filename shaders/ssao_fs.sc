@@ -3,8 +3,8 @@ $input v_wpos, v_texcoord0 // in...
 #include "common.sh"
 
 SAMPLER2D(u_texture, 0);
-uniform vec4 u_intensity; 
-uniform vec4 u_radius; 
+uniform vec4 intensity; 
+uniform vec4 radius; 
 uniform mat4 u_camInvProj;
 uniform mat4 u_camProj;
 
@@ -54,12 +54,12 @@ void main()
 	
 	for (int i = 0; i < SAMPLE_COUNT; ++i)
 	{
-		vec2 sample = SAMPLES[i] * u_radius.x; // TODO randomize
+		vec2 sample = SAMPLES[i] * radius.x; // TODO randomize
 		/*sample = vec2(random(v_texcoord0), random(v_texcoord0 * 2)) * 2 - 1;
 		float dist = random(v_texcoord0 * 3);
-		sample *= dist * dist * u_radius.x;/**/
+		sample *= dist * dist * radius.x;/**/
 		vec4 sample_pos = view_pos;
-		sample_pos.xy += sample * u_radius.x;
+		sample_pos.xy += sample * radius.x;
 		
 		vec4 sample_pos_proj = mul(u_camProj, sample_pos);
 		sample_pos_proj /= sample_pos_proj.w;
@@ -71,15 +71,15 @@ void main()
 		
 		float delta = sample_pos.z - view_pos.z;
 		
-		if(delta < u_radius.x)
+		if(delta < radius.x)
 		{
 			occlusion += step(CAP_MIN_DISTANCE, delta) 
 				* smoothstep(0, 1, delta / CAP_MAX_DISTANCE)
-				/ (3 * length(sample / u_radius.x));
+				/ (3 * length(sample / radius.x));
 		}
 	}
 	
-	occlusion = clamp(occlusion - SAMPLE_COUNT/4, 0, SAMPLE_COUNT) * u_intensity.x;
+	occlusion = clamp(occlusion - SAMPLE_COUNT/4, 0, SAMPLE_COUNT) * intensity.x;
 	gl_FragColor.rgb = vec3_splat(1 - occlusion / SAMPLE_COUNT);
 	gl_FragColor.w = 1;
 }

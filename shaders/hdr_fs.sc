@@ -6,6 +6,7 @@ SAMPLER2D(u_hdrBuffer, 0);
 SAMPLER2D(u_avgLuminance, 1);
 
 uniform vec4 exposure;
+uniform vec4 midgray;
 
 float reinhard2(float x, float whiteSqr)
 {
@@ -31,12 +32,12 @@ void main()
 	vec3 hdr_color = texture2D(u_hdrBuffer, v_texcoord0).xyz * exposure.x;
 	float lum = luma(hdr_color);
 
-	float map_middle = (0.18 / (avg_loglum + 0.001)) * lum;
+	float map_middle = (midgray.r / (avg_loglum + 0.001)) * lum;
 	
 	//float ld = reinhard2(map_middle, 1.1*1.1);
 	//float ld = map_middle / (map_middle + 1);
 	
-	float ld = Uncharted2Tonemap(map_middle) / Uncharted2Tonemap(11.0);
+	float ld = Uncharted2Tonemap(map_middle) / Uncharted2Tonemap(11);
 	
 	vec3 finalColor = (hdr_color / lum) * ld;
 

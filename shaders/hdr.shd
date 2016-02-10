@@ -16,5 +16,6 @@ texture_slots = {
 
 uniforms = 
 {
-	{ name = "exposure", type="float" }
+	{ name = "exposure", type="float" },
+	{ name = "midgray", type="float" }
 }

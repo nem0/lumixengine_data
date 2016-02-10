@@ -46,7 +46,12 @@ void main()
 		#endif
 		gl_FragData[1].xyz = (normal + 1) * 0.5; // todo: store only xz 
 		gl_FragData[1].w = 1;
-		gl_FragData[2] = vec4(1, 1, 1, 1);
+		float spec = u_materialSpecularShininess.g / 64.0;
+		float shininess = u_materialSpecularShininess.a / 64.0;
+		#ifdef SPECULAR_TEXTURE
+			spec *= texture2D(u_texSpecular, v_texcoord0).g;
+		#endif
+		gl_FragData[2] = vec4(spec, shininess, 0, 1);
 	#else
 		#ifdef SHADOW
 			float depth = v_common2.z / v_common2.w;

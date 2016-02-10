@@ -50,7 +50,10 @@ void main()
 		vec3 normal = vec3(0, 1, 0);
 		gl_FragData[1].xyz = (normal + 1) * 0.5; // todo: store only xz 
 		gl_FragData[1].w = 1;
-		gl_FragData[2] = vec4(1, 1, 1, 1);
+		float spec = u_materialSpecularShininess.g / 64.0;
+		float shininess = u_materialSpecularShininess.a / 64.0;
+		gl_FragData[2] = vec4(spec, shininess, 0, 1);
+
 	#else
 		vec3 wnormal = vec3(0, 1, 0);
 		vec3 view = normalize(v_view);

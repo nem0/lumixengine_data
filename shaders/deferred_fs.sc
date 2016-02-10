@@ -67,12 +67,13 @@ void main()
 {
 	vec3 normal = texture2D(u_gbuffer1, v_texcoord0) * 2 - 1;
 	vec4 color = texture2D(u_gbuffer0, v_texcoord0);
-
+	vec4 value2 = texture2D(u_gbuffer2, v_texcoord0) * 64.0;
+	
 	vec4 wpos = getViewPos(v_texcoord0);
-	vec3 texture_specular = vec3(1, 1, 1); // todo
 
 	vec3 view = normalize(mul(u_camInvView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - wpos);
-	vec4 mat_specular_shininess = vec4(1, 1, 1, 4);
+	
+	vec4 mat_specular_shininess = vec4(value2.x, value2.x, value2.x, value2.y);
 	
 	
 	vec3 diffuse = shadeDirectionalLight(u_lightDirFov.xyz
@@ -81,7 +82,7 @@ void main()
 					, u_lightSpecular.rgb
 					, normal
 					, mat_specular_shininess
-					, texture_specular);
+					, vec3(1, 1, 1));
 	diffuse = diffuse * color;
 					
 					

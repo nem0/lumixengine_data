@@ -42,7 +42,9 @@ vec3 calcLight(vec4 dirFov, vec3 _wpos)
 void main()
 {
 	vec4 color = texture2D(u_texColor, v_texcoord0);
-	if(color.a < 0.3) discard;
+	#ifdef ALPHA_CUTOUT
+		if(color.a < u_alphaRef) discard;
+	#endif
 	#ifdef DEFERRED
 		gl_FragData[0] = color;
 		vec3 normal = vec3(0, 1, 0);

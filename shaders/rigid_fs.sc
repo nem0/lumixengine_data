@@ -24,11 +24,11 @@ uniform vec4 u_fogParams;
 
 void main()
 {     
+	vec4 color = texture2D(u_texColor, v_texcoord0);
+	#ifdef ALPHA_CUTOUT
+		if(color.a < u_alphaRef) discard;
+	#endif
 	#ifdef DEFERRED
-		vec4 color = texture2D(u_texColor, v_texcoord0);
-		#ifdef ALPHA_CUTOUT
-			if(color.a < 0.3) discard;
-		#endif
 		gl_FragData[0] = color;
 		vec3 normal;
 		#ifdef NORMAL_MAPPING
@@ -49,10 +49,6 @@ void main()
 		gl_FragData[2] = vec4(1, 1, 1, 1);
 	#else
 		#ifdef SHADOW
-			vec4 color = texture2D(u_texColor, v_texcoord0);
-			#ifdef ALPHA_CUTOUT
-				if(color.a < 0.3) discard;
-			#endif
 			float depth = v_common2.z / v_common2.w;
 			gl_FragColor = vec4_splat(depth);
 		#else
@@ -72,12 +68,7 @@ void main()
 			#endif
 			wnormal = mul(tbn, wnormal);
 			vec3 view = normalize(v_view);
-
-			vec4 color = texture2D(u_texColor, v_texcoord0);
-			#ifdef ALPHA_CUTOUT
-				if(color.a < 0.3) discard;
-			#endif
-						 
+					 
 			vec3 texture_specular = 
 			#ifdef SPECULAR_TEXTURE
 				texture2D(u_texSpecular, v_texcoord0).rgb;

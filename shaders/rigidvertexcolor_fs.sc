@@ -26,8 +26,8 @@ void main()
 {     
 	#ifdef SHADOW
 		vec4 color = texture2D(u_texColor, v_texcoord0);
-		if(color.a < 0.3)
-			discard;
+		if(color.a < u_alphaRef) discard;
+		
 		float depth = v_common2.z/v_common2.w;
 		gl_FragColor = vec4_splat(depth);
 	#else
@@ -49,8 +49,7 @@ void main()
 		vec3 view = normalize(v_view);
 
 		vec4 color = texture2D(u_texColor, v_texcoord0) * v_color.rgba;
-		if(color.a < 0.3)
-			discard;
+		if(color.a < u_alphaRef) discard;
 					 
 		vec3 texture_specular = 
 		#ifdef SPECULAR_TEXTURE

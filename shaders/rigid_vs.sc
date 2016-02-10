@@ -22,10 +22,9 @@ void main()
 		v_normal = mul(model, vec4(normal.xyz, 0.0) ).xyz;
 		v_tangent = mul(model, vec4(tangent.xyz, 0.0) ).xyz;
 		v_bitangent = cross(v_normal, v_tangent);
-		v_texcoord0 = a_texcoord0;
 		v_view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - v_wpos;
 	#endif
-
+	v_texcoord0 = a_texcoord0;
 	v_common2 = mul(u_viewProj, vec4(v_wpos, 1.0) ); 
 	gl_Position =  v_common2;
 }

@@ -241,6 +241,7 @@ function deferred(pipeline)
 			setActiveDirectionalLightUniforms(pipeline)
 			disableDepthWrite(pipeline)
 			drawQuad(pipeline, -1, -1, 2, 2, sky_material)
+			clearStencil(pipeline)
 	end
 	
 	beginNewView(pipeline, "DEFERRED_LOCAL_LIGHT")

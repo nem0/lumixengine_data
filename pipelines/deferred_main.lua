@@ -228,22 +228,6 @@ function deferred(pipeline)
 		bindFramebufferTexture(pipeline, "shadowmap", 0, shadowmap_uniform)
 		drawQuad(pipeline, -1, 1, 2, -2, deferred_material)
 
-	if parameters.sky_enabled then
-		setPass(pipeline, "SKY")
-			setStencil(pipeline, STENCIL_OP_PASS_Z_KEEP 
-				| STENCIL_OP_FAIL_Z_KEEP 
-				| STENCIL_OP_FAIL_S_KEEP 
-				| STENCIL_TEST_NOTEQUAL)
-			setStencilRMask(pipeline, 1)
-			setStencilRef(pipeline, 1)
-
-			setFramebuffer(pipeline, "hdr")
-			setActiveDirectionalLightUniforms(pipeline)
-			disableDepthWrite(pipeline)
-			drawQuad(pipeline, -1, -1, 2, 2, sky_material)
-			clearStencil(pipeline)
-	end
-	
 	beginNewView(pipeline, "DEFERRED_LOCAL_LIGHT")
 		setFramebuffer(pipeline, "hdr")
 		disableDepthWrite(pipeline)
@@ -259,6 +243,22 @@ function deferred(pipeline)
 		deferredLocalLightLoop(pipeline, deferred_point_light_material, bufs)
 		
 		disableBlending(pipeline)
+		
+	if parameters.sky_enabled then
+		setPass(pipeline, "SKY")
+			setStencil(pipeline, STENCIL_OP_PASS_Z_KEEP 
+				| STENCIL_OP_FAIL_Z_KEEP 
+				| STENCIL_OP_FAIL_S_KEEP 
+				| STENCIL_TEST_NOTEQUAL)
+			setStencilRMask(pipeline, 1)
+			setStencilRef(pipeline, 1)
+
+			setFramebuffer(pipeline, "hdr")
+			setActiveDirectionalLightUniforms(pipeline)
+			disableDepthWrite(pipeline)
+			drawQuad(pipeline, -1, -1, 2, 2, sky_material)
+			clearStencil(pipeline)
+	end
 end
 
 function editor(pipeline)

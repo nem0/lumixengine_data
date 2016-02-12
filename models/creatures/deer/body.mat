@@ -4,7 +4,7 @@
 "texture" : {"source" : "deer-body-normal.dds"},
 "backface_culling" : true,
 "shininess" : 4.00000000,
-"specular" : [1.00000000,
+"color" : [1.00000000,
 1.00000000,
 1.00000000],
 "z_test" : true}

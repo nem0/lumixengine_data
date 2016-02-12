@@ -17,7 +17,7 @@ uniform vec4 u_lightDirFov;
 uniform mat4 u_shadowmapMatrices[4];
 uniform vec4 u_fogColorDensity; 
 uniform vec4 u_lightSpecular;
-uniform vec4 u_materialSpecularShininess;
+uniform vec4 u_materialColorShininess;
 uniform vec4 u_attenuationParams;
 uniform vec4 u_fogParams;
 uniform mat4 u_camView;
@@ -25,11 +25,12 @@ uniform mat4 u_camView;
 
 void main()
 {     
+	vec4 color = texture2D(u_texColor, v_texcoord0);
+	#ifdef ALPHA_CUTOUT
+		if(color.a < u_alphaRef) discard;
+	#endif
+	color.xyz *= u_materialColorShininess.rgb;
 	#ifdef DEFERRED
-		vec4 color = texture2D(u_texColor, v_texcoord0);
-		#ifdef ALPHA_CUTOUT
-			if(color.a < u_alphaRef) discard;
-		#endif
 		gl_FragData[0] = color;
 		mat3 tbn = mat3(
 			normalize(v_tangent),
@@ -46,17 +47,13 @@ void main()
 		#endif
 		gl_FragData[1].xyz = (normalize(mul(tbn, normal)) + 1) * 0.5; // todo: store only xz 
 		gl_FragData[1].w = 1;
-		float spec = u_materialSpecularShininess.g / 64.0;
-		float shininess = u_materialSpecularShininess.a / 64.0;
+		float spec = u_materialColorShininess.g / 64.0;
+		float shininess = u_materialColorShininess.a / 64.0;
 		#ifdef SPECULAR_TEXTURE
 			spec *= texture2D(u_texSpecular, v_texcoord0).g;
 		#endif
 		gl_FragData[2] = vec4(spec, shininess, 0, 1);
 	#else
-		vec4 color = texture2D(u_texColor, v_texcoord0);
-		#ifdef ALPHA_CUTOUT
-			if(color.a < u_alphaRef) discard;
-		#endif
 		#ifdef SHADOW
 			float depth = v_common2.z/v_common2.w;
 			gl_FragColor = vec4_splat(depth);
@@ -93,7 +90,7 @@ void main()
 				, v_texcoord0
 				, u_lightPosRadius
 				, u_lightRgbAttenuation
-				, u_materialSpecularShininess
+				, u_materialColorShininess
 				, u_lightSpecular
 				, texture_specular
 				);
@@ -107,7 +104,7 @@ void main()
 					, u_lightRgbAttenuation.rgb
 					, u_lightSpecular.rgb
 					, wnormal
-					, u_materialSpecularShininess
+					, u_materialColorShininess
 					, texture_specular);
 				diffuse = diffuse.xyz * color.rgb;
 				float ndotl = -dot(wnormal, u_lightDirFov.xyz);

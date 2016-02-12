@@ -3,7 +3,7 @@
 "texture" : {"source" : "noise.dds"},
 "backface_culling" : false,
 "shininess" : 4.00000000,
-"specular" : [1.00000000,
+"color" : [1.00000000,
 1.00000000,
 1.00000000],
 "z_test" : true}

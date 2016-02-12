@@ -18,7 +18,7 @@ uniform mat4 u_shadowmapMatrices[4];
 uniform vec4 u_fogColorDensity; 
 uniform vec4 u_terrainParams;
 uniform vec4 u_lightSpecular;
-uniform vec4 u_materialSpecularShininess;
+uniform vec4 u_materialColorShininess;
 uniform vec4 detail_texture_distance;
 uniform vec4 texture_scale;
 uniform vec4 u_attenuationParams;
@@ -179,6 +179,7 @@ void main()
 		vec4 color = 
 			texture2D(u_texColormap, v_texcoord1) * 
 			vec4((c00.rgb * b1 + c01.rgb * b2 + c10.rgb * b3 + c11.rgb * b4) / (b1 + b2 + b3 + b4), 1);
+		color.rgb *= u_materialColorShininess.rgb;
 			
 		vec3 wnormal;
 		#ifdef NORMAL_MAPPING
@@ -207,8 +208,8 @@ void main()
 				gl_FragData[0] = color;
 				gl_FragData[1].xyz = (wnormal + vec3_splat(1)) * 0.5;
 				gl_FragData[1].w = 1;
-				float spec = u_materialSpecularShininess.g / 64.0;
-				float shininess = u_materialSpecularShininess.a / 64.0;
+				float spec = u_materialColorShininess.g / 64.0;
+				float shininess = u_materialColorShininess.a / 64.0;
 				#ifdef SPECULAR_TEXTURE
 					spec *= texture2D(u_texSpecular, v_texcoord0).g;
 				#endif
@@ -231,7 +232,7 @@ void main()
 				, detail_uv.xy
 				, u_lightPosRadius
 				, u_lightRgbAttenuation
-				, u_materialSpecularShininess
+				, u_materialColorShininess
 				, u_lightSpecular
 				, texture_specular
 				);
@@ -246,7 +247,7 @@ void main()
 					, u_lightRgbAttenuation.rgb
 					, u_lightSpecular.rgb
 					, wnormal
-					, u_materialSpecularShininess
+					, u_materialColorShininess
 					, texture_specular);
 				diffuse = diffuse.xyz * color.rgb;
 				float ndotl = -dot(terrain_normal, u_lightDirFov.xyz);

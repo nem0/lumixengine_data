@@ -172,6 +172,10 @@ function computeLumUniforms()
 	end
 end
  
+function initScene(pipeline)
+	hdr_exposure_param = addRenderParamFloat(pipeline, "HDR exposure")
+end
+
 function init(pipeline)
 	shadowmap_uniform = createUniform(pipeline, "u_texShadowmap")
 	texture_uniform = createUniform(pipeline, "u_texture")
@@ -184,6 +188,8 @@ function init(pipeline)
 	lum_material = loadMaterial(pipeline, "shaders/hdrlum.mat")
 	lum_size_uniform = createVec4ArrayUniform(pipeline, "u_offset", 16)
 	sky_material = loadMaterial(pipeline, "shaders/sky.mat")
+
+	hdr_exposure_uniform = createUniformVec4(pipeline, "exposure")
 	
 	computeLumUniforms()
 end
@@ -394,6 +400,10 @@ function hdr(pipeline)
 		clear(pipeline, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
 		bindFramebufferTexture(pipeline, "hdr", 0, hdr_buffer_uniform)
 		bindFramebufferTexture(pipeline, current_lum1, 0, avg_luminance_uniform)
+		
+		local hdr_exposure = {getRenderParamFloat(pipeline, hdr_exposure_param), 0, 0, 0}
+		setUniform(pipeline, hdr_exposure_uniform, {hdr_exposure})
+		
 		drawQuad(pipeline, -1, 1, 2, -2, hdr_material)
 end
 

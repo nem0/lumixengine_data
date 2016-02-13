@@ -39,8 +39,7 @@ void main()
 				normalize(v_bitangent)
 				);
 			tbn = transpose(tbn);
-			normal.xz = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
-			normal.y = sqrt(1.0 - dot(normal.xz, normal.xz));
+			normal.xzy = texture2D(u_texNormal, v_texcoord0).xyz * 2.0 - 1.0;
 			normal = normalize(mul(tbn, normal));
 		#else
 			normal = normalize(v_normal);
@@ -67,12 +66,11 @@ void main()
 						
 			vec3 wnormal;
 			#ifdef NORMAL_MAPPING
-				wnormal.xz = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
-				wnormal.y = sqrt(1.0 - dot(wnormal.xz, wnormal.xz) );
+				wnormal.xzy = texture2D(u_texNormal, v_texcoord0).xyz * 2.0 - 1.0;
+				wnormal = mul(tbn, wnormal);
 			#else
-				wnormal = vec3(0.0, 1.0, 0.0);
+				wnormal = v_normal.xyz;
 			#endif
-			wnormal = mul(tbn, wnormal);
 			vec3 view = normalize(v_view);
 					 
 			vec3 texture_specular = 

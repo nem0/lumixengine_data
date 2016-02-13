@@ -187,9 +187,8 @@ void main()
 			vec4 n01 = texture2DLod(u_texNormal, duv01, mipmap_level);
 			vec4 n10 = texture2DLod(u_texNormal, duv10, mipmap_level);
 			vec4 n11 = texture2DLod(u_texNormal, duv11, mipmap_level);
-			wnormal.xz = (n00.xy * b1 + n01.xy * b2 + n10.xy * b3 + n11.xy * b4) / (b1 + b2 + b3 + b4);
-			wnormal.xz = wnormal.xz * 2.0 - 1.0;
-			wnormal.y = sqrt(1 - dot(wnormal.xz, wnormal.xz));
+			wnormal.xzy = (n00.xyz * b1 + n01.xyz * b2 + n10.xyz * b3 + n11.xyz * b4) / (b1 + b2 + b3 + b4);
+			wnormal = wnormal * 2.0 - 1.0;
 			wnormal = normalize(mul(tbn, wnormal));
 		#else
 			wnormal = terrain_normal;

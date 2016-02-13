@@ -40,12 +40,12 @@ void main()
 		tbn = transpose(tbn);
 		vec3 normal;
 		#ifdef NORMAL_MAPPING
-			normal.xz = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
-			normal.y = sqrt(1.0 - dot(normal.xz, normal.xz));
+			normal.xzy = texture2D(u_texNormal, v_texcoord0).xyz * 2.0 - 1.0;
+			normal = normalize(mul(tbn, normal));
 		#else
-			normal = vec3(0.0, 1.0, 0.0);
+			normal = v_normal.xyz;
 		#endif
-		gl_FragData[1].xyz = (normalize(mul(tbn, normal)) + 1) * 0.5; // todo: store only xz 
+		gl_FragData[1].xyz = (normal + 1) * 0.5; // todo: store only xz 
 		gl_FragData[1].w = 1;
 		float spec = u_materialColorShininess.g / 64.0;
 		float shininess = u_materialColorShininess.a / 64.0;

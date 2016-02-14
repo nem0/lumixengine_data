@@ -209,11 +209,10 @@ function deferred(pipeline)
 		setStencilRMask(pipeline, 0xff)
 		setStencilRef(pipeline, 1)
 		
-		renderModels(pipeline, 1, false)
+		renderModels(pipeline)
 		clearStencil(pipeline)
 		
 	beginNewView(pipeline, "copyRenderbuffer");
-		
 		copyRenderbuffer(pipeline, "g_buffer", 3, "hdr", 1)
 		
 	setPass(pipeline, "MAIN")
@@ -257,6 +256,7 @@ function deferred(pipeline)
 			setActiveDirectionalLightUniforms(pipeline)
 			disableDepthWrite(pipeline)
 			drawQuad(pipeline, -1, -1, 2, 2, sky_material)
+			clearLightCommandBuffer(pipeline)
 			clearStencil(pipeline)
 	end
 end

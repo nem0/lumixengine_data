@@ -177,7 +177,7 @@ function pointLight(pipeline)
 	disableDepthWrite(pipeline)
 	enableBlending(pipeline, "add")
 	applyCamera(pipeline, "editor")
-	renderModels(pipeline, 1, true)
+	renderPointLightLitGeometry(pipeline)
 end
 
  

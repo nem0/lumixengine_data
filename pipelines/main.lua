@@ -287,10 +287,11 @@ function main(pipeline)
 	if parameters.sky_enabled then
 		setPass(pipeline, "SKY")
 			setFramebuffer(pipeline, "hdr")
-			setActiveDirectionalLightUniforms(pipeline)
 			disableDepthWrite(pipeline)
 			clear(pipeline, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
+			setActiveDirectionalLightUniforms(pipeline, sky_material)
 			drawQuad(pipeline, -1, -1, 2, 2, sky_material)
+			clearLightCommandBuffer(pipeline)
 	end
 
 	setPass(pipeline, "MAIN")
@@ -301,9 +302,9 @@ function main(pipeline)
 		enableRGBWrite(pipeline)
 		setFramebuffer(pipeline, "hdr")
 		applyCamera(pipeline, "editor")
-		renderModels(pipeline, 1, false)
-	--		executeCustomCommand(pipeline, "render_physics");
+		renderModels(pipeline)
 		renderDebugShapes(pipeline)
+		
 end
 
 
@@ -323,7 +324,7 @@ function pointLight(pipeline)
 		disableDepthWrite(pipeline)
 		enableBlending(pipeline, "add")
 		applyCamera(pipeline, "editor")
-		renderModels(pipeline, 1, true)
+		renderPointLightLitGeometry(pipeline)
 end
 
 

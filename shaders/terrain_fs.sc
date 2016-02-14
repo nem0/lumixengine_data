@@ -8,7 +8,10 @@ SAMPLER2D(u_texSatellitemap, 2);
 SAMPLER2D(u_texColormap, 3);
 SAMPLER2D(u_texColor, 4);
 SAMPLER2D(u_texNormal, 5);
-SAMPLER2D(u_texShadowmap, 6);
+#ifndef SHADOW
+	SAMPLER2D(u_texShadowmap, 6);
+#endif
+
 
 uniform vec4 u_lightPosRadius;
 uniform vec4 u_lightRgbAttenuation;

@@ -9,7 +9,9 @@ SAMPLER2D(u_texColor, 0);
 #ifdef SPECULAR_TEXTURE
 	SAMPLER2D(u_texSpecular, 2);
 #endif
-SAMPLER2D(u_texShadowmap, 3);
+#ifndef SHADOW
+	SAMPLER2D(u_texShadowmap, 3);
+#endif
 uniform vec4 u_lightPosRadius;
 uniform vec4 u_lightRgbAttenuation;
 uniform vec4 u_ambientColor;

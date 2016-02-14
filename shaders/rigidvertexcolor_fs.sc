@@ -69,7 +69,7 @@ void main()
 				wnormal.xzy = texture2D(u_texNormal, v_texcoord0).xyz * 2.0 - 1.0;
 				wnormal = mul(tbn, wnormal);
 			#else
-				wnormal = v_normal.xyz;
+				wnormal = normalize(v_normal.xyz);
 			#endif
 			vec3 view = normalize(v_view);
 

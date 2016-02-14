@@ -43,7 +43,7 @@ void main()
 			normal.xzy = texture2D(u_texNormal, v_texcoord0).xyz * 2.0 - 1.0;
 			normal = normalize(mul(tbn, normal));
 		#else
-			normal = v_normal.xyz;
+			normal = normalize(v_normal.xyz);
 		#endif
 		gl_FragData[1].xyz = (normal + 1) * 0.5; // todo: store only xz 
 		gl_FragData[1].w = 1;
@@ -69,10 +69,11 @@ void main()
 			#ifdef NORMAL_MAPPING
 				wnormal.xz = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
 				wnormal.y = sqrt(1.0 - dot(wnormal.xz, wnormal.xz) );
+				wnormal = mul(tbn, wnormal);
 			#else
-				wnormal = vec3(0.0, 1.0, 0.0);
+				wnormal = normalize(v_normal.xyz);
 			#endif
-			wnormal = mul(tbn, wnormal);
+			
 			vec3 view = normalize(v_view);
 
 			vec3 texture_specular = 

@@ -1,7 +1,6 @@
 {"shader" : "shaders/hdr.shd",
 "defines" : [],
-"uniforms" : [{"name" : "exposure",
-"float_value" : 1.00000000},
+"uniforms" : [
 {"name" : "midgray",
 "float_value" : 0.18000001}],
 "backface_culling" : false,

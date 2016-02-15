@@ -9,7 +9,7 @@ SAMPLER2D(u_texColormap, 3);
 SAMPLER2D(u_texColor, 4);
 SAMPLER2D(u_texNormal, 5);
 #ifndef SHADOW
-	SAMPLER2D(u_texShadowmap, 6);
+	SAMPLER2D(u_texShadowmap, 15);
 #endif
 
 

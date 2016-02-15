@@ -8,7 +8,7 @@ addFramebuffer(this, "default", {
 	}
 })
 
-addFramebuffer(this,  "g_buffer", {
+addFramebuffer(this, "g_buffer", {
 	width = 1024,
 	height = 1024,
 	screen_size = true,
@@ -29,7 +29,6 @@ addFramebuffer(this,  "blur", {
 })
 
 parameters.hdr = true
-parameters.render_gizmos = true
 parameters.debug_gbuffer0 = false
 parameters.debug_gbuffer1 = false
 parameters.debug_gbuffer2 = false
@@ -46,16 +45,10 @@ gbuffer0_uniform = createUniform(this, "u_gbuffer0")
 gbuffer1_uniform = createUniform(this, "u_gbuffer1")
 gbuffer2_uniform = createUniform(this, "u_gbuffer2")
 gbuffer_depth_uniform = createUniform(this, "u_gbuffer_depth")
-shadowmap_uniform = createUniform(this, "u_texShadowmap")
 blur_material = loadMaterial(this, "shaders/blur.mat")
 deferred_material = loadMaterial(this, "shaders/deferred.mat")
 screen_space_material = loadMaterial(this, "shaders/screen_space.mat")
 deferred_point_light_material =loadMaterial(this, "shaders/deferredpointlight.mat")
-avg_luminance_uniform = createUniform(this, "u_avgLuminance")
-hdr_buffer_uniform = createUniform(this, "u_hdrBuffer")
-hdr_material = loadMaterial(this, "shaders/hdr.mat")
-lum_material = loadMaterial(this, "shaders/hdrlum.mat")
-lum_size_uniform = createVec4ArrayUniform(this, "u_offset", 16)
 sky_material = loadMaterial(this, "shaders/sky.mat")
 initHDR(this)
 initShadowmap(this)
@@ -97,13 +90,6 @@ function deferred()
 		disableDepthWrite(this)
 		enableBlending(this, "add")
 		applyCamera(this, "editor")
-		local bufs = {
-			{ "g_buffer", 0, gbuffer0_uniform },
-			{ "g_buffer", 1, gbuffer1_uniform },
-			{ "g_buffer", 2, gbuffer2_uniform },
-			{ "g_buffer", 3, gbuffer_depth_uniform },
-			{ "shadowmap", 0, shadowmap_uniform }
-		}
 		deferredLocalLightLoop(this, deferred_point_light_material, bufs)
 		
 		disableBlending(this)
@@ -121,7 +107,7 @@ function deferred()
 			setActiveGlobalLightUniforms(this)
 			disableDepthWrite(this)
 			drawQuad(this, -1, -1, 2, 2, sky_material)
-			clearLightCommandBuffer(this)
+			clearGlobalCommandBuffer(this)
 			clearStencil(this)
 	end
 end
@@ -161,11 +147,11 @@ end
 
 
 function render()
-	shadowmap(this)
+	shadowmap("editor")
 	deferred(this)
 	renderDebugShapes(this)
-	particles(this)
-	hdr(this)
+	particles("editor")
+	hdr("editor")
 
 	editor(this)
 	debugDeferred(this)

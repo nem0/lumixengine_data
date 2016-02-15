@@ -4,7 +4,7 @@ $input v_wpos, v_common, v_texcoord0, v_view
 
 SAMPLER2D(u_texColor, 0);
 #ifndef SHADOW
-	SAMPLER2D(u_texShadowmap, 2);
+	SAMPLER2D(u_texShadowmap, 15);
 #endif
 
 

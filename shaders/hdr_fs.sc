@@ -2,8 +2,8 @@ $input v_wpos, v_texcoord0 // in...
 
 #include "common.sh"
 
-SAMPLER2D(u_hdrBuffer, 0);
-SAMPLER2D(u_avgLuminance, 1);
+SAMPLER2D(u_hdrBuffer, 15);
+SAMPLER2D(u_avgLuminance, 14);
 
 uniform vec4 exposure;
 uniform vec4 midgray;

@@ -2,11 +2,11 @@ $input v_wpos, v_texcoord0, v_view, v_pos_radius, v_color_attn, v_dir_fov, v_spe
 
 #include "common.sh"
 
-SAMPLER2D(u_gbuffer0, 0);
-SAMPLER2D(u_gbuffer1, 1);
-SAMPLER2D(u_gbuffer2, 2);
-SAMPLER2D(u_gbuffer_depth, 3);
-SAMPLER2D(u_texShadowmap, 4);
+SAMPLER2D(u_gbuffer0, 15);
+SAMPLER2D(u_gbuffer1, 14);
+SAMPLER2D(u_gbuffer2, 13);
+SAMPLER2D(u_gbuffer_depth, 12);
+SAMPLER2D(u_texShadowmap, 11);
 
 uniform mat4 u_shadowmapMatrices[4];
 uniform vec4 u_fogColorDensity; 

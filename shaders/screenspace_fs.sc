@@ -7,7 +7,7 @@ $input v_wpos, v_texcoord0 // in...
 
 #include "common.sh"
 
-SAMPLER2D(u_texture, 0);
+SAMPLER2D(u_texture, 15);
 
 void main()
 {

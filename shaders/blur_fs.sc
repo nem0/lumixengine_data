@@ -3,7 +3,7 @@ $input v_wpos, v_texcoord0 // in...
 #include "common.sh"
 
 uniform vec4 u_textureSize;
-SAMPLER2D(u_texShadowmap, 0);
+SAMPLER2D(u_texShadowmap, 15);
 
 void main()
 {

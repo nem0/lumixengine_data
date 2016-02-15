@@ -2,7 +2,7 @@ $input v_wpos, v_texcoord0 // in...
 
 #include "common.sh"
 
-SAMPLER2D(u_texture, 0);
+SAMPLER2D(u_texture, 15);
 uniform vec4 intensity; 
 uniform vec4 radius; 
 uniform mat4 u_camInvProj;

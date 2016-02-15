@@ -3,9 +3,9 @@ $input v_texcoord0
 #include "common.sh"
 
 
-SAMPLER2D(s_texColor, 0);
+SAMPLER2D(s_texColor, 15);
 #ifdef LUM1
-	SAMPLER2D(s_texPrevLum, 1);
+	SAMPLER2D(s_texPrevLum, 14);
 #endif
 uniform vec4 u_offset[16];
 

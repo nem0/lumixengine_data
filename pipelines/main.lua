@@ -1,6 +1,5 @@
 require "pipelines/common"
 
-parameters.render_gizmos = true
 parameters.SSAO = false
 parameters.SSAO_debug = false
 parameters.SSAO_blur = false
@@ -43,16 +42,10 @@ addFramebuffer(this, "blur", {
 initHDR(this)
 initShadowmap(this)
 
-shadowmap_uniform = createUniform(this, "u_texShadowmap")
 texture_uniform = createUniform(this, "u_texture")
 blur_material = loadMaterial(this, "shaders/blur.mat")
 screen_space_material = loadMaterial(this, "shaders/screen_space.mat")
 ssao_material = loadMaterial(this, "shaders/ssao.mat")
-avg_luminance_uniform = createUniform(this, "u_avgLuminance")
-hdr_buffer_uniform = createUniform(this, "u_hdrBuffer")
-hdr_material = loadMaterial(this, "shaders/hdr.mat")
-lum_material = loadMaterial(this, "shaders/hdrlum.mat")
-lum_size_uniform = createVec4ArrayUniform(this, "u_offset", 16)
 sky_material = loadMaterial(this, "shaders/sky.mat")
 
 function initScene()
@@ -67,7 +60,8 @@ function renderSSAODDebug()
 		disableDepthWrite(this)
 		setFramebuffer(this, "default")
 		bindFramebufferTexture(this, "SSAO", 0, texture_uniform)
-		drawQuad(this, 0.48, 0.48, 0.5, 0.5, screen_space_material);
+		drawQuad(this, 0.48, 0.48, 0.5, 0.5, screen_space_material)
+		clearGlobalCommandBuffer(this)
 	end
 end
 
@@ -79,7 +73,8 @@ function renderSSAODPostprocess()
 		disableDepthWrite(this)
 		setFramebuffer(this, "hdr")
 		bindFramebufferTexture(this, "SSAO", 0, texture_uniform)
-		drawQuad(this, -1.0, -1.0, 2, 2, screen_space_material);
+		drawQuad(this, -1.0, -1.0, 2, 2, screen_space_material)
+		clearGlobalCommandBuffer(this)
 	end
 end
 
@@ -91,7 +86,8 @@ function SSAO()
 		disableDepthWrite(this)
 		setFramebuffer(this, "SSAO")
 		bindFramebufferTexture(this, "hdr", 1, texture_uniform)
-		drawQuad(this, -1, -1, 2, 2, ssao_material);		
+		drawQuad(this, -1, -1, 2, 2, ssao_material)
+		clearGlobalCommandBuffer(this)
 
 		if parameters.SSAO_blur then
 			setPass(this, "BLUR_H")
@@ -100,6 +96,7 @@ function SSAO()
 				disableDepthWrite(this)
 				bindFramebufferTexture(this, "SSAO", 0, shadowmap_uniform)
 				drawQuad(this, -1, -1, 2, 2, blur_material)
+				clearGlobalCommandBuffer(this)
 				enableDepthWrite(this)
 			
 			setPass(this, "BLUR_V")
@@ -107,7 +104,8 @@ function SSAO()
 				setFramebuffer(this, "SSAO")
 				disableDepthWrite(this)
 				bindFramebufferTexture(this, "blur", 0, shadowmap_uniform)
-				drawQuad(this, -1, -1, 2, 2, blur_material);
+				drawQuad(this, -1, -1, 2, 2, blur_material)
+				clearGlobalCommandBuffer(this)
 				enableDepthWrite(this)		
 		end
 	end
@@ -121,7 +119,7 @@ function main()
 			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
 			setActiveGlobalLightUniforms(this, sky_material)
 			drawQuad(this, -1, -1, 2, 2, sky_material)
-			clearLightCommandBuffer(this)
+			clearGlobalCommandBuffer(this)
 	end
 
 	setPass(this, "MAIN")
@@ -150,14 +148,14 @@ end
 
 
 function render()
-	shadowmap(this)
+	shadowmap("editor")
 	main(this)
-	particles(this)
+	particles("editor")
 	pointLight(this)		
 	SSAO(this)
 	renderSSAODPostprocess(this)
 
-	hdr(this)
+	hdr("editor")
 	editor(this)
 	renderSSAODDebug(this)
 	shadowmapDebug(this)

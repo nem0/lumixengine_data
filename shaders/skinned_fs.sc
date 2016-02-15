@@ -10,7 +10,7 @@ SAMPLER2D(u_texColor, 0);
 	SAMPLER2D(u_texSpecular, 2);
 #endif
 #ifndef SHADOW
-	SAMPLER2D(u_texShadowmap, 3);
+	SAMPLER2D(u_texShadowmap, 15);
 #endif
 
 uniform vec4 u_lightPosRadius;

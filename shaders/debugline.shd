@@ -1,10 +1,2 @@
-passes = {"MAIN", "EDITOR"}
-vs_combinations = { 
-	{}
-}
-
-fs_combinations =               
-{
-	{}
-}
-   
+pass "MAIN"
+pass "EDITOR"

@@ -1,48 +1,23 @@
-passes = {"MAIN", "SHADOW", "POINT_LIGHT", "DEFERRED"}
-vs_combinations = { 
-	{},
-	{},                                                
-	{}
-}
+pass "MAIN"
+	fs { "NORMAL_MAPPING" }
 
-fs_combinations =               
-{
-	{ "NORMAL_MAPPING" },
-	{ },
-	{ "NORMAL_MAPPING", "HAS_SHADOWMAP" },
-	{ "NORMAL_MAPPING" }
-}
+pass "SHADOW"
+	fs { }
 
-texture_slots = {
-	{
-		name = "Heightmap",
-		uniform = "u_texHeightmap"
-	},
-	{
-		name = "Splatmap",
-		uniform = "u_texSplatmap"
-	},
-	{
-		name = "Satellite map",
-		uniform = "u_texSatellitemap"
-	},
-	{
-		name = "Colormap",
-		uniform = "u_texColormap"
-	},
-	{
-		name = "Diffuse",
-		uniform = "u_texColor",
-		is_atlas = true
-	},
-	{
-		name = "Normal",
-		uniform = "u_texNormal",
-		define = "NORMAL_MAPPING"
-	}
-}
+pass "POINT_LIGHT"
+	fs { "NORMAL_MAPPING", "HAS_SHADOWMAP" }
 
-uniforms = {
-	{ name = "detail_texture_distance", type = "float" },
-	{ name = "texture_scale", type = "float" }
-}
+pass "DEFERRED"
+	fs { "NORMAL_MAPPING" }
+	
+texture_slot("Heightmap", "u_texHeightmap")
+texture_slot("Splatmap", "u_texSplatmap")
+texture_slot("Satellite map", "u_texSatellitemap")
+texture_slot("Colormap", "u_texColormap")
+texture_slot("Diffuse", "u_texColor")
+	atlas()
+texture_slot("Normal", "u_texNormal")
+	texture_define "NORMAL_MAPPING"
+
+uniform("detail_texture_distance", "float")
+uniform("texture_scale", "float")

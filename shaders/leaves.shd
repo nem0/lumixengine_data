@@ -1,34 +1,19 @@
-passes = {"MAIN", "SHADOW", "POINT_LIGHT", "DEFERRED"}
-vs_combinations = { 
-	{},
-	{},                                                
-	{},
-	{}
-}
-
-fs_combinations =               
-{
-	{ "NORMAL_MAPPING", "ALPHA_CUTOUT" },
-	{ "ALPHA_CUTOUT" },
-	{ "NORMAL_MAPPING", "SPECULAR_TEXTURE", "HAS_SHADOWMAP", "ALPHA_CUTOUT" },
-	{ "NORMAL_MAPPING", "ALPHA_CUTOUT" }
-}
-   
-backface_culling = false 
+backface_culling(false) 
   
-texture_slots = {
-	{
-		name = "Diffuse",
-		uniform = "u_texColor"
-	},
-	{
-		name = "Normal",
-		uniform = "u_texNormal",
-		define = "NORMAL_MAPPING"
-	},
-	{
-		name = "Specular",
-		uniform = "u_texSpecular",
-		define = "SPECULAR_TEXTURE"
-	}
-}
+texture_slot("Diffuse", "u_texColor")
+texture_slot("Normal","u_texNormal")
+	texture_define "NORMAL_MAPPING"
+texture_slot("Specular", "u_texSpecular")
+	texture_define = "SPECULAR_TEXTURE"
+
+pass "MAIN"
+	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT" }
+	
+pass "SHADOW"
+	fs { "ALPHA_CUTOUT" }
+	
+pass "POINT_LIGHT"
+	fs { "NORMAL_MAPPING", "SPECULAR_TEXTURE", "HAS_SHADOWMAP", "ALPHA_CUTOUT" }
+
+pass "DEFERRED"
+	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT" }

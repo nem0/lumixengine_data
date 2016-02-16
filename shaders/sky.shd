@@ -1,34 +1,10 @@
-passes = {"SKY"}
-vs_combinations = { 
-	{}
-}
+pass "SKY"
 
-fs_combinations =               
-{
-	{}
-}
-   
-texture_slots = {
-}
+backface_culling(false)
+depth_test(false)
 
-backface_culling = false
-depth_test = false
-
-uniforms = {
-	{
-		name = "u_airColor",
-		type = "color"
-	},
-	{
-		name = "u_brightness",
-		type = "vec3"
-	},
-	{
-		name = "u_strength",
-		type = "vec3"
-	},
-	{
-		name = "u_sunSize",
-		type = "float"
-	}
-}
+uniform("u_airColor", "color")
+uniform("u_brightness", "vec3")
+uniform("u_strength", "vec3")
+uniform("u_sunSize", "float")
+	

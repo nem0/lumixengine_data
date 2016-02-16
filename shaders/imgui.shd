@@ -1,24 +1,8 @@
-passes = {"IMGUI"}
-vs_combinations = { 
-	{},
-	{},                                                
-	{}
-}
-
-fs_combinations =               
-{
-	{ },
-	{ },
-	{ },
-}
+pass "IMGUI"
    
-depth_test = false
-backface_culling = false 
-alpha_blending = "alpha"
+
+backface_culling(false) 
+depth_test(false)
+alpha_blending "alpha"
   
-texture_slots = {
-	{
-		name = "Diffuse",
-		uniform = "s_texColor"
-	}
-}
+texture_slot("Diffuse", "s_texColor")

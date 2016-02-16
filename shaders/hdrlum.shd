@@ -1,19 +1,7 @@
-passes = {"HDR_LUMINANCE", "HDR_AVG_LUMINANCE", "LUM1"}
-vs_combinations = { 
-	{},
-	{},
-	{}
-}
-
-fs_combinations =               
-{
-	{},
-	{},
-	{}
-}
+pass "HDR_LUMINANCE"
+pass "HDR_AVG_LUMINANCE"
+pass "LUM1"
    
-backface_culling = false   
-depth_test = false 
+backface_culling(false)   
+depth_test(false) 
  
-texture_slots = {
-}

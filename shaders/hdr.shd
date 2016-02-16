@@ -1,23 +1,6 @@
-passes = {"HDR"}
-vs_combinations =
-{ 
-	{},
-	{}
-}
+pass "HDR"
 
-fs_combinations =               
-{
-	{},
-	{}
-}
-   
-texture_slots = {
-}
+backface_culling(false)
+depth_test(false)
 
-backface_culling = false
-depth_test = false
-
-uniforms = 
-{
-	{ name = "midgray", type="float" }
-}
+uniform("midgray", "float")

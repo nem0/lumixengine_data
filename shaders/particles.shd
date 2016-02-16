@@ -1,18 +1,5 @@
-passes = {"PARTICLES"}
-vs_combinations = { 
-	{}
-}
-
-fs_combinations =               
-{
-	{}
-}
+pass "PARTICLES"
    
 alpha_blending = "alpha"
    
-texture_slots = {
-	{
-		name = "Diffuse",
-		uniform = "u_texColor"
-	}
-}
+texture_slot("Diffuse", "u_texColor")

@@ -1,14 +1,4 @@
-passes = {"SCREEN_SPACE"}
-vs_combinations = { 
-	{}
-}
-
-fs_combinations =               
-{
-	{}
-}
+pass "SCREEN_SPACE"
  
-backface_culling = false
+backface_culling(false)
  
-texture_slots = {
-}

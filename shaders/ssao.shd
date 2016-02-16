@@ -1,19 +1,4 @@
-passes = {"SSAO"}
-vs_combinations = { 
-	{}
-}
+pass "SSAO"
 
-fs_combinations =               
-{
-	{}
-}
-   
-texture_slots = {
-}
-
-
-uniforms = 
-{
-	{ name = "intensity", type = "float" },
-	{ name = "radius", type = "float" }
-}
+uniform("intensity", "float")
+uniform("radius", "float")

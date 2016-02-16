@@ -1,14 +1,2 @@
-passes = {"BLUR_V", "BLUR_H"}
-vs_combinations = { 
-	{},
-	{}
-}
-
-fs_combinations =               
-{
-	{},
-	{}
-}
-   
-texture_slots = {
-}
+pass "BLUR_H"
+pass "BLUR_V"

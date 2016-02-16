@@ -1,30 +1,13 @@
-passes = {"MAIN", "POINT_LIGHT", "DEFERRED"}
-vs_combinations = { 
-	{},
-	{},                                                
-	{}
-}
-
-fs_combinations =               
-{
-	{ "ALPHA_CUTOUT" },
-	{ "ALPHA_CUTOUT" },
-	{ "ALPHA_CUTOUT" }
-}
+pass "MAIN"
+	fs { "ALPHA_CUTOUT" }
+pass "POINT_LIGHT"
+	fs { "ALPHA_CUTOUT" }
+pass "DEFERRED"
+	fs { "ALPHA_CUTOUT" }
    
-backface_culling = false
+backface_culling(false)
   
-texture_slots = {
-	{
-		name = "Diffuse",
-		uniform = "u_texColor"
-	},
-	{
-		name = "Noise",
-		uniform = "u_texNoise"
-	}
-}
+texture_slot("Diffuse", "u_texColor")
+texture_slot("Noise", "u_texNoise")
 
-uniforms = {
-	{ name = "u_time", type="time" }
-}
+uniform("u_time", "time")

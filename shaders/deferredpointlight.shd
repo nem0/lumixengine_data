@@ -1,14 +1,1 @@
-passes = {"MAIN"}
-vs_combinations = { 
-	{},
-	{}
-}
-
-fs_combinations =               
-{
-	{},
-	{}
-}
-   
-texture_slots = {
-}
+pass "MAIN"

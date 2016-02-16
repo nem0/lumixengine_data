@@ -84,7 +84,9 @@ function deferred()
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
 		bindFramebufferTexture(this, "shadowmap", 0, shadowmap_uniform)
 		drawQuad(this, -1, 1, 2, -2, deferred_material)
-
+		clearGlobalCommandBuffer(this)
+		
+	
 	beginNewView(this, "DEFERRED_LOCAL_LIGHT")
 		setFramebuffer(this, "hdr")
 		disableDepthWrite(this)
@@ -117,41 +119,55 @@ function debugDeferred()
 	setPass(this, "SCREEN_SPACE")
 	local x = 0.5
 	if parameters.debug_gbuffer0 then
+		beginNewView(this, "debug_gbuffer0")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 0, texture_uniform)
-			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material);
+			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
+			clearGlobalCommandBuffer(this)
 			x = x - 0.51
 	end
 	if parameters.debug_gbuffer1 then
 		beginNewView(this, "debug_gbuffer1")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 1, texture_uniform)
-			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material);
+			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
+			clearGlobalCommandBuffer(this)
 			x = x - 0.51
 	end
 	if parameters.debug_gbuffer2 then
 		beginNewView(this, "debug_gbuffer2")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 2, texture_uniform)
-			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material);
+			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
+			clearGlobalCommandBuffer(this)
 			x = x - 0.51
 	end
 	if parameters.debug_gbuffer_depth then
 		beginNewView(this, "debug_gbuffer_depth")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 3, texture_uniform)
-			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material);
+			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
+			clearGlobalCommandBuffer(this)
 			x = x - 0.51
 	end
+end
+
+function debugShapes()
+	setPass(this, "MAIN")
+		beginNewView(this, "debug_shapes")
+		applyCamera(this,"editor")
+		setFramebuffer(this, "hdr")
+		renderDebugShapes(this)
 end
 
 
 function render()
 	shadowmap("editor")
 	deferred(this)
-	renderDebugShapes(this)
 	particles("editor")
+	debugShapes()
 	hdr("editor")
+	
 
 	editor(this)
 	debugDeferred(this)

@@ -12,6 +12,10 @@ fs_combinations =
 	{ },
 }
    
+depth_test = false
+backface_culling = false 
+alpha_blending = "alpha"
+  
 texture_slots = {
 	{
 		name = "Diffuse",

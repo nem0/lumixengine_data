@@ -18,9 +18,7 @@
 "float_value" : 30.00000000},
 {"name" : "texture_scale",
 "float_value" : 1.00000000}],
-"backface_culling" : true,
 "shininess" : 4.00000000,
 "color" : [1.00000000,
 1.00000000,
-1.00000000],
-"z_test" : true}
+1.00000000]}

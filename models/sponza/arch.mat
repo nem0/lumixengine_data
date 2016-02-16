@@ -5,9 +5,7 @@
 "texture" : {"source" : "/models/sponza/sponza_arch_spec.dds"},
 "defines" : ["SPECULAR_TEXTURE"],
 "uniforms" : [],
-"backface_culling" : true,
 "shininess" : 4.00000000,
 "color" : [1.00000000,
 1.00000000,
-1.00000000],
-"z_test" : true}
+1.00000000]}

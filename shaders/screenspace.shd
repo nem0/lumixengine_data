@@ -7,6 +7,8 @@ fs_combinations =
 {
 	{}
 }
-   
+ 
+backface_culling = false
+ 
 texture_slots = {
 }

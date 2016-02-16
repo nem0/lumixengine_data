@@ -2,6 +2,5 @@
 	"shader" : "shaders/particles.shd"
 	, "texture" : {
 		"source" : "default.dds", "srgb" : true
-	},
-	"alpha_blending" : "alpha"
+	}
 }

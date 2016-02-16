@@ -2,9 +2,7 @@
 "texture" : {"source" : "texture1.dds"},
 "texture" : {"source" : "texture0.dds"},
 "uniforms" : [],
-"backface_culling" : true,
 "shininess" : 4.00000000,
 "color" : [1.00000000,
 1.00000000,
-1.00000000],
-"z_test" : true}
+1.00000000]}

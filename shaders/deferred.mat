@@ -1,4 +1,2 @@
 {"shader" : "shaders/deferred.shd",
-"uniforms" : [],
-"backface_culling" : false,
-"z_test" : false}
+"uniforms" : []}

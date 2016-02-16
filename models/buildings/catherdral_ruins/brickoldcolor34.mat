@@ -2,9 +2,7 @@
 "texture" : {"source" : "/models/buildings/catherdral_ruins/3td_brickoldcolor_34.dds",
 "srgb" : true},
 "texture" : {"source" : "/models/buildings/catherdral_ruins/3td_brickoldcolor_34_nrm.dds"},
-"backface_culling" : true,
 "shininess" : 4.00000000,
 "color" : [1.00000000,
 1.00000000,
-1.00000000],
-"z_test" : true}
+1.00000000]}

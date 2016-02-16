@@ -1,4 +1,2 @@
 {"shader" : "shaders/debugline.shd",
-"uniforms" : [],
-"backface_culling" : true,
-"z_test" : true}
+"uniforms" : []}

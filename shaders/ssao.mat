@@ -3,9 +3,7 @@
 "float_value" : 1.00000000},
 {"name" : "radius",
 "float_value" : 0.32000003}],
-"backface_culling" : true,
 "shininess" : 4.00000000,
 "color" : [1.00000000,
 1.00000000,
-1.00000000],
-"z_test" : true}
+1.00000000]}

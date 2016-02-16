@@ -1,5 +1,3 @@
 {"shader" : "shaders/imgui.shd",
-"uniforms" : [],
-"backface_culling" : false,
-"alpha_blending" : "alpha",
-"z_test" : true}
+"uniforms" : []
+}

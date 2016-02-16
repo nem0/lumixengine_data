@@ -3,7 +3,6 @@ parameters = {
 	render_gizmos = true,
 	blur_shadowmap = true,
 	render_shadowmap_debug = false,
-	particles_enabled = true
 }
 
 local current_lum1 = "lum1a"

@@ -8,6 +8,8 @@ fs_combinations =
 	{}
 }
    
+alpha_blending = "alpha"
+   
 texture_slots = {
 	{
 		name = "Diffuse",

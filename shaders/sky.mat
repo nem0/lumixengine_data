@@ -18,9 +18,8 @@
 		"float_value" : 15
 	}
 ],
-"backface_culling" : false,
 "shininess" : 4.00000000,
 "color" : [1.00000000,
 1.00000000,
-1.00000000],
-"z_test" : false}
+1.00000000]
+}

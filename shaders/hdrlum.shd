@@ -12,5 +12,8 @@ fs_combinations =
 	{}
 }
    
+backface_culling = false   
+depth_test = false 
+ 
 texture_slots = {
 }

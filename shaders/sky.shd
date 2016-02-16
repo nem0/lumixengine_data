@@ -11,6 +11,8 @@ fs_combinations =
 texture_slots = {
 }
 
+backface_culling = false
+depth_test = false
 
 uniforms = {
 	{

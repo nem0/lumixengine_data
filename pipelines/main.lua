@@ -54,44 +54,47 @@ end
 
 function renderSSAODDebug()
 	if parameters.SSAO_debug then
-		setPass(this, "SCREEN_SPACE")
-		beginNewView(this, "SHADOWMAP_DEBUG")
-		disableBlending(this)
-		disableDepthWrite(this)
-		setFramebuffer(this, "default")
-		bindFramebufferTexture(this, "SSAO", 0, texture_uniform)
-		drawQuad(this, 0.48, 0.48, 0.5, 0.5, screen_space_material)
-		clearGlobalCommandBuffer(this)
+		newView(this, "ssao_debug")
+			setPass(this, "SCREEN_SPACE")
+			newView(this, "SHADOWMAP_DEBUG")
+			disableBlending(this)
+			disableDepthWrite(this)
+			setFramebuffer(this, "default")
+			bindFramebufferTexture(this, "SSAO", 0, texture_uniform)
+			drawQuad(this, 0.48, 0.48, 0.5, 0.5, screen_space_material)
+			clearGlobalCommandBuffer(this)
 	end
 end
 
 
 function renderSSAODPostprocess()
 	if parameters.SSAO then
-		setPass(this, "SCREEN_SPACE")
-		enableBlending(this, "multiply")
-		disableDepthWrite(this)
-		setFramebuffer(this, "hdr")
-		bindFramebufferTexture(this, "SSAO", 0, texture_uniform)
-		drawQuad(this, -1.0, -1.0, 2, 2, screen_space_material)
-		clearGlobalCommandBuffer(this)
+		newView(this, "ssao_postprocess")
+			setPass(this, "SCREEN_SPACE")
+			enableBlending(this, "multiply")
+			disableDepthWrite(this)
+			setFramebuffer(this, "hdr")
+			bindFramebufferTexture(this, "SSAO", 0, texture_uniform)
+			drawQuad(this, -1.0, -1.0, 2, 2, screen_space_material)
+			clearGlobalCommandBuffer(this)
 	end
 end
 
 
 function SSAO()
 	if parameters.SSAO then
-		setPass(this, "SSAO")
-		disableBlending(this)
-		disableDepthWrite(this)
-		setFramebuffer(this, "SSAO")
-		bindFramebufferTexture(this, "hdr", 1, texture_uniform)
-		drawQuad(this, -1, -1, 2, 2, ssao_material)
-		clearGlobalCommandBuffer(this)
+		newView(this, "ssao")
+			setPass(this, "SSAO")
+			disableBlending(this)
+			disableDepthWrite(this)
+			setFramebuffer(this, "SSAO")
+			bindFramebufferTexture(this, "hdr", 1, texture_uniform)
+			drawQuad(this, -1, -1, 2, 2, ssao_material)
+			clearGlobalCommandBuffer(this)
 
 		if parameters.SSAO_blur then
-			setPass(this, "BLUR_H")
-				beginNewView(this, "h");
+			newView(this, "ssao_blur_h")
+				setPass(this, "BLUR_H")
 				setFramebuffer(this, "blur")
 				disableDepthWrite(this)
 				bindFramebufferTexture(this, "SSAO", 0, shadowmap_uniform)
@@ -99,8 +102,8 @@ function SSAO()
 				clearGlobalCommandBuffer(this)
 				enableDepthWrite(this)
 			
-			setPass(this, "BLUR_V")
-				beginNewView(this, "v");
+			newView(this, "ssao_blur_v")
+				setPass(this, "BLUR_V")
 				setFramebuffer(this, "SSAO")
 				disableDepthWrite(this)
 				bindFramebufferTexture(this, "blur", 0, shadowmap_uniform)
@@ -113,7 +116,8 @@ end
 
 function main()
 	if parameters.sky_enabled then
-		setPass(this, "SKY")
+		newView(this, "sky")
+			setPass(this, "SKY")
 			setFramebuffer(this, "hdr")
 			disableDepthWrite(this)
 			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
@@ -122,7 +126,8 @@ function main()
 			clearGlobalCommandBuffer(this)
 	end
 
-	setPass(this, "MAIN")
+	newView(this, "main")
+		setPass(this, "MAIN")
 		enableDepthWrite(this)
 		if not parameters.sky_enabled then
 			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
@@ -138,7 +143,8 @@ end
 
 
 function pointLight()
-	setPass(this, "POINT_LIGHT")
+	newView(this, "POINT_LIGHT")
+		setPass(this, "POINT_LIGHT")
 		setFramebuffer(this, "hdr")
 		disableDepthWrite(this)
 		enableBlending(this, "add")

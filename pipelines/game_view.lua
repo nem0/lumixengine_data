@@ -64,36 +64,38 @@ end
 
 function renderSSAODPostprocess(this)
 	if parameters.SSAO then
-		setPass(this, "SCREEN_SPACE")
-		enableBlending(this, "multiply")
-		disableDepthWrite(this)
-		setFramebuffer(this, "hdr")
-		bindFramebufferTexture(this, "SSAO", 0, texture_uniform)
-		drawQuad(this, -1.0, -1.0, 2, 2, screen_space_material);
+		newView(this, "ssao_postprocess")
+			setPass(this, "SCREEN_SPACE")
+			enableBlending(this, "multiply")
+			disableDepthWrite(this)
+			setFramebuffer(this, "hdr")
+			bindFramebufferTexture(this, "SSAO", 0, texture_uniform)
+			drawQuad(this, -1.0, -1.0, 2, 2, screen_space_material);
 	end
 end
 
 
 function SSAO(this)
 	if parameters.SSAO then
-		setPass(this, "SSAO")
-		disableBlending(this)
-		disableDepthWrite(this)
-		setFramebuffer(this, "SSAO")
-		bindFramebufferTexture(this, "hdr", 1, texture_uniform)
-		drawQuad(this, -1, -1, 2, 2, ssao_material);		
+		newView(this, "ssao")
+			setPass(this, "SSAO")
+			disableBlending(this)
+			disableDepthWrite(this)
+			setFramebuffer(this, "SSAO")
+			bindFramebufferTexture(this, "hdr", 1, texture_uniform)
+			drawQuad(this, -1, -1, 2, 2, ssao_material);		
 
 		if parameters.SSAO_blur then
-			setPass(this, "BLUR_H")
-				beginNewView(this, "h");
+			newView(this, "ssao_blur_h")
+				setPass(this, "BLUR_H")
 				setFramebuffer(this, "blur")
 				disableDepthWrite(this)
 				bindFramebufferTexture(this, "SSAO", 0, shadowmap_uniform)
 				drawQuad(this, -1, -1, 2, 2, blur_material)
 				enableDepthWrite(this)
 			
-			setPass(this, "BLUR_V")
-				beginNewView(this, "v");
+			newView(this, "ssao_blur_h")
+				setPass(this, "BLUR_V")
 				setFramebuffer(this, "SSAO")
 				disableDepthWrite(this)
 				bindFramebufferTexture(this, "blur", 0, shadowmap_uniform)
@@ -107,7 +109,8 @@ end
 
 function main(this)
 	if parameters.sky_enabled then
-		setPass(this, "SKY")
+		newView(this, "sky")
+			setPass(this, "SKY")
 			setFramebuffer(this, "hdr")
 			setActiveGlobalLightUniforms(this)
 			disableDepthWrite(this)
@@ -115,7 +118,8 @@ function main(this)
 			drawQuad(this, -1, -1, 2, 2, sky_material)
 	end
 
-	setPass(this, "MAIN")
+	newView(this, "main")
+		setPass(this, "MAIN")
 		enableDepthWrite(this)
 		if not parameters.sky_enabled then
 			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
@@ -129,7 +133,8 @@ end
 
 
 function pointLight(this)
-	setPass(this, "POINT_LIGHT")
+	newView(this, "point_light")
+		setPass(this, "POINT_LIGHT")
 		setFramebuffer(this, "hdr")
 		disableDepthWrite(this)
 		enableBlending(this, "add")
@@ -140,14 +145,16 @@ end
 
 function editor(this)
 	if parameters.render_gizmos then
-		setPass(this, "EDITOR")
+		newView(this, "editor")			
+			setPass(this, "EDITOR")
 			setFramebuffer(this, "default")
 			disableDepthWrite(this)
 			disableBlending(this)
 			applyCamera(this, "main")
 			renderIcons(this)
 
-		beginNewView(this, "gizmo")
+		newView(this, "gizmo")
+			setPass(this, "EDITOR")
 			setFramebuffer(this, "default")
 			applyCamera(this, "main")
 			renderGizmos(this)

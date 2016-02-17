@@ -33,14 +33,16 @@ end
 
 function editor()
 	if parameters.render_gizmos then
-		setPass(this, "EDITOR")
+		newView(this, "editor")
+			setPass(this, "EDITOR")
 			setFramebuffer(this, "default")
 			disableDepthWrite(this)
 			disableBlending(this)
 			applyCamera(this, "editor")
 			renderIcons(this)
 
-		beginNewView(this, "gizmo")
+		newView(this, "gizmo")
+			setPass(this, "EDITOR")
 			setFramebuffer(this, "default")
 			applyCamera(this, "editor")
 			renderGizmos(this)
@@ -49,12 +51,12 @@ end
 
 function shadowmapDebug()
 	if parameters.render_shadowmap_debug then
-		setPass(this, "SCREEN_SPACE")
-		beginNewView(this, "SHADOWMAP_DEBUG")
-		setFramebuffer(this, "default")
-		bindFramebufferTexture(this, "shadowmap", 0, texture_uniform)
-		drawQuad(this, 0.48, 0.98, 0.5, -0.5, screen_space_material)
-		clearGlobalCommandBuffer(this)
+		newView(this, "shadowmap_debug")
+			setPass(this, "SCREEN_SPACE")
+			setFramebuffer(this, "default")
+			bindFramebufferTexture(this, "shadowmap", 0, texture_uniform)
+			drawQuad(this, 0.48, 0.98, 0.5, -0.5, screen_space_material)
+			clearGlobalCommandBuffer(this)
 	end
 end
 
@@ -159,7 +161,8 @@ end
 
 
 function hdr(camera_slot)
-	setPass(this, "HDR_LUMINANCE")
+	newView(this, "hdr_luminance")
+		setPass(this, "HDR_LUMINANCE")
 		setFramebuffer(this, "lum128")
 		disableDepthWrite(this)
 		disableBlending(this)
@@ -168,21 +171,24 @@ function hdr(camera_slot)
 		drawQuad(this, -1, -1, 2, 2, lum_material)
 		clearGlobalCommandBuffer(this)
 	
-	setPass(this, "HDR_AVG_LUMINANCE")
+	newView(this, "hdr_avg_luminance")
+		setPass(this, "HDR_AVG_LUMINANCE")
 		setFramebuffer(this, "lum64")
 		setUniform(this, lum_size_uniform, lum_uniforms[64])
 		bindFramebufferTexture(this, "lum128", 0, hdr_buffer_uniform)
 		drawQuad(this, -1, -1, 2, 2, lum_material)
 		clearGlobalCommandBuffer(this)
 
-	beginNewView(this, "lum16")
+	newView(this, "lum16")
+		setPass(this, "HDR_AVG_LUMINANCE")
 		setFramebuffer(this, "lum16")
 		setUniform(this, lum_size_uniform, lum_uniforms[16])
 		bindFramebufferTexture(this, "lum64", 0, hdr_buffer_uniform)
 		drawQuad(this, -1, -1, 2, 2, lum_material)
 		clearGlobalCommandBuffer(this)
 	
-	beginNewView(this, "lum4")
+	newView(this, "lum4")
+		setPass(this, "HDR_AVG_LUMINANCE")
 		setFramebuffer(this, "lum4")
 		setUniform(this, lum_size_uniform, lum_uniforms[4])
 		bindFramebufferTexture(this, "lum16", 0, hdr_buffer_uniform)
@@ -197,7 +203,8 @@ function hdr(camera_slot)
 		current_lum1 = "lum1a" 
 	end
 
-	setPass(this, "LUM1")
+	newView(this, "lum1")
+		setPass(this, "LUM1")
 		setFramebuffer(this, current_lum1)
 		setUniform(this, lum_size_uniform, lum_uniforms[1])
 		bindFramebufferTexture(this, "lum4", 0, hdr_buffer_uniform)
@@ -205,7 +212,8 @@ function hdr(camera_slot)
 		drawQuad(this, -1, -1, 2, 2, lum_material)
 		clearGlobalCommandBuffer(this)
 
-	setPass(this, "HDR")
+	newView(this, "hdr")
+		setPass(this, "HDR")
 		setFramebuffer(this, "default")
 		disableBlending(this)
 		applyCamera(this, camera_slot)
@@ -222,16 +230,39 @@ function hdr(camera_slot)
 end
 
 function shadowmap(camera_slot)
-	setPass(this, "SHADOW")         
+	newView(this, "shadow0")
+		setPass(this, "SHADOW")         
 		applyCamera(this, camera_slot)
 		setFramebuffer(this, "shadowmap")
-		renderShadowmap(this) 
+		renderShadowmap(this, 0) 
+		clearGlobalCommandBuffer(this)
+
+	newView(this, "shadow1")
+		setPass(this, "SHADOW")         
+		applyCamera(this, camera_slot)
+		setFramebuffer(this, "shadowmap")
+		renderShadowmap(this, 1) 
+		clearGlobalCommandBuffer(this)
+
+	newView(this, "shadow2")
+		setPass(this, "SHADOW")         
+		applyCamera(this, camera_slot)
+		setFramebuffer(this, "shadowmap")
+		renderShadowmap(this, 2) 
+		clearGlobalCommandBuffer(this)
+
+	newView(this, "shadow3")
+		setPass(this, "SHADOW")         
+		applyCamera(this, camera_slot)
+		setFramebuffer(this, "shadowmap")
+		renderShadowmap(this, 3) 
 		clearGlobalCommandBuffer(this)
 		
 		renderLocalLightsShadowmaps(this, camera_slot, { "point_light_shadowmap", "point_light2_shadowmap" })
 		
 	if parameters.blur_shadowmap then
-		setPass(this, "BLUR_H")
+		newView(this, "blur_shadowmap_h")
+			setPass(this, "BLUR_H")
 			setFramebuffer(this, "blur")
 			disableDepthWrite(this)
 			bindFramebufferTexture(this, "shadowmap", 0, shadowmap_uniform)
@@ -239,7 +270,8 @@ function shadowmap(camera_slot)
 			clearGlobalCommandBuffer(this)
 			enableDepthWrite(this)
 
-		setPass(this, "BLUR_V")
+		newView(this, "blur_shadowmap_v")
+			setPass(this, "BLUR_V")
 			setFramebuffer(this, "shadowmap")
 			disableDepthWrite(this)
 			bindFramebufferTexture(this, "blur", 0, shadowmap_uniform)
@@ -251,9 +283,10 @@ end
 
 function particles(camera_slot)
 	if parameters.particles_enabled then
-		setPass(this, "PARTICLES")
-		disableDepthWrite(this)
-		applyCamera(this, camera_slot)
-		renderParticles(this)
+		newView(this, "particles")
+			setPass(this, "PARTICLES")
+			disableDepthWrite(this)
+			applyCamera(this, camera_slot)
+			renderParticles(this)
 	end	
 end

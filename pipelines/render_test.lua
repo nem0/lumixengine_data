@@ -42,36 +42,38 @@ initShadowmap()
 
 function renderSSAODPostprocess()
 	if parameters.SSAO then
-		setPass(this, "SCREEN_SPACE")
-		enableBlending(this, "multiply")
-		disableDepthWrite(this)
-		setFramebuffer(this, "default")
-		bindFramebufferTexture(this, "SSAO", 0, texture_uniform)
-		drawQuad(this, -1.0, -1.0, 2, 2, screen_space_material);
+		newView(this, "ssao_postprocess")
+			setPass(this, "SCREEN_SPACE")
+			enableBlending(this, "multiply")
+			disableDepthWrite(this)
+			setFramebuffer(this, "default")
+			bindFramebufferTexture(this, "SSAO", 0, texture_uniform)
+			drawQuad(this, -1.0, -1.0, 2, 2, screen_space_material);
 	end
 end
 
 
 function SSAO()
 	if parameters.SSAO then
-		setPass(this, "SSAO")
-		disableBlending(this)
-		disableDepthWrite(this)
-		setFramebuffer(this, "SSAO")
-		bindFramebufferTexture(this, "default", 1, texture_uniform)
-		drawQuad(this, -1, -1, 2, 2, ssao_material);		
+		newView(this, "ssao")
+			setPass(this, "SSAO")
+			disableBlending(this)
+			disableDepthWrite(this)
+			setFramebuffer(this, "SSAO")
+			bindFramebufferTexture(this, "default", 1, texture_uniform)
+			drawQuad(this, -1, -1, 2, 2, ssao_material);		
 
 		if parameters.SSAO_blur then
-			setPass(this, "BLUR_H")
-				beginNewView(this, "h");
+			newView(this, "ssao_blur_h")
+				setPass(this, "BLUR_H")
 				setFramebuffer(this, "blur")
 				disableDepthWrite(this)
 				bindFramebufferTexture(this, "SSAO", 0, shadowmap_uniform)
 				drawQuad(this, -1, -1, 2, 2, blur_material)
 				enableDepthWrite(this)
 			
-			setPass(this, "BLUR_V")
-				beginNewView(this, "v");
+			newView(this, "ssao_blur_v")
+				setPass(this, "BLUR_V")
 				setFramebuffer(this, "SSAO")
 				disableDepthWrite(this)
 				bindFramebufferTexture(this, "blur", 0, shadowmap_uniform)
@@ -83,23 +85,25 @@ end
  
 
 function main()
-	setPass(this, "MAIN")
-	clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffaaaaff)
-	enableRGBWrite(this)
-	setFramebuffer(this, "default")
-	applyCamera(this, "editor")
-	setActiveGlobalLightUniforms(this)
-	renderModels(this, 1, false)
-	renderDebugShapes(this)
+	newView(this, "main")
+		setPass(this, "MAIN")
+		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffaaaaff)
+		enableRGBWrite(this)
+		setFramebuffer(this, "default")
+		applyCamera(this, "editor")
+		setActiveGlobalLightUniforms(this)
+		renderModels(this, 1, false)
+		renderDebugShapes(this)
 end
 
 
 function pointLight()
-	setPass(this, "POINT_LIGHT")
-	disableDepthWrite(this)
-	enableBlending(this, "add")
-	applyCamera(this, "editor")
-	renderPointLightLitGeometry(this)
+	newView(this, "point_light")
+		setPass(this, "POINT_LIGHT")
+		disableDepthWrite(this)
+		enableBlending(this, "add")
+		applyCamera(this, "editor")
+		renderPointLightLitGeometry(this)
 end
 
  

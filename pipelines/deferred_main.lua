@@ -55,7 +55,8 @@ initShadowmap(this)
 
 
 function deferred()
-	setPass(this, "DEFERRED")
+	newView(this, "deferred")
+		setPass(this, "DEFERRED")
 		setFramebuffer(this, "g_buffer")
 		applyCamera(this, "editor")
 		clear(this, CLEAR_ALL, 0x00000000)
@@ -70,10 +71,11 @@ function deferred()
 		renderModels(this)
 		clearStencil(this)
 		
-	beginNewView(this, "copyRenderbuffer");
+	newView(this, "copyRenderbuffer");
 		copyRenderbuffer(this, "g_buffer", 3, "hdr", 1)
 		
-	setPass(this, "MAIN")
+	newView(this, "main")
+		setPass(this, "MAIN")
 		setFramebuffer(this, "hdr")
 		applyCamera(this, "editor")
 		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
@@ -84,20 +86,20 @@ function deferred()
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
 		bindFramebufferTexture(this, "shadowmap", 0, shadowmap_uniform)
 		drawQuad(this, -1, 1, 2, -2, deferred_material)
-		clearGlobalCommandBuffer(this)
-		
 	
-	beginNewView(this, "DEFERRED_LOCAL_LIGHT")
+	newView(this, "deferred_local_light")
+		setPass(this, "MAIN")
 		setFramebuffer(this, "hdr")
 		disableDepthWrite(this)
 		enableBlending(this, "add")
 		applyCamera(this, "editor")
-		deferredLocalLightLoop(this, deferred_point_light_material, bufs)
-		
+		renderLightVolumes(this, deferred_point_light_material)
 		disableBlending(this)
+		clearGlobalCommandBuffer(this)
 		
 	if parameters.sky_enabled then
-		setPass(this, "SKY")
+		newView(this, "sky")
+			setPass(this, "SKY")
 			setStencil(this, STENCIL_OP_PASS_Z_KEEP 
 				| STENCIL_OP_FAIL_Z_KEEP 
 				| STENCIL_OP_FAIL_S_KEEP 
@@ -116,10 +118,10 @@ end
 
 
 function debugDeferred()
-	setPass(this, "SCREEN_SPACE")
 	local x = 0.5
 	if parameters.debug_gbuffer0 then
-		beginNewView(this, "debug_gbuffer0")
+		newView(this, "debug_gbuffer0")
+			setPass(this, "SCREEN_SPACE")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 0, texture_uniform)
 			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
@@ -127,7 +129,8 @@ function debugDeferred()
 			x = x - 0.51
 	end
 	if parameters.debug_gbuffer1 then
-		beginNewView(this, "debug_gbuffer1")
+		newView(this, "debug_gbuffer1")
+			setPass(this, "SCREEN_SPACE")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 1, texture_uniform)
 			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
@@ -135,7 +138,8 @@ function debugDeferred()
 			x = x - 0.51
 	end
 	if parameters.debug_gbuffer2 then
-		beginNewView(this, "debug_gbuffer2")
+		newView(this, "debug_gbuffer2")
+			setPass(this, "SCREEN_SPACE")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 2, texture_uniform)
 			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
@@ -143,7 +147,8 @@ function debugDeferred()
 			x = x - 0.51
 	end
 	if parameters.debug_gbuffer_depth then
-		beginNewView(this, "debug_gbuffer_depth")
+		newView(this, "debug_gbuffer_depth")
+			setPass(this, "SCREEN_SPACE")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 3, texture_uniform)
 			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
@@ -153,8 +158,8 @@ function debugDeferred()
 end
 
 function debugShapes()
-	setPass(this, "MAIN")
-		beginNewView(this, "debug_shapes")
+	newView(this, "debug_shapes")
+		setPass(this, "MAIN")
 		applyCamera(this,"editor")
 		setFramebuffer(this, "hdr")
 		renderDebugShapes(this)

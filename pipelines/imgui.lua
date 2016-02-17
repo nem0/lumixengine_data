@@ -1,12 +1,6 @@
-framebuffers = {
-}
- 
-function init(pipeline)
-end
- 
- 
-function render(pipeline)
-		setPass(pipeline, "IMGUI")
-			setFramebuffer(pipeline, "default")
-			clear(pipeline, CLEAR_COLOR | CLEAR_DEPTH, 0x303030ff)
+function render()
+	newView(this, "imgui")
+		setPass(this, "IMGUI")
+		setFramebuffer(this, "default")
+		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0x303030ff)
 end

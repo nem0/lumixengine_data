@@ -1,5 +1,5 @@
 pass "PARTICLES"
    
-alpha_blending = "alpha"
+alpha_blending "alpha"
    
 texture_slot("Diffuse", "u_texColor")

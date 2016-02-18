@@ -55,7 +55,7 @@ initShadowmap(this)
 
 
 function deferred()
-	newView(this, "deferred")
+	deferred_view = newView(this, "deferred")
 		setPass(this, "DEFERRED")
 		setFramebuffer(this, "g_buffer")
 		applyCamera(this, "editor")
@@ -68,8 +68,7 @@ function deferred()
 		setStencilRMask(this, 0xff)
 		setStencilRef(this, 1)
 		
-		renderModels(this)
-		clearStencil(this)
+		renderModels(this, {deferred_view})
 		
 	newView(this, "copyRenderbuffer");
 		copyRenderbuffer(this, "g_buffer", 3, "hdr", 1)
@@ -95,7 +94,6 @@ function deferred()
 		applyCamera(this, "editor")
 		renderLightVolumes(this, deferred_point_light_material)
 		disableBlending(this)
-		clearGlobalCommandBuffer(this)
 		
 	if parameters.sky_enabled then
 		newView(this, "sky")
@@ -111,8 +109,6 @@ function deferred()
 			setActiveGlobalLightUniforms(this)
 			disableDepthWrite(this)
 			drawQuad(this, -1, -1, 2, 2, sky_material)
-			clearGlobalCommandBuffer(this)
-			clearStencil(this)
 	end
 end
 
@@ -125,7 +121,6 @@ function debugDeferred()
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 0, texture_uniform)
 			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
-			clearGlobalCommandBuffer(this)
 			x = x - 0.51
 	end
 	if parameters.debug_gbuffer1 then
@@ -134,7 +129,6 @@ function debugDeferred()
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 1, texture_uniform)
 			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
-			clearGlobalCommandBuffer(this)
 			x = x - 0.51
 	end
 	if parameters.debug_gbuffer2 then
@@ -143,7 +137,6 @@ function debugDeferred()
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 2, texture_uniform)
 			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
-			clearGlobalCommandBuffer(this)
 			x = x - 0.51
 	end
 	if parameters.debug_gbuffer_depth then
@@ -152,7 +145,6 @@ function debugDeferred()
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 3, texture_uniform)
 			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
-			clearGlobalCommandBuffer(this)
 			x = x - 0.51
 	end
 end

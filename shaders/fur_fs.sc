@@ -24,6 +24,7 @@ uniform vec4 u_materialColorShininess;
 uniform vec4 u_attenuationParams;
 uniform vec4 u_fogParams;
 uniform mat4 u_camView;
+uniform vec4 u_layer;
 
 
 void main()
@@ -115,7 +116,7 @@ void main()
 				diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 
 			#endif
 
-			#ifdef MAIN
+			#if defined MAIN || defined FUR
 				vec3 ambient = u_ambientColor.rgb * color.rgb;
 			#else
 				vec3 ambient = vec3(0, 0, 0);
@@ -128,7 +129,12 @@ void main()
 			#else
 				gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
 			#endif
-			gl_FragColor.w = 1.0;
+			#ifdef FUR
+				gl_FragColor.rgb *= lerp(0.4, 1, u_layer.x);
+				gl_FragColor.w = color.r * (1.0 - u_layer.x);
+			#else
+				gl_FragColor.w = 1.0;
+			#endif
 		#endif       
 	#endif		
 }

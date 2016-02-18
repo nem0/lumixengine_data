@@ -56,7 +56,6 @@ function shadowmapDebug()
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "shadowmap", 0, texture_uniform)
 			drawQuad(this, 0.48, 0.98, 0.5, -0.5, screen_space_material)
-			clearGlobalCommandBuffer(this)
 	end
 end
 
@@ -169,7 +168,6 @@ function hdr(camera_slot)
 		setUniform(this, lum_size_uniform, lum_uniforms[128])
 		bindFramebufferTexture(this, "hdr", 0, hdr_buffer_uniform)
 		drawQuad(this, -1, -1, 2, 2, lum_material)
-		clearGlobalCommandBuffer(this)
 	
 	newView(this, "hdr_avg_luminance")
 		setPass(this, "HDR_AVG_LUMINANCE")
@@ -177,7 +175,6 @@ function hdr(camera_slot)
 		setUniform(this, lum_size_uniform, lum_uniforms[64])
 		bindFramebufferTexture(this, "lum128", 0, hdr_buffer_uniform)
 		drawQuad(this, -1, -1, 2, 2, lum_material)
-		clearGlobalCommandBuffer(this)
 
 	newView(this, "lum16")
 		setPass(this, "HDR_AVG_LUMINANCE")
@@ -185,7 +182,6 @@ function hdr(camera_slot)
 		setUniform(this, lum_size_uniform, lum_uniforms[16])
 		bindFramebufferTexture(this, "lum64", 0, hdr_buffer_uniform)
 		drawQuad(this, -1, -1, 2, 2, lum_material)
-		clearGlobalCommandBuffer(this)
 	
 	newView(this, "lum4")
 		setPass(this, "HDR_AVG_LUMINANCE")
@@ -193,7 +189,6 @@ function hdr(camera_slot)
 		setUniform(this, lum_size_uniform, lum_uniforms[4])
 		bindFramebufferTexture(this, "lum16", 0, hdr_buffer_uniform)
 		drawQuad(this, -1, -1, 2, 2, lum_material)
-		clearGlobalCommandBuffer(this)
 
 	local old_lum1 = "lum1b"
 	if current_lum1 == "lum1a" then 
@@ -210,7 +205,6 @@ function hdr(camera_slot)
 		bindFramebufferTexture(this, "lum4", 0, hdr_buffer_uniform)
 		bindFramebufferTexture(this, old_lum1, 0, avg_luminance_uniform)
 		drawQuad(this, -1, -1, 2, 2, lum_material)
-		clearGlobalCommandBuffer(this)
 
 	newView(this, "hdr")
 		setPass(this, "HDR")
@@ -226,7 +220,6 @@ function hdr(camera_slot)
  		setUniform(this, hdr_exposure_uniform, {hdr_exposure})
 		
 		drawQuad(this, -1, 1, 2, -2, hdr_material)
-		clearGlobalCommandBuffer(this)
 end
 
 function shadowmap(camera_slot)
@@ -235,28 +228,24 @@ function shadowmap(camera_slot)
 		applyCamera(this, camera_slot)
 		setFramebuffer(this, "shadowmap")
 		renderShadowmap(this, 0) 
-		clearGlobalCommandBuffer(this)
 
 	newView(this, "shadow1")
 		setPass(this, "SHADOW")         
 		applyCamera(this, camera_slot)
 		setFramebuffer(this, "shadowmap")
 		renderShadowmap(this, 1) 
-		clearGlobalCommandBuffer(this)
 
 	newView(this, "shadow2")
 		setPass(this, "SHADOW")         
 		applyCamera(this, camera_slot)
 		setFramebuffer(this, "shadowmap")
 		renderShadowmap(this, 2) 
-		clearGlobalCommandBuffer(this)
 
 	newView(this, "shadow3")
 		setPass(this, "SHADOW")         
 		applyCamera(this, camera_slot)
 		setFramebuffer(this, "shadowmap")
 		renderShadowmap(this, 3) 
-		clearGlobalCommandBuffer(this)
 		
 		renderLocalLightsShadowmaps(this, camera_slot, { "point_light_shadowmap", "point_light2_shadowmap" })
 		
@@ -267,7 +256,6 @@ function shadowmap(camera_slot)
 			disableDepthWrite(this)
 			bindFramebufferTexture(this, "shadowmap", 0, shadowmap_uniform)
 			drawQuad(this, -1, -1, 2, 2, blur_material)
-			clearGlobalCommandBuffer(this)
 			enableDepthWrite(this)
 
 		newView(this, "blur_shadowmap_v")
@@ -276,7 +264,6 @@ function shadowmap(camera_slot)
 			disableDepthWrite(this)
 			bindFramebufferTexture(this, "blur", 0, shadowmap_uniform)
 			drawQuad(this, -1, -1, 2, 2, blur_material);
-			clearGlobalCommandBuffer(this)
 			enableDepthWrite(this)
 	end
 end

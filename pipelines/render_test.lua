@@ -85,14 +85,14 @@ end
  
 
 function main()
-	newView(this, "main")
+	main_view = newView(this, "main")
 		setPass(this, "MAIN")
 		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffaaaaff)
 		enableRGBWrite(this)
 		setFramebuffer(this, "default")
 		applyCamera(this, "editor")
 		setActiveGlobalLightUniforms(this)
-		renderModels(this, 1, false)
+		renderModels(this, {main_view})
 		renderDebugShapes(this)
 end
 

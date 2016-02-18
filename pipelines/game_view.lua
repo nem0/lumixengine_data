@@ -118,7 +118,7 @@ function main(this)
 			drawQuad(this, -1, -1, 2, 2, sky_material)
 	end
 
-	newView(this, "main")
+	main_view = newView(this, "main")
 		setPass(this, "MAIN")
 		enableDepthWrite(this)
 		if not parameters.sky_enabled then
@@ -128,7 +128,7 @@ function main(this)
 		setFramebuffer(this, "hdr")
 		applyCamera(this, "main")
 		setActiveGlobalLightUniforms(this)
-		renderModels(this)
+		renderModels(this, {main_view})
 end
 
 

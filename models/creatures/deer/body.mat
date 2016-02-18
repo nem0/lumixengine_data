@@ -1,4 +1,4 @@
-{"shader" : "shaders/skinned.shd",
+{"shader" : "shaders/fur.shd",
 "texture" : {"source" : "deer-body.dds",
 "srgb" : true},
 "texture" : {"source" : "deer-body-normal.dds"},

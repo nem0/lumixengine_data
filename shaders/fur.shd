@@ -1,4 +1,3 @@
-  
 texture_slot("Diffuse", "u_texColor")
 texture_slot("Normal","u_texNormal")
 	texture_define "NORMAL_MAPPING"
@@ -6,14 +5,16 @@ texture_slot("Specular", "u_texSpecular")
 	texture_define = "SPECULAR_TEXTURE"
 
 pass "MAIN"
-	fs { "NORMAL_MAPPING" }
+	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT" }
 	
 pass "SHADOW"
-
+	fs { "ALPHA_CUTOUT" }
+	
 pass "POINT_LIGHT"
-	fs { "NORMAL_MAPPING", "SPECULAR_TEXTURE", "HAS_SHADOWMAP" }
+	fs { "NORMAL_MAPPING", "SPECULAR_TEXTURE", "HAS_SHADOWMAP", "ALPHA_CUTOUT" }
 
 pass "DEFERRED"
-	fs { "NORMAL_MAPPING" }
-	
+	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT" }
 
+pass "FUR"
+	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT" }

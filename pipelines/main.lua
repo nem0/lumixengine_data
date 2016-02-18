@@ -62,7 +62,6 @@ function renderSSAODDebug()
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "SSAO", 0, texture_uniform)
 			drawQuad(this, 0.48, 0.48, 0.5, 0.5, screen_space_material)
-			clearGlobalCommandBuffer(this)
 	end
 end
 
@@ -76,7 +75,6 @@ function renderSSAODPostprocess()
 			setFramebuffer(this, "hdr")
 			bindFramebufferTexture(this, "SSAO", 0, texture_uniform)
 			drawQuad(this, -1.0, -1.0, 2, 2, screen_space_material)
-			clearGlobalCommandBuffer(this)
 	end
 end
 
@@ -90,7 +88,6 @@ function SSAO()
 			setFramebuffer(this, "SSAO")
 			bindFramebufferTexture(this, "hdr", 1, texture_uniform)
 			drawQuad(this, -1, -1, 2, 2, ssao_material)
-			clearGlobalCommandBuffer(this)
 
 		if parameters.SSAO_blur then
 			newView(this, "ssao_blur_h")
@@ -99,7 +96,6 @@ function SSAO()
 				disableDepthWrite(this)
 				bindFramebufferTexture(this, "SSAO", 0, shadowmap_uniform)
 				drawQuad(this, -1, -1, 2, 2, blur_material)
-				clearGlobalCommandBuffer(this)
 				enableDepthWrite(this)
 			
 			newView(this, "ssao_blur_v")
@@ -108,7 +104,6 @@ function SSAO()
 				disableDepthWrite(this)
 				bindFramebufferTexture(this, "blur", 0, shadowmap_uniform)
 				drawQuad(this, -1, -1, 2, 2, blur_material)
-				clearGlobalCommandBuffer(this)
 				enableDepthWrite(this)		
 		end
 	end
@@ -123,10 +118,9 @@ function main()
 			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
 			setActiveGlobalLightUniforms(this, sky_material)
 			drawQuad(this, -1, -1, 2, 2, sky_material)
-			clearGlobalCommandBuffer(this)
 	end
 
-	newView(this, "main")
+	main_view = newView(this, "MAIN")
 		setPass(this, "MAIN")
 		enableDepthWrite(this)
 		if not parameters.sky_enabled then
@@ -136,9 +130,19 @@ function main()
 		setFramebuffer(this, "hdr")
 		applyCamera(this, "editor")
 		setActiveGlobalLightUniforms(this)
-		renderModels(this)
 		renderDebugShapes(this)
-		
+end
+
+
+function fur()
+	fur_view = newView(this, "FUR")
+		setPass(this, "FUR")
+		setFramebuffer(this, "hdr")
+		disableDepthWrite(this)
+		enableBlending(this, "alpha")
+		applyCamera(this, "editor")
+		setActiveGlobalLightUniforms(this)
+		renderModels(this, {main_view, fur_view})
 end
 
 
@@ -158,9 +162,10 @@ function render()
 	main(this)
 	particles("editor")
 	pointLight(this)		
+	fur(this)
 	SSAO(this)
 	renderSSAODPostprocess(this)
-
+	
 	hdr("editor")
 	editor(this)
 	renderSSAODDebug(this)

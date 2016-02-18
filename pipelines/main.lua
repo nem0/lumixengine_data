@@ -141,6 +141,7 @@ function fur()
 		disableDepthWrite(this)
 		enableBlending(this, "alpha")
 		applyCamera(this, "editor")
+		setActiveGlobalLightUniforms(this)
 		renderModels(this, {main_view, fur_view})
 end
 

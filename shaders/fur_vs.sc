@@ -15,7 +15,7 @@ void main()
 		a_weight.w * u_boneMatrices[int(a_indices.w)], u_model[0]);
 
 	#ifdef FUR
-		a_position += a_normal * (u_layer.x * 0.02);
+		a_position += a_normal * (u_layer.x * 0.03);
 	#endif
 
     v_wpos = mul(model, vec4(a_position, 1.0)).xyz;

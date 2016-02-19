@@ -1,0 +1,12 @@
+{"shader" : "shaders/leaves.shd",
+"texture" : {"source" : "/models/plants/hedge_long_round/diffuse.dds",
+"srgb" : true},
+"texture" : {"source" : "/models/plants/hedge_long_round/normal.dds"},
+"defines" : ["NORMAL_MAPPING",
+"ALPHA_CUTOUT"],
+"uniforms" : [],
+"shininess" : 4.00000000,
+"alpha_ref" : 0.30000000,
+"color" : [1.00000000,
+1.00000000,
+1.00000000]}

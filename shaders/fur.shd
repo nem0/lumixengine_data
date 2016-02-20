@@ -18,3 +18,8 @@ pass "DEFERRED"
 
 pass "FUR"
 	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT" }
+
+uniform("u_alphaMultiplier", "float")
+uniform("u_furLength", "float")
+uniform("u_gravity", "float")
+uniform("u_darkening", "float")

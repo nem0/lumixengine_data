@@ -25,14 +25,13 @@ uniform vec4 u_attenuationParams;
 uniform vec4 u_fogParams;
 uniform mat4 u_camView;
 uniform vec4 u_layer;
+uniform vec4 u_alphaMultiplier;
+uniform vec4 u_darkening;
 
 
 void main()
 {     
 	vec4 color = texture2D(u_texColor, v_texcoord0);
-	#ifdef ALPHA_CUTOUT
-		if(color.a < u_alphaRef) discard;
-	#endif
 	color.xyz *= u_materialColorShininess.rgb;
 	#ifdef DEFERRED
 		gl_FragData[0] = color;
@@ -113,7 +112,7 @@ void main()
 					, texture_specular);
 				diffuse = diffuse.xyz * color.rgb;
 				float ndotl = -dot(wnormal, u_lightDirFov.xyz);
-				diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 
+				//diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 
 			#endif
 
 			#if defined MAIN || defined FUR
@@ -130,10 +129,15 @@ void main()
 				gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
 			#endif
 			#ifdef FUR
-				gl_FragColor.rgb *= lerp(0.4, 1, u_layer.x);
-				gl_FragColor.w = color.r * (1.0 - u_layer.x);
+				gl_FragColor.rgb *= lerp(u_darkening.x, 1, u_layer.x);
+				float alpha = color.a * u_alphaMultiplier.x - u_layer.x;
+				#ifdef ALPHA_CUTOUT
+					if(alpha < u_alphaRef) discard;
+				#endif
+
+				gl_FragColor.a = alpha;
 			#else
-				gl_FragColor.w = 1.0;
+				gl_FragColor.a = 1.0;
 			#endif
 		#endif       
 	#endif		

@@ -5,9 +5,13 @@ $output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_common2
 
 uniform mat4 u_boneMatrices[128];
 uniform vec4 u_layer;
+uniform vec4 u_furLength;
+uniform vec4 u_gravity;
 
 void main()
 {
+	vec4 normal = a_normal * 2.0 - 1.0;
+	vec4 tangent = a_tangent * 2.0 - 1.0;
 	mat4 model = 
 		mul(a_weight.x * u_boneMatrices[int(a_indices.x)] + 
 		a_weight.y * u_boneMatrices[int(a_indices.y)] +
@@ -15,14 +19,11 @@ void main()
 		a_weight.w * u_boneMatrices[int(a_indices.w)], u_model[0]);
 
 	#ifdef FUR
-		a_position += a_normal * (u_layer.x * 0.03);
+		a_position += (vec3(0, u_gravity.x * u_layer.x, 0) + normal.xyz) * u_layer.x * u_furLength.x * 0.001;
 	#endif
 
     v_wpos = mul(model, vec4(a_position, 1.0)).xyz;
 	#ifndef SHADOW
-		vec4 normal = a_normal * 2.0 - 1.0;
-		vec4 tangent = a_tangent * 2.0 - 1.0;
-
 		v_normal = mul(model, vec4(normal.xyz, 0.0) ).xyz;
 		v_tangent = mul(model, vec4(tangent.xyz, 0.0) ).xyz;
 		v_bitangent = cross(v_normal, v_tangent);

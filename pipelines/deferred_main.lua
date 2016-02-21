@@ -117,6 +117,7 @@ function debugDeferred()
 	local x = 0.5
 	if parameters.debug_gbuffer0 then
 		newView(this, "debug_gbuffer0")
+			disableDepthWrite(this)
 			setPass(this, "SCREEN_SPACE")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 0, texture_uniform)
@@ -125,6 +126,7 @@ function debugDeferred()
 	end
 	if parameters.debug_gbuffer1 then
 		newView(this, "debug_gbuffer1")
+			disableDepthWrite(this)
 			setPass(this, "SCREEN_SPACE")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 1, texture_uniform)
@@ -133,6 +135,7 @@ function debugDeferred()
 	end
 	if parameters.debug_gbuffer2 then
 		newView(this, "debug_gbuffer2")
+			disableDepthWrite(this)
 			setPass(this, "SCREEN_SPACE")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 2, texture_uniform)
@@ -141,6 +144,7 @@ function debugDeferred()
 	end
 	if parameters.debug_gbuffer_depth then
 		newView(this, "debug_gbuffer_depth")
+			disableDepthWrite(this)
 			setPass(this, "SCREEN_SPACE")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "g_buffer", 3, texture_uniform)

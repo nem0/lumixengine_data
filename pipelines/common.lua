@@ -43,6 +43,7 @@ function editor()
 
 		newView(this, "gizmo")
 			setPass(this, "EDITOR")
+			disableDepthWrite(this)
 			setFramebuffer(this, "default")
 			applyCamera(this, "editor")
 			renderGizmos(this)

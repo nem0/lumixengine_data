@@ -18,9 +18,6 @@ void main()
 		a_weight.z * u_boneMatrices[int(a_indices.z)] +
 		a_weight.w * u_boneMatrices[int(a_indices.w)], u_model[0]);
 
-	#ifdef FUR
-		a_position += (vec3(0, u_gravity.x * u_layer.x, 0) + normal.xyz) * u_layer.x * u_furLength.x * 0.001;
-	#endif
 
     v_wpos = mul(model, vec4(a_position, 1.0)).xyz;
 	#ifndef SHADOW
@@ -28,6 +25,9 @@ void main()
 		v_tangent = mul(model, vec4(tangent.xyz, 0.0) ).xyz;
 		v_bitangent = cross(v_normal, v_tangent);
 		v_view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - v_wpos;
+		#ifdef FUR
+			v_wpos += (vec3(0, u_gravity.x * u_layer.x, 0) + v_normal.xyz) * u_layer.x * u_furLength.x * 0.001;
+		#endif
 	#endif
 
 	

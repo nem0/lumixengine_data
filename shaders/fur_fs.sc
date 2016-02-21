@@ -137,6 +137,7 @@ void main()
 
 				gl_FragColor.a = alpha;
 			#else
+				gl_FragColor.rgb *= u_darkening.x;
 				gl_FragColor.a = 1.0;
 			#endif
 		#endif       

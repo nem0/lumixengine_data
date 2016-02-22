@@ -50,6 +50,8 @@ sky_material = loadMaterial(this, "shaders/sky.mat")
 
 function initScene()
 	hdr_exposure_param = addRenderParamFloat(this, "HDR exposure", 1.0)
+	dof_focal_distance_param = addRenderParamFloat(this, "DOF focal distance", 10.0)
+	dof_focal_range_param = addRenderParamFloat(this, "DOF focal range", 10.0)
 end
 
 function renderSSAODDebug()

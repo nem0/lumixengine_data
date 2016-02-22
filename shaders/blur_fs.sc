@@ -37,6 +37,6 @@ void main()
 		+ texture2D(u_texShadowmap, v_texcoord0 + vec2(0, -4/u_textureSize.y)) * BLUR9_WEIGHT(4);
 #endif
 		
-	gl_FragColor.rgb = vec3_splat(color.r);
+	gl_FragColor.rgb = color.rgb;
 	gl_FragColor.w = 1.0;
 }

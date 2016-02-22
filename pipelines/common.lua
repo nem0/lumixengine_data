@@ -3,6 +3,7 @@ parameters = {
 	render_gizmos = true,
 	blur_shadowmap = true,
 	render_shadowmap_debug = false,
+	dof = true
 }
 
 local current_lum1 = "lum1a"
@@ -143,18 +144,40 @@ function initHDR()
 	addFramebuffer(this,  "hdr", {
 		width = 1024,
 		height = 1024,
-		screen_size = true;
+		screen_size = true,
 		renderbuffers = {
 			{ format = "rgba16f" },
 			{ format = "depth32" }
 		}
 	})
 
+	addFramebuffer(this,  "dof", {
+		width = 1024,
+		height = 1024,
+		size_ratio = { 0.5, 0.5},
+		renderbuffers = {
+			{ format = "rgba16f" },
+		}
+	})
+
+	addFramebuffer(this,  "dof_blur", {
+		width = 1024,
+		height = 1024,
+		size_ratio = { 0.5, 0.5},
+		renderbuffers = {
+			{ format = "rgba8" },
+		}
+	})
+	
 	avg_luminance_uniform = createUniform(this, "u_avgLuminance")
 	lum_material = loadMaterial(this, "shaders/hdrlum.mat")
 	hdr_material = loadMaterial(this, "shaders/hdr.mat")
 	hdr_buffer_uniform = createUniform(this, "u_hdrBuffer")
+	dof_buffer_uniform = createUniform(this, "u_dofBuffer")
+	depth_buffer_uniform = createUniform(this, "u_depthBuffer")
 	hdr_exposure_uniform = createVec4ArrayUniform(this, "exposure", 1)
+	dof_focal_distance_uniform = createUniform(this, "focal_distance", 1)
+	dof_focal_range_uniform = createUniform(this, "focal_range", 1)
 	lum_size_uniform = createVec4ArrayUniform(this, "u_offset", 16)
 	computeLumUniforms()
 end
@@ -207,20 +230,70 @@ function hdr(camera_slot)
 		bindFramebufferTexture(this, old_lum1, 0, avg_luminance_uniform)
 		drawQuad(this, -1, -1, 2, 2, lum_material)
 
-	newView(this, "hdr")
-		setPass(this, "HDR")
-		setFramebuffer(this, "default")
-		disableBlending(this)
-		applyCamera(this, camera_slot)
-		disableDepthWrite(this)
-		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
-		bindFramebufferTexture(this, "hdr", 0, hdr_buffer_uniform)
-		bindFramebufferTexture(this, current_lum1, 0, avg_luminance_uniform)
+	if parameters.dof then
+		newView(this, "dof")
+			disableDepthWrite(this)
+			setPass(this, "SCREEN_SPACE")
+			setFramebuffer(this, "dof")
+			bindFramebufferTexture(this, "hdr", 0, texture_uniform)
+			drawQuad(this, -1, 1.0, 2, -2, screen_space_material)
 
-		local hdr_exposure = {getRenderParamFloat(this, hdr_exposure_param), 0, 0, 0}
- 		setUniform(this, hdr_exposure_uniform, {hdr_exposure})
-		
-		drawQuad(this, -1, 1, 2, -2, hdr_material)
+
+		newView(this, "blur_dof_h")
+			setPass(this, "BLUR_H")
+			setFramebuffer(this, "dof_blur")
+			disableDepthWrite(this)
+			bindFramebufferTexture(this, "dof", 0, shadowmap_uniform)
+			drawQuad(this, -1, -1, 2, 2, blur_material)
+			enableDepthWrite(this)
+
+		newView(this, "blur_dof_v")
+			setPass(this, "BLUR_V")
+			setFramebuffer(this, "dof")
+			disableDepthWrite(this)
+			bindFramebufferTexture(this, "dof_blur", 0, shadowmap_uniform)
+			drawQuad(this, -1, -1, 2, 2, blur_material);
+			enableDepthWrite(this)
+
+		newView(this, "hdr_dof")
+			setPass(this, "HDR_DOF")
+			setFramebuffer(this, "default")
+			disableBlending(this)
+			applyCamera(this, camera_slot)
+			disableDepthWrite(this)
+			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
+
+			bindFramebufferTexture(this, "hdr", 0, hdr_buffer_uniform)
+			bindFramebufferTexture(this, current_lum1, 0, avg_luminance_uniform)
+			bindFramebufferTexture(this, "dof", 0, dof_buffer_uniform)
+			bindFramebufferTexture(this, "hdr", 1, depth_buffer_uniform)
+
+			local hdr_exposure = {getRenderParamFloat(this, hdr_exposure_param), 0, 0, 0}
+			setUniform(this, hdr_exposure_uniform, {hdr_exposure})
+			local dof_focal_distance = {getRenderParamFloat(this, dof_focal_distance_param), 0, 0, 0}
+			setUniform(this, dof_focal_distance_uniform, {dof_focal_distance})
+			local dof_focal_range = {getRenderParamFloat(this, dof_focal_range_param), 0, 0, 0}
+			setUniform(this, dof_focal_range_uniform, {dof_focal_range})
+			
+			drawQuad(this, -1, 1, 2, -2, hdr_material)
+	end
+			
+	if not parameters.dof then
+		newView(this, "hdr")
+			setPass(this, "HDR")
+			setFramebuffer(this, "default")
+			disableBlending(this)
+			applyCamera(this, camera_slot)
+			disableDepthWrite(this)
+			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
+			bindFramebufferTexture(this, "hdr", 0, hdr_buffer_uniform)
+			bindFramebufferTexture(this, current_lum1, 0, avg_luminance_uniform)
+
+			local hdr_exposure = {getRenderParamFloat(this, hdr_exposure_param), 0, 0, 0}
+			setUniform(this, hdr_exposure_uniform, {hdr_exposure})
+			
+			drawQuad(this, -1, 1, 2, -2, hdr_material)
+	end
 end
 
 function shadowmap(camera_slot)

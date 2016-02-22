@@ -1,5 +1,7 @@
 pass "HDR"
 
+pass "HDR_DOF"
+
 backface_culling(false)
 depth_test(false)
 

@@ -62,6 +62,14 @@ function shadowmapDebug()
 end
 
 function initShadowmap()
+	addFramebuffer(this, "shadowmap_blur", {
+		width = 2048,
+		height = 2048,
+		renderbuffers = {
+			{ format = "r32f" }
+		}
+	})
+
 	addFramebuffer(this, "shadowmap", {
 		width = 2048,
 		height = 2048,
@@ -326,7 +334,7 @@ function shadowmap(camera_slot)
 	if parameters.blur_shadowmap then
 		newView(this, "blur_shadowmap_h")
 			setPass(this, "BLUR_H")
-			setFramebuffer(this, "blur")
+			setFramebuffer(this, "shadowmap_blur")
 			disableDepthWrite(this)
 			bindFramebufferTexture(this, "shadowmap", 0, shadowmap_uniform)
 			drawQuad(this, -1, -1, 2, 2, blur_material)
@@ -336,7 +344,7 @@ function shadowmap(camera_slot)
 			setPass(this, "BLUR_V")
 			setFramebuffer(this, "shadowmap")
 			disableDepthWrite(this)
-			bindFramebufferTexture(this, "blur", 0, shadowmap_uniform)
+			bindFramebufferTexture(this, "shadowmap_blur", 0, shadowmap_uniform)
 			drawQuad(this, -1, -1, 2, 2, blur_material);
 			enableDepthWrite(this)
 	end

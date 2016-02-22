@@ -20,14 +20,6 @@ addFramebuffer(this, "g_buffer", {
 	}
 })
 
-addFramebuffer(this,  "blur", {
-	width = 2048,
-	height = 2048,
-	renderbuffers = {
-		{ format = "r32f" }
-	}
-})
-
 parameters.hdr = true
 parameters.debug_gbuffer0 = false
 parameters.debug_gbuffer1 = false

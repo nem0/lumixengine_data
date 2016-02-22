@@ -31,13 +31,14 @@ addFramebuffer(this,  "SSAO_blurred", {
 	}
 })
 
-addFramebuffer(this, "blur", {
+addFramebuffer(this, "blur_rgba8", {
 	width = 2048,
 	height = 2048,
 	renderbuffers = {
-		{ format = "r32f" }
+		{ format = "rgba8f" }
 	}
 })
+
   
 initHDR(this)
 initShadowmap(this)
@@ -94,9 +95,9 @@ function SSAO()
 		if parameters.SSAO_blur then
 			newView(this, "ssao_blur_h")
 				setPass(this, "BLUR_H")
-				setFramebuffer(this, "blur")
+				setFramebuffer(this, "blur_rgba8")
 				disableDepthWrite(this)
-				bindFramebufferTexture(this, "SSAO", 0, shadowmap_uniform)
+				bindFramebufferTexture(this, "SSAO", 0, texture_uniform)
 				drawQuad(this, -1, -1, 2, 2, blur_material)
 				enableDepthWrite(this)
 			
@@ -104,7 +105,7 @@ function SSAO()
 				setPass(this, "BLUR_V")
 				setFramebuffer(this, "SSAO")
 				disableDepthWrite(this)
-				bindFramebufferTexture(this, "blur", 0, shadowmap_uniform)
+				bindFramebufferTexture(this, "blur_rgba8", 0, texture_uniform)
 				drawQuad(this, -1, -1, 2, 2, blur_material)
 				enableDepthWrite(this)		
 		end

@@ -35,7 +35,7 @@ addFramebuffer(this, "blur_rgba8", {
 	width = 2048,
 	height = 2048,
 	renderbuffers = {
-		{ format = "rgba8f" }
+		{ format = "rgba8" }
 	}
 })
 

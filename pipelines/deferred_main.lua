@@ -1,4 +1,6 @@
-require "pipelines/common"
+local common = require "pipelines/common"
+
+local ctx = { pipeline = this }
 
 addFramebuffer(this, "default", {
 	width = 1024,
@@ -20,32 +22,32 @@ addFramebuffer(this, "g_buffer", {
 	}
 })
 
-parameters.hdr = true
-parameters.debug_gbuffer0 = false
-parameters.debug_gbuffer1 = false
-parameters.debug_gbuffer2 = false
-parameters.debug_gbuffer_depth = false
-parameters.sky_enabled = true
+pipeline_parameters.hdr = true
+pipeline_parameters.debug_gbuffer0 = false
+pipeline_parameters.debug_gbuffer1 = false
+pipeline_parameters.debug_gbuffer2 = false
+pipeline_parameters.debug_gbuffer_depth = false
+pipeline_parameters.sky_enabled = true
 
 function initScene(this)
-	hdr_exposure_param = addRenderParamFloat(this, "HDR exposure", 1.0)
-	dof_focal_distance_param = addRenderParamFloat(this, "DOF focal distance", 10.0)
-	dof_focal_range_param = addRenderParamFloat(this, "DOF focal range", 10.0)
+	ctx.hdr_exposure_param = addRenderParamFloat(this, "HDR exposure", 1.0)
+	ctx.dof_focal_distance_param = addRenderParamFloat(this, "DOF focal distance", 10.0)
+	ctx.dof_focal_range_param = addRenderParamFloat(this, "DOF focal range", 10.0)
 end
 
 
-texture_uniform = createUniform(this, "u_texture")
-gbuffer0_uniform = createUniform(this, "u_gbuffer0")
-gbuffer1_uniform = createUniform(this, "u_gbuffer1")
-gbuffer2_uniform = createUniform(this, "u_gbuffer2")
-gbuffer_depth_uniform = createUniform(this, "u_gbuffer_depth")
-blur_material = loadMaterial(this, "shaders/blur.mat")
-deferred_material = loadMaterial(this, "shaders/deferred.mat")
-screen_space_material = loadMaterial(this, "shaders/screen_space.mat")
-deferred_point_light_material =loadMaterial(this, "shaders/deferredpointlight.mat")
-sky_material = loadMaterial(this, "shaders/sky.mat")
-initHDR(this)
-initShadowmap(this)
+local texture_uniform = createUniform(this, "u_texture")
+local gbuffer0_uniform = createUniform(this, "u_gbuffer0")
+local gbuffer1_uniform = createUniform(this, "u_gbuffer1")
+local gbuffer2_uniform = createUniform(this, "u_gbuffer2")
+local gbuffer_depth_uniform = createUniform(this, "u_gbuffer_depth")
+local blur_material = loadMaterial(this, "shaders/blur.mat")
+local deferred_material = loadMaterial(this, "shaders/deferred.mat")
+local screen_space_material = loadMaterial(this, "shaders/screen_space.mat")
+local deferred_point_light_material =loadMaterial(this, "shaders/deferredpointlight.mat")
+local sky_material = loadMaterial(this, "shaders/sky.mat")
+common.initHDR(ctx)
+common.initShadowmap(ctx)
 
 
 function deferred()
@@ -77,7 +79,7 @@ function deferred()
 		bindFramebufferTexture(this, "g_buffer", 1, gbuffer1_uniform)
 		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform)
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
-		bindFramebufferTexture(this, "shadowmap", 0, shadowmap_uniform)
+		bindFramebufferTexture(this, "shadowmap", 0, ctx.shadowmap_uniform)
 		drawQuad(this, -1, 1, 2, -2, deferred_material)
 	
 	newView(this, "deferred_local_light")
@@ -89,7 +91,7 @@ function deferred()
 		renderLightVolumes(this, deferred_point_light_material)
 		disableBlending(this)
 		
-	if parameters.sky_enabled then
+	if pipeline_parameters.sky_enabled then
 		newView(this, "sky")
 			setPass(this, "SKY")
 			setStencil(this, STENCIL_OP_PASS_Z_KEEP 
@@ -109,7 +111,7 @@ end
 
 function debugDeferred()
 	local x = 0.5
-	if parameters.debug_gbuffer0 then
+	if pipeline_parameters.debug_gbuffer0 then
 		newView(this, "debug_gbuffer0")
 			disableDepthWrite(this)
 			setPass(this, "SCREEN_SPACE")
@@ -118,7 +120,7 @@ function debugDeferred()
 			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
 			x = x - 0.51
 	end
-	if parameters.debug_gbuffer1 then
+	if pipeline_parameters.debug_gbuffer1 then
 		newView(this, "debug_gbuffer1")
 			disableDepthWrite(this)
 			setPass(this, "SCREEN_SPACE")
@@ -127,7 +129,7 @@ function debugDeferred()
 			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
 			x = x - 0.51
 	end
-	if parameters.debug_gbuffer2 then
+	if pipeline_parameters.debug_gbuffer2 then
 		newView(this, "debug_gbuffer2")
 			disableDepthWrite(this)
 			setPass(this, "SCREEN_SPACE")
@@ -136,7 +138,7 @@ function debugDeferred()
 			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
 			x = x - 0.51
 	end
-	if parameters.debug_gbuffer_depth then
+	if pipeline_parameters.debug_gbuffer_depth then
 		newView(this, "debug_gbuffer_depth")
 			disableDepthWrite(this)
 			setPass(this, "SCREEN_SPACE")
@@ -157,14 +159,13 @@ end
 
 
 function render()
-	shadowmap("editor")
+	common.shadowmap(ctx, "editor")
 	deferred(this)
-	particles("editor")
+	common.particles(ctx, "editor")
 	debugShapes()
-	hdr("editor")
-	
+	common.hdr(ctx, "editor")
 
-	editor(this)
+	common.editor(ctx)
 	debugDeferred(this)
-	shadowmapDebug(this)
+	common.shadowmapDebug(ctx, this)
 end

@@ -2,8 +2,6 @@
 -- LUMIX PROPERTY PLAYER_SPEED float
 -- LUMIX PROPERTY MOUSE_SENSITIVITY float
 
-cmp = Engine.createComponent(g_scene_physics, "physical_controller", this)
-
 local LSHIFT_KEY = 160
 
 local LEFT_ACTION = 0
@@ -22,18 +20,22 @@ local CONTROLLER_MOVE_Y = 10
 local yaw = 0
 local pitch = 0
 
-Engine.addInputAction(g_engine, LEFT_ACTION, 0, string.byte("A"), -1)
-Engine.addInputAction(g_engine, RIGHT_ACTION, 0, string.byte("D"), -1)
-Engine.addInputAction(g_engine, FORWARD_ACTION, 0, string.byte("W"), -1)
-Engine.addInputAction(g_engine, BACK_ACTION, 0, string.byte("S"), -1)
-Engine.addInputAction(g_engine, ROT_H_ACTION, 2, 0, -1)
-Engine.addInputAction(g_engine, ROT_V_ACTION, 3, 0, -1)
-Engine.addInputAction(g_engine, SPRINT_ACTION, 0, LSHIFT_KEY, -1)
+function init()
+	cmp = Engine.createComponent(g_scene_physics, "physical_controller", this)
 
-Engine.addInputAction(g_engine, CONTROLLER_ROT_X, 6, 0, 0)
-Engine.addInputAction(g_engine, CONTROLLER_ROT_Y, 7, 0, 0)
-Engine.addInputAction(g_engine, CONTROLLER_MOVE_X, 4, 0, 0)
-Engine.addInputAction(g_engine, CONTROLLER_MOVE_Y, 5, 0, 0)
+	Engine.addInputAction(g_engine, LEFT_ACTION, 0, string.byte("A"), -1)
+	Engine.addInputAction(g_engine, RIGHT_ACTION, 0, string.byte("D"), -1)
+	Engine.addInputAction(g_engine, FORWARD_ACTION, 0, string.byte("W"), -1)
+	Engine.addInputAction(g_engine, BACK_ACTION, 0, string.byte("S"), -1)
+	Engine.addInputAction(g_engine, ROT_H_ACTION, 2, 0, -1)
+	Engine.addInputAction(g_engine, ROT_V_ACTION, 3, 0, -1)
+	Engine.addInputAction(g_engine, SPRINT_ACTION, 0, LSHIFT_KEY, -1)
+
+	Engine.addInputAction(g_engine, CONTROLLER_ROT_X, 6, 0, 0)
+	Engine.addInputAction(g_engine, CONTROLLER_ROT_Y, 7, 0, 0)
+	Engine.addInputAction(g_engine, CONTROLLER_MOVE_X, 4, 0, 0)
+	Engine.addInputAction(g_engine, CONTROLLER_MOVE_Y, 5, 0, 0)
+end
 
 function update(dt)
 	yaw = yaw + Engine.getInputActionValue(g_engine, ROT_H_ACTION) * -0.01 * MOUSE_SENSITIVITY;

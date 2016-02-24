@@ -43,10 +43,17 @@ void main()
 		float depth = texture2D(u_depthBuffer, v_texcoord0).x;
 		vec4 linear_depth_v = mul(u_camInvProj, vec4(0, 0, depth, 1));
 		linear_depth_v /= linear_depth_v.w;
-		gl_FragColor = vec4(-linear_depth_v.xyz, 1);
+
+		#if 0
+			float depth2 = texture2D(u_depthBuffer, vec2(0.5, 0.5)).x;
+			vec4 linear_depth2_v = mul(u_camInvProj, vec4(0, 0, depth2, 1));
+			linear_depth2_v /= linear_depth2_v.w;
+			float t = clamp(abs(-linear_depth_v.z - -linear_depth2_v.z) / focal_range.x, 0, 1);
+		#else 
+			float t = clamp(abs(-linear_depth_v.z - focal_distance.x) / focal_range.x, 0, 1);
+		#endif
 		
 		vec3 dof_color = texture2D(u_dofBuffer, v_texcoord0).xyz;
-		float t = clamp(abs(-linear_depth_v.z - focal_distance.x) / focal_range.x, 0, 1);
 		if (-linear_depth_v.z > 10000) t = 0;
 		hdr_color = lerp(hdr_color, dof_color, t);
 	#endif		

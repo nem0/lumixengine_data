@@ -1,9 +1,11 @@
-require "pipelines/common"
+local common = require "pipelines/common"
 
-parameters.SSAO = false
-parameters.SSAO_debug = false
-parameters.SSAO_blur = false
-parameters.sky_enabled = true
+local ctx = { pipeline = this }
+
+pipeline_parameters.SSAO = false
+pipeline_parameters.SSAO_debug = false
+pipeline_parameters.SSAO_blur = false
+pipeline_parameters.sky_enabled = true
 
 addFramebuffer(this, "default", {
 	width = 1024,
@@ -40,23 +42,23 @@ addFramebuffer(this, "blur_rgba8", {
 })
 
   
-initHDR(this)
-initShadowmap(this)
+common.initHDR(ctx)
+common.initShadowmap(ctx)
 
-texture_uniform = createUniform(this, "u_texture")
-blur_material = loadMaterial(this, "shaders/blur.mat")
-screen_space_material = loadMaterial(this, "shaders/screen_space.mat")
-ssao_material = loadMaterial(this, "shaders/ssao.mat")
-sky_material = loadMaterial(this, "shaders/sky.mat")
+local texture_uniform = createUniform(this, "u_texture")
+local blur_material = loadMaterial(this, "shaders/blur.mat")
+local screen_space_material = loadMaterial(this, "shaders/screen_space.mat")
+local ssao_material = loadMaterial(this, "shaders/ssao.mat")
+local sky_material = loadMaterial(this, "shaders/sky.mat")
 
 function initScene()
-	hdr_exposure_param = addRenderParamFloat(this, "HDR exposure", 1.0)
-	dof_focal_distance_param = addRenderParamFloat(this, "DOF focal distance", 10.0)
-	dof_focal_range_param = addRenderParamFloat(this, "DOF focal range", 10.0)
+	ctx.hdr_exposure_param = addRenderParamFloat(this, "HDR exposure", 1.0)
+	ctx.dof_focal_distance_param = addRenderParamFloat(this, "DOF focal distance", 10.0)
+	ctx.dof_focal_range_param = addRenderParamFloat(this, "DOF focal range", 10.0)
 end
 
 function renderSSAODDebug()
-	if parameters.SSAO_debug then
+	if pipeline_parameters.SSAO_debug then
 		newView(this, "ssao_debug")
 			setPass(this, "SCREEN_SPACE")
 			newView(this, "SHADOWMAP_DEBUG")
@@ -70,7 +72,7 @@ end
 
 
 function renderSSAODPostprocess()
-	if parameters.SSAO then
+	if pipeline_parameters.SSAO then
 		newView(this, "ssao_postprocess")
 			setPass(this, "SCREEN_SPACE")
 			enableBlending(this, "multiply")
@@ -83,7 +85,7 @@ end
 
 
 function SSAO()
-	if parameters.SSAO then
+	if pipeline_parameters.SSAO then
 		newView(this, "ssao")
 			setPass(this, "SSAO")
 			disableBlending(this)
@@ -92,7 +94,7 @@ function SSAO()
 			bindFramebufferTexture(this, "hdr", 1, texture_uniform)
 			drawQuad(this, -1, -1, 2, 2, ssao_material)
 
-		if parameters.SSAO_blur then
+		if pipeline_parameters.SSAO_blur then
 			newView(this, "ssao_blur_h")
 				setPass(this, "BLUR_H")
 				setFramebuffer(this, "blur_rgba8")
@@ -113,7 +115,7 @@ function SSAO()
 end
 
 function main()
-	if parameters.sky_enabled then
+	if pipeline_parameters.sky_enabled then
 		newView(this, "sky")
 			setPass(this, "SKY")
 			setFramebuffer(this, "hdr")
@@ -126,7 +128,7 @@ function main()
 	main_view = newView(this, "MAIN")
 		setPass(this, "MAIN")
 		enableDepthWrite(this)
-		if not parameters.sky_enabled then
+		if not pipeline_parameters.sky_enabled then
 			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
 		end
 		enableRGBWrite(this)
@@ -161,17 +163,17 @@ end
 
 
 function render()
-	shadowmap("editor")
+	common.shadowmap(ctx, "editor")
 	main(this)
-	particles("editor")
+	common.particles(ctx, "editor")
 	pointLight(this)		
 	fur(this)
 	SSAO(this)
 	renderSSAODPostprocess(this)
 	
-	hdr("editor")
-	editor(this)
+	common.hdr(ctx, "editor")
+	common.editor(ctx)
 	renderSSAODDebug(this)
-	shadowmapDebug(this)
+	common.shadowmapDebug(ctx)
 end
 

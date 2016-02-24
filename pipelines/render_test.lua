@@ -1,4 +1,5 @@
-require "pipelines/common"
+local common = require "pipelines/common"
+local ctx = { pipeline = this }
 
 addFramebuffer(this, "SSAO", {
 	width = 1024,
@@ -27,21 +28,22 @@ addFramebuffer(this, "blur", {
 	}
 })
 
-parameters.render_gizmos = true
-parameters.SSAO = false
-parameters.SSAO_debug = false
-parameters.SSAO_blur = false
+pipeline_parameters.render_gizmos = true
+pipeline_parameters.SSAO = false
+pipeline_parameters.SSAO_debug = false
+pipeline_parameters.SSAO_blur = false
  
 shadowmap_uniform = createUniform(this, "u_texShadowmap")
 texture_uniform = createUniform(this, "u_texture")
 blur_material = loadMaterial(this, "shaders/blur.mat")
 screen_space_material = loadMaterial(this, "shaders/screen_space.mat")
 ssao_material = loadMaterial(this, "shaders/ssao.mat")
-initShadowmap()
+common.initShadowmap(ctx)
+common.initHDR(ctx)
 
 
 function renderSSAODPostprocess()
-	if parameters.SSAO then
+	if pipeline_parameters.SSAO then
 		newView(this, "ssao_postprocess")
 			setPass(this, "SCREEN_SPACE")
 			enableBlending(this, "multiply")
@@ -54,7 +56,7 @@ end
 
 
 function SSAO()
-	if parameters.SSAO then
+	if pipeline_parameters.SSAO then
 		newView(this, "ssao")
 			setPass(this, "SSAO")
 			disableBlending(this)
@@ -63,7 +65,7 @@ function SSAO()
 			bindFramebufferTexture(this, "default", 1, texture_uniform)
 			drawQuad(this, -1, -1, 2, 2, ssao_material);		
 
-		if parameters.SSAO_blur then
+		if pipeline_parameters.SSAO_blur then
 			newView(this, "ssao_blur_h")
 				setPass(this, "BLUR_H")
 				setFramebuffer(this, "blur")
@@ -108,9 +110,9 @@ end
 
  
 function render()
-	shadowmap("editor")
+	common.shadowmap(ctx, "editor")
 	main(this)
-	particles("editor")
+	common.particles(ctx, "editor")
 	pointLight(this)		
 	SSAO(this)
 	renderSSAODPostprocess(this)

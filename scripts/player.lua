@@ -1,6 +1,8 @@
--- LUMIX PROPERTY CAMERA_ENTITY entity
--- LUMIX PROPERTY PLAYER_SPEED float
--- LUMIX PROPERTY MOUSE_SENSITIVITY float
+camera_entity = -1
+PLAYER_SPEED = 1
+MOUSE_SENSITIVITY = 1
+
+Editor.setPropertyType("camera_entity", Editor.ENTITY_PROPERTY)
 
 local LSHIFT_KEY = 160
 
@@ -55,7 +57,7 @@ function update(dt)
 		speed = speed * 3
 	end
 	
-	Engine.setEntityLocalRotation(g_scene_hierarchy, CAMERA_ENTITY, {1, 0, 0}, pitch)
+	Engine.setEntityLocalRotation(g_scene_hierarchy, camera_entity, {1, 0, 0}, pitch)
 	
 	Engine.setEntityRotation(g_universe, this, {0, 1, 0}, yaw);
 

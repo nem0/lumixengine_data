@@ -1,12 +1,12 @@
-local common = require "pipelines/common"
-
-local ctx = { pipeline = this }
+common = require "pipelines/common"
+ctx = { pipeline = this, main_pipeline = "default" }
 
 addFramebuffer(this, "default", {
 	width = 1024,
 	height = 1024,
 	renderbuffers = {
 		{ format = "rgba8" },
+		{ format = "depth32" }
 	}
 })
 
@@ -22,19 +22,11 @@ addFramebuffer(this, "g_buffer", {
 	}
 })
 
-pipeline_parameters.hdr = true
-pipeline_parameters.debug_gbuffer0 = false
-pipeline_parameters.debug_gbuffer1 = false
-pipeline_parameters.debug_gbuffer2 = false
-pipeline_parameters.debug_gbuffer_depth = false
-pipeline_parameters.sky_enabled = true
-
-function initScene(this)
-	ctx.hdr_exposure_param = addRenderParamFloat(this, "HDR exposure", 1.0)
-	ctx.dof_focal_distance_param = addRenderParamFloat(this, "DOF focal distance", 10.0)
-	ctx.dof_focal_range_param = addRenderParamFloat(this, "DOF focal range", 10.0)
-end
-
+debug_gbuffer0 = false
+debug_gbuffer1 = false
+debug_gbuffer2 = false
+debug_gbuffer_depth = false
+sky_enabled = true
 
 local texture_uniform = createUniform(this, "u_texture")
 local gbuffer0_uniform = createUniform(this, "u_gbuffer0")
@@ -46,7 +38,7 @@ local deferred_material = loadMaterial(this, "shaders/deferred.mat")
 local screen_space_material = loadMaterial(this, "shaders/screen_space.mat")
 local deferred_point_light_material =loadMaterial(this, "shaders/deferredpointlight.mat")
 local sky_material = loadMaterial(this, "shaders/sky.mat")
-common.initHDR(ctx)
+common.init(ctx)
 common.initShadowmap(ctx)
 
 
@@ -67,11 +59,11 @@ function deferred()
 		renderModels(this, {deferred_view})
 		
 	newView(this, "copyRenderbuffer");
-		copyRenderbuffer(this, "g_buffer", 3, "hdr", 1)
+		copyRenderbuffer(this, "g_buffer", 3, ctx.main_pipeline, 1)
 		
 	newView(this, "main")
 		setPass(this, "MAIN")
-		setFramebuffer(this, "hdr")
+		setFramebuffer(this, ctx.main_pipeline)
 		applyCamera(this, "editor")
 		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
 		
@@ -84,14 +76,14 @@ function deferred()
 	
 	newView(this, "deferred_local_light")
 		setPass(this, "MAIN")
-		setFramebuffer(this, "hdr")
+		setFramebuffer(this, ctx.main_pipeline)
 		disableDepthWrite(this)
 		enableBlending(this, "add")
 		applyCamera(this, "editor")
 		renderLightVolumes(this, deferred_point_light_material)
 		disableBlending(this)
 		
-	if pipeline_parameters.sky_enabled then
+	if sky_enabled then
 		newView(this, "sky")
 			setPass(this, "SKY")
 			setStencil(this, STENCIL_OP_PASS_Z_KEEP 
@@ -101,7 +93,7 @@ function deferred()
 			setStencilRMask(this, 1)
 			setStencilRef(this, 1)
 
-			setFramebuffer(this, "hdr")
+			setFramebuffer(this, ctx.main_pipeline)
 			setActiveGlobalLightUniforms(this)
 			disableDepthWrite(this)
 			drawQuad(this, -1, -1, 2, 2, sky_material)
@@ -111,7 +103,7 @@ end
 
 function debugDeferred()
 	local x = 0.5
-	if pipeline_parameters.debug_gbuffer0 then
+	if debug_gbuffer0 then
 		newView(this, "debug_gbuffer0")
 			disableDepthWrite(this)
 			setPass(this, "SCREEN_SPACE")
@@ -120,7 +112,7 @@ function debugDeferred()
 			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
 			x = x - 0.51
 	end
-	if pipeline_parameters.debug_gbuffer1 then
+	if debug_gbuffer1 then
 		newView(this, "debug_gbuffer1")
 			disableDepthWrite(this)
 			setPass(this, "SCREEN_SPACE")
@@ -129,7 +121,7 @@ function debugDeferred()
 			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
 			x = x - 0.51
 	end
-	if pipeline_parameters.debug_gbuffer2 then
+	if debug_gbuffer2 then
 		newView(this, "debug_gbuffer2")
 			disableDepthWrite(this)
 			setPass(this, "SCREEN_SPACE")
@@ -138,7 +130,7 @@ function debugDeferred()
 			drawQuad(this, x, 1.0, 0.5, -0.5, screen_space_material)
 			x = x - 0.51
 	end
-	if pipeline_parameters.debug_gbuffer_depth then
+	if debug_gbuffer_depth then
 		newView(this, "debug_gbuffer_depth")
 			disableDepthWrite(this)
 			setPass(this, "SCREEN_SPACE")
@@ -153,7 +145,7 @@ function debugShapes()
 	newView(this, "debug_shapes")
 		setPass(this, "MAIN")
 		applyCamera(this,"editor")
-		setFramebuffer(this, "hdr")
+		setFramebuffer(this, ctx.main_pipeline)
 		renderDebugShapes(this)
 end
 
@@ -163,8 +155,9 @@ function render()
 	deferred(this)
 	common.particles(ctx, "editor")
 	debugShapes()
-	common.hdr(ctx, "editor")
 
+	postprocessCallback(this, "editor")
+	
 	common.editor(ctx)
 	debugDeferred(this)
 	common.shadowmapDebug(ctx, this)

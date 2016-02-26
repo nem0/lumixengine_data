@@ -240,14 +240,17 @@ function onDestroy()
 		removeFramebuffer(pipeline_env.ctx.pipeline, "hdr")
 		removeFramebuffer(pipeline_env.ctx.pipeline, "dof")
 		removeFramebuffer(pipeline_env.ctx.pipeline, "dof_blur")
-		pipeline_env.ctx.main_framebuffer = "default"
+		pipeline_env.ctx.main_framebuffer = original_framebuffer
+		pipeline_env.do_gamma_mapping = true
 	end
 end
 
 function initPostprocess(pipeline, env)
 	pipeline_env = env
 	initHDR(env.ctx)
+	original_framebuffer = env.ctx.main_framebuffer
 	env.ctx.main_framebuffer = "hdr"
+	env.do_gamma_mapping = false
 end
 
 function postprocess(pipeline, env)
@@ -257,7 +260,9 @@ function postprocess(pipeline, env)
 		slot = Renderer.getCameraSlot(g_scene_renderer, camera_cmp)
 		env.ctx.main_framebuffer = "hdr"
 		hdr(env.ctx, slot)
+		env.do_gamma_mapping = false
 	else
-		env.ctx.main_framebuffer = "default"
+		env.ctx.main_framebuffer = original_framebuffer
+		env.do_gamma_mapping = true
 	end
 end

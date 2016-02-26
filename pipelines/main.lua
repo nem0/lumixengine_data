@@ -1,12 +1,23 @@
 common = require "pipelines/common"
-ctx = { pipeline = this, main_framebuffer = "default" }
+ctx = { pipeline = this, main_framebuffer = "forward" }
+do_gamma_mapping = true
 
 local sky_enabled = true
 local deferred_enabled = false
 
+
 addFramebuffer(this, "default", {
 	width = 1024,
 	height = 1024,
+	renderbuffers = {
+		{ format = "rgba8" },
+	}
+})
+
+addFramebuffer(this, "forward", {
+	width = 1024,
+	height = 1024,
+	size_ratio = {1, 1},
 	renderbuffers = {
 		{ format = "rgba8" },
 		{ format = "depth24" }
@@ -38,7 +49,8 @@ local gbuffer1_uniform = createUniform(this, "u_gbuffer1")
 local gbuffer2_uniform = createUniform(this, "u_gbuffer2")
 local gbuffer_depth_uniform = createUniform(this, "u_gbuffer_depth")
 local deferred_material = loadMaterial(this, "shaders/deferred.mat")
-local deferred_point_light_material =loadMaterial(this, "shaders/deferredpointlight.mat")
+local deferred_point_light_material = loadMaterial(this, "shaders/deferredpointlight.mat")
+local gamma_mapping_material = loadMaterial(this, "shaders/gamma_mapping.mat")
 
 
 function deferred(camera_slot)
@@ -159,8 +171,14 @@ function render()
 	end
 	fur(this)
 
-	if not postprocessCallback(this, "editor") then
-		-- todo SRGB
+	postprocessCallback(this, "editor")
+
+	if do_gamma_mapping then
+		newView(this, "SRGB")
+			setPass(this, "GAMMA_MAPPING")
+			setFramebuffer(this, "default")
+			bindFramebufferTexture(this, "forward", 0, texture_uniform)
+			drawQuad(this, -1, 1, 2, -2, gamma_mapping_material)
 	end
 	
 	common.editor(ctx)

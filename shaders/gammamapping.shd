@@ -1,0 +1,5 @@
+pass "GAMMA_MAPPING"
+ 
+backface_culling(false)
+depth_test(false)
+ 

@@ -1,8 +1,12 @@
 {"shader" : "shaders/grass.shd",
 "texture" : {"source" : "/models/plants/grass02/diffus.dds",
 "srgb" : true},
-"uniforms" : [],
+"texture" : {"source" : "/models/plants/bush/noise.dds"},
+"defines" : ["ALPHA_CUTOUT"],
+"uniforms" : [{"name" : "u_time",
+"time" : 0}],
 "shininess" : 4.00000000,
+"alpha_ref" : 0.30000000,
 "color" : [1.00000000,
 1.00000000,
 1.00000000]}

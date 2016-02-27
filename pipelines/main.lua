@@ -32,7 +32,7 @@ addFramebuffer(this, "g_buffer", {
 		{ format = "rgba8" },
 		{ format = "rgba8" },
 		{ format = "rgba8" },
-		{ format = "depth32" }
+		{ format = "depth24" }
 	}
 })
   

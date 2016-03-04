@@ -71,8 +71,8 @@ function init()
 			})
 			
 			if piece.is_white then
-				local r = Engine.getRenderableComponent(g_scene_renderer, piece.entity)
-				Engine.setRenderableMaterial(g_scene_renderer, r, 0, "models/manmade/barell/barrel.mat")
+				local r = Renderer.getRenderableComponent(g_scene_renderer, piece.entity)
+				Renderer.setRenderableMaterial(g_scene_renderer, r, 0, "models/manmade/barell/barrel.mat")
 			end
 		end
 	end

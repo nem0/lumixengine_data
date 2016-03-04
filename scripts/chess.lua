@@ -38,6 +38,13 @@ local black_pieces = {}
 local selected_piece = nil
 local is_black_turn = false
 
+local LEFT_MOUSE_BUTTON = 1
+local X_ACTION = 0
+local Y_ACTION = 1
+local SELECT_ACTION = 2
+local cursor = {}
+
+
 function init()
 	--pieces
 	for side = 1,2 do
@@ -71,7 +78,6 @@ function init()
 	end
 		
 	-- cursor
-	local cursor = {}
 	cursor.pos = {0, 0, 0}
 	cursor.entity = Engine.createEntityEx(g_engine, g_universe,
 	{
@@ -81,10 +87,6 @@ function init()
 		}
 	})
 
-	local LEFT_MOUSE_BUTTON = 1
-	local X_ACTION = 0
-	local Y_ACTION = 1
-	local SELECT_ACTION = 2
 	Engine.addInputAction(g_engine, X_ACTION, 2, 0, -1)
 	Engine.addInputAction(g_engine, Y_ACTION, 3, 0, -1)
 	Engine.addInputAction(g_engine, SELECT_ACTION, 1, LEFT_MOUSE_BUTTON, -1)

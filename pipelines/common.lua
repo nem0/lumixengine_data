@@ -50,7 +50,7 @@ function module.initShadowmap(ctx)
 		height = 2048,
 		renderbuffers = {
 			{format="r32f"},
-			{format = "depth32"}
+			{format = "depth24"}
 		}
 	})
 
@@ -58,7 +58,7 @@ function module.initShadowmap(ctx)
 		width = 1024,
 		height = 1024,
 		renderbuffers = {
-			{format = "depth32"}
+			{format = "depth24"}
 		}
 	})
 
@@ -66,7 +66,7 @@ function module.initShadowmap(ctx)
 		width = 1024,
 		height = 1024,
 		renderbuffers = {
-			{format = "depth32"}
+			{format = "depth24"}
 		}
 	})
 	ctx.shadowmap_uniform = createUniform(ctx.pipeline, "u_texShadowmap")

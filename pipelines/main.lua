@@ -3,7 +3,7 @@ ctx = { pipeline = this, main_framebuffer = "forward" }
 do_gamma_mapping = true
 
 local sky_enabled = true
-local deferred_enabled = true
+local deferred_enabled = false
 
 
 addFramebuffer(this, "default", {

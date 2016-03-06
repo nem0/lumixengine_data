@@ -174,6 +174,7 @@ function hdr(ctx, camera_slot)
 		drawQuad(ctx.pipeline, -1, -1, 2, 2, ctx.lum_material)
 
 	setMaterialDefine(ctx.pipeline, ctx.hdr_material, "FILM_GRAIN", film_grain_enabled)
+	setMaterialDefine(ctx.pipeline, ctx.hdr_material, "DOF", dof_enabled)
 	if dof_enabled then
 		newView(ctx.pipeline, "dof")
 			disableDepthWrite(ctx.pipeline)

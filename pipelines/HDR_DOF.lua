@@ -2,6 +2,9 @@ hdr_exposure = 1
 dof_focal_distance = 0
 dof_focal_range = 10
 dof_enabled = true
+film_grain_enabled = true
+grain_amount = 0.02
+grain_size = 1.6
 enabled = true
 
 local pipeline_env = nil
@@ -110,6 +113,8 @@ function initHDR(ctx)
 	})
 	
 	ctx.avg_luminance_uniform = createUniform(ctx.pipeline, "u_avgLuminance")
+	ctx.grain_amount_uniform = createUniform(ctx.pipeline, "u_grainAmount")
+	ctx.grain_size_uniform = createUniform(ctx.pipeline, "u_grainSize")
 	ctx.lum_material = loadMaterial(ctx.pipeline, "shaders/hdrlum.mat")
 	ctx.hdr_material = loadMaterial(ctx.pipeline, "shaders/hdr.mat")
 	ctx.hdr_buffer_uniform = createUniform(ctx.pipeline, "u_hdrBuffer")
@@ -168,6 +173,7 @@ function hdr(ctx, camera_slot)
 		bindFramebufferTexture(ctx.pipeline, old_lum1, 0, ctx.avg_luminance_uniform)
 		drawQuad(ctx.pipeline, -1, -1, 2, 2, ctx.lum_material)
 
+	setMaterialDefine(ctx.pipeline, ctx.hdr_material, "FILM_GRAIN", film_grain_enabled)
 	if dof_enabled then
 		newView(ctx.pipeline, "dof")
 			disableDepthWrite(ctx.pipeline)
@@ -194,7 +200,7 @@ function hdr(ctx, camera_slot)
 			enableDepthWrite(ctx.pipeline)
 
 		newView(ctx.pipeline, "hdr_dof")
-			setPass(ctx.pipeline, "HDR_DOF")
+			setPass(ctx.pipeline, "POSTPROCESS")
 			setFramebuffer(ctx.pipeline, "default")
 			disableBlending(ctx.pipeline)
 			applyCamera(ctx.pipeline, camera_slot)
@@ -206,15 +212,11 @@ function hdr(ctx, camera_slot)
 			bindFramebufferTexture(ctx.pipeline, "dof", 0, ctx.dof_buffer_uniform)
 			bindFramebufferTexture(ctx.pipeline, "hdr", 1, ctx.depth_buffer_uniform)
 
-			setUniform(ctx.pipeline, ctx.hdr_exposure_uniform, {{hdr_exposure, 0, 0, 0}})
 			setUniform(ctx.pipeline, ctx.dof_focal_distance_uniform, {{dof_focal_distance, 0, 0, 0}})
 			setUniform(ctx.pipeline, ctx.dof_focal_range_uniform, {{dof_focal_range, 0, 0, 0}})
-			
-			drawQuad(ctx.pipeline, -1, 1, 2, -2, ctx.hdr_material)
-
 	else
 		newView(ctx.pipeline, "hdr")
-			setPass(ctx.pipeline, "HDR")
+			setPass(ctx.pipeline, "POSTPROCESS")
 			setFramebuffer(ctx.pipeline, "default")
 			disableBlending(ctx.pipeline)
 			applyCamera(ctx.pipeline, camera_slot)
@@ -222,11 +224,13 @@ function hdr(ctx, camera_slot)
 			clear(ctx.pipeline, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
 			bindFramebufferTexture(ctx.pipeline, "hdr", 0, ctx.hdr_buffer_uniform)
 			bindFramebufferTexture(ctx.pipeline, ctx.current_lum1, 0, ctx.avg_luminance_uniform)
-
-			setUniform(ctx.pipeline, ctx.hdr_exposure_uniform, {{hdr_exposure, 0, 0, 0}})
-			
-			drawQuad(ctx.pipeline, -1, 1, 2, -2, ctx.hdr_material)
 	end
+	if film_grain_enabled then
+		setUniform(ctx.pipeline, ctx.grain_amount_uniform, {{grain_amount, 0, 0, 0}})
+		setUniform(ctx.pipeline, ctx.grain_size_uniform, {{grain_size, 0, 0, 0}})
+	end
+	setUniform(ctx.pipeline, ctx.hdr_exposure_uniform, {{hdr_exposure, 0, 0, 0}})
+	drawQuad(ctx.pipeline, -1, 1, 2, -2, ctx.hdr_material)
 end
 
 function onDestroy()

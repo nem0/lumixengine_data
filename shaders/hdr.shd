@@ -1,8 +1,8 @@
-pass "HDR"
-
-pass "HDR_DOF"
+pass "POSTPROCESS"
+	fs { "DOF", "FILM_GRAIN" }
 
 backface_culling(false)
 depth_test(false)
 
+uniform("u_time", "time")
 uniform("midgray", "float")

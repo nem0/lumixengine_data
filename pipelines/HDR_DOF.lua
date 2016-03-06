@@ -6,6 +6,9 @@ film_grain_enabled = true
 grain_amount = 0.02
 grain_size = 1.6
 enabled = true
+max_dof_blur = 0.5
+dof_clear_range = 0
+dof_near_multiplier = 100
 
 local pipeline_env = nil
 
@@ -122,6 +125,9 @@ function initHDR(ctx)
 	ctx.hdr_exposure_uniform = createVec4ArrayUniform(ctx.pipeline, "exposure", 1)
 	ctx.dof_focal_distance_uniform = createUniform(ctx.pipeline, "focal_distance", 1)
 	ctx.dof_focal_range_uniform = createUniform(ctx.pipeline, "focal_range", 1)
+	ctx.max_dof_blur_uniform = createUniform(ctx.pipeline, "max_dof_blur", 1)
+	ctx.dof_near_multiplier_uniform = createUniform(ctx.pipeline, "dof_near_multiplier", 100)
+	ctx.dof_clear_range_uniform = createUniform(ctx.pipeline, "clear_range", 0)
 	ctx.lum_size_uniform = createVec4ArrayUniform(ctx.pipeline, "u_offset", 16)
 	computeLumUniforms()
 end
@@ -215,6 +221,9 @@ function hdr(ctx, camera_slot)
 
 			setUniform(ctx.pipeline, ctx.dof_focal_distance_uniform, {{dof_focal_distance, 0, 0, 0}})
 			setUniform(ctx.pipeline, ctx.dof_focal_range_uniform, {{dof_focal_range, 0, 0, 0}})
+			setUniform(ctx.pipeline, ctx.max_dof_blur_uniform, {{max_dof_blur, 0, 0, 0}})
+			setUniform(ctx.pipeline, ctx.dof_clear_range_uniform, {{dof_clear_range, 0, 0, 0}})
+			setUniform(ctx.pipeline, ctx.dof_near_multiplier_uniform, {{dof_near_multiplier, 0, 0, 0}})
 	else
 		newView(ctx.pipeline, "hdr")
 			setPass(ctx.pipeline, "POSTPROCESS")

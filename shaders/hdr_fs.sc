@@ -28,6 +28,10 @@ uniform vec4 u_time;
 uniform vec4 u_textureSize;
 uniform vec4 u_grainAmount;
 uniform vec4 u_grainSize;
+uniform vec4 max_dof_blur;
+uniform vec4 clear_range;
+uniform vec4 dof_near_multiplier;
+
 #define timer u_time.x * 0.01
 #define grainamount u_grainAmount.x
 #define grainsize u_grainSize.x
@@ -152,9 +156,12 @@ void main()
 			linear_depth2_v /= linear_depth2_v.w;
 			float t = clamp(abs(-linear_depth_v.z - -linear_depth2_v.z) / focal_range.x, 0, 1);
 		#else 
-			float t = clamp(abs(-linear_depth_v.z - focal_distance.x) / focal_range.x, 0, 1);
+			float depth_dif = abs(-linear_depth_v.z - focal_distance.x);	
+			float near_multiplier = -linear_depth_v.z < focal_distance.x ? dof_near_multiplier.x : 1;
+			float t = clamp((depth_dif - clear_range.x) / focal_range.x * near_multiplier, 0, 1);
 		#endif
 		
+		t = min(t, max_dof_blur.x);
 		vec3 dof_color = texture2D(u_dofBuffer, v_texcoord0).xyz;
 		if (-linear_depth_v.z > 10000) t = 0;
 		hdr_color = lerp(hdr_color, dof_color, t);

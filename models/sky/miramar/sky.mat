@@ -1,0 +1,7 @@
+{"shader" : "shaders/cube_sky.shd",
+"texture" : {"source" : "sky.dds", "srgb" : true},
+"shininess" : 4.00000000,
+"color" : [1.00000000,
+1.00000000,
+1.00000000]
+}

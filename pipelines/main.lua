@@ -4,7 +4,7 @@ do_gamma_mapping = true
 
 local sky_enabled = true
 local deferred_enabled = false
-
+local cube_sky_enabled = true
 
 addFramebuffer(this, "default", {
 	width = 1024,
@@ -44,6 +44,7 @@ local texture_uniform = createUniform(this, "u_texture")
 local blur_material = loadMaterial(this, "shaders/blur.mat")
 local screen_space_material = loadMaterial(this, "shaders/screen_space.mat")
 local sky_material = loadMaterial(this, "shaders/sky.mat")
+local cube_sky_material = loadMaterial(this, "models/sky/miramar/sky.mat")
 local gbuffer0_uniform = createUniform(this, "u_gbuffer0")
 local gbuffer1_uniform = createUniform(this, "u_gbuffer1")
 local gbuffer2_uniform = createUniform(this, "u_gbuffer2")
@@ -119,7 +120,11 @@ function main()
 			disableDepthWrite(this)
 			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
 			setActiveGlobalLightUniforms(this, sky_material)
-			drawQuad(this, -1, -1, 2, 2, sky_material)
+			if cube_sky_enabled then
+				drawQuad(this, -1, -1, 2, 2, cube_sky_material)
+			else
+				drawQuad(this, -1, -1, 2, 2, sky_material)
+			end
 	end
 
 	main_view = newView(this, "MAIN")

@@ -1,0 +1,6 @@
+texture_slot("Diffuse", "u_texColor")
+
+pass "SKY"
+
+backface_culling(false)
+depth_test(false)

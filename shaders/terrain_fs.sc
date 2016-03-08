@@ -205,6 +205,7 @@ void main()
 		float dist = length(v_view);
 		float t = (dist - detail_texture_distance.x) / detail_texture_distance.x;
 		color = mix(color, texture2D(u_texSatellitemap, v_texcoord1), clamp(t, 0, 1));
+		wnormal = mix(wnormal, terrain_normal, clamp(t, 0, 1));
 
 		#ifdef DEFERRED
 				gl_FragData[0] = color;

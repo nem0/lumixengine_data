@@ -1,4 +1,4 @@
-{"shader" : "shaders/cube_sky.shd",
+{"shader" : "shaders/cubesky.shd",
 "texture" : {"source" : "sky.dds", "srgb" : true},
 "shininess" : 4.00000000,
 "color" : [1.00000000,

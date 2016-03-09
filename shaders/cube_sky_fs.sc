@@ -7,6 +7,8 @@ uniform mat4 u_camView;
 uniform mat4 u_camInvView;
 uniform mat4 u_camInvViewProj;
 uniform mat4 u_camInvProj;
+uniform vec4 u_fogParams;
+uniform vec4 u_fogColorDensity; 
 SAMPLERCUBE(u_texColor, 0);
 
 
@@ -22,65 +24,26 @@ vec3 get_world_normal(vec2 frag_coord)
 }
 
 
-vec3 getEyeDir(vec2 uv)
+float getFogFactorSky(vec3 camera_wpos, float fog_density, vec3 eye_dir, vec4 fog_params) 
 {
-	uv = uv * 2 - 1;
-	
-	mat3 m;
-	m[0] = vec3(1, 0, 0);
-	m[1] = vec3(0, 1, 0);
-	m[2] = vec3(0, 0, 1);
-	
-	vec3 v = mul(m, normalize(vec3(-uv.x, -uv.y, 1)));
-	
-	return v; 
-}
+	if(eye_dir.y < 0.2) 
+		return clamp(1-eye_dir.y*5, 0, 1);
+ 
+	float to_top = max(0, (fog_params.x + fog_params.y) - camera_wpos.y);
 
+	float avg_y = (fog_params.x + fog_params.y + camera_wpos.y) * 0.5;
+	float avg_density = fog_density * clamp(1 - (avg_y - fog_params.x) / fog_params.y, 0, 1);
+	float res = exp(-pow(avg_density * to_top / eye_dir.y, 2));
+	res =  1 - clamp(res, 0, 1);
+	return res;
+}
 
 void main()
 {
 	vec3 eye_dir = get_world_normal(v_texcoord0);
-	gl_FragColor = textureCube(u_texColor, eye_dir);
-	
-	//vec4(1, 0, 0, 1);
-	/*vec3 lightdir = -u_lightDirFov.xyz;
-	vec3 eyedir = get_world_normal(v_texcoord0);
-	
-	float alpha = dot(eyedir, lightdir);
-	
-	gl_FragColor = vec4(eyedir, 1);
-	//return ;
-	float rayleigh_factor = phase(alpha, -0.01)*u_brightness.x;
-	float mie_factor = phase(alpha, mie_distribution)*u_brightness.y;
-	float spot = smoothstep(0.0, u_sunSize, phase(alpha, 0.9995))*u_brightness.z;
-	
-	vec3 eye_position = vec3(0.0, surface_height, 0.0);
-	float eye_depth = atmospheric_depth(eye_position, eyedir);
-	float step_length = eye_depth/float(step_count);
-	
-	float eye_extinction = horizon_extinction(
-		eye_position, eyedir, surface_height-0.15
-	);
-	
-	vec3 rayleigh_collected = vec3(0.0, 0.0, 0.0);
-	vec3 mie_collected = vec3(0.0, 0.0, 0.0);
-	
-	for(int i=0; i<step_count; i++)
-	{
-		float sample_distance = step_length*float(i);
-		vec3 position = eye_position + eyedir*sample_distance;
-		float extinction = horizon_extinction(position, lightdir, surface_height-0.35);
-		float sample_depth = atmospheric_depth(position, lightdir);
-		vec3 influx = absorb(sample_depth, vec3_splat(intensity), u_strength.x)*extinction;
-		rayleigh_collected += absorb(sample_distance, u_airColor.rgb*influx, u_strength.y);
-		mie_collected += absorb(sample_distance, influx, u_strength.z);
-	}
-	
-	rayleigh_collected = (rayleigh_collected * eye_extinction * pow(eye_depth, rayleigh_collection_power))/float(step_count);
-	mie_collected = (mie_collected * eye_extinction * pow(eye_depth, mie_collection_power))/float(step_count);
-	
-	vec3 color = vec3(spot*mie_collected + mie_factor*mie_collected +rayleigh_factor*rayleigh_collected);
-	
-	gl_FragColor.xyz = color;
-	gl_FragColor.w = 1;*/
+	vec3 camera_wpos = mul(u_camInvView, vec4(0, 0, 0, 1)).xyz;
+	float fog_factor = getFogFactorSky(camera_wpos, u_fogColorDensity.w, eye_dir, u_fogParams);
+	vec4 sky_color = textureCube(u_texColor, eye_dir);
+	gl_FragColor.xyz = mix(sky_color, u_fogColorDensity.rgb, fog_factor);
+	gl_FragColor.w = 1;
 }

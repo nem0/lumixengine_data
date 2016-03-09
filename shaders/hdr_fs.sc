@@ -38,8 +38,7 @@ uniform vec4 dof_near_multiplier;
 
 static const float permTexUnit = 1.0/256.0;
 static const float permTexUnitHalf = 0.5/256.0;
-
-static const float lumamount = 1.0;
+static const float lumamount = 0.1;
 
 float reinhard2(float x, float whiteSqr)
 {

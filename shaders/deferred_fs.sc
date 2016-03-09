@@ -71,7 +71,8 @@ void main()
 	
 	vec4 wpos = getViewPos(v_texcoord0);
 
-	vec3 view = normalize(mul(u_camInvView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - wpos);
+	vec4 camera_wpos = mul(u_camInvView, vec4(0, 0, 0, 1));
+	vec3 view = normalize(camera_wpos.xyz - wpos);
 	
 	vec4 mat_specular_shininess = vec4(value2.x, value2.x, value2.x, value2.y);
 	
@@ -90,10 +91,7 @@ void main()
 	diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, wpos, ndotl); 
 
 	vec3 ambient = u_ambientColor.rgb * color.rgb;
-
-	vec4 view_pos = mul(u_camView, wpos);
-
-	float fog_factor = getFogFactor(view_pos.z / view_pos.w, u_fogColorDensity.w, wpos.y, u_fogParams);
+	float fog_factor = getFogFactor(camera_wpos.xyz / camera_wpos.w, u_fogColorDensity.w, wpos.xyz, u_fogParams);
 	gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
 	gl_FragColor.w = 1;
 }

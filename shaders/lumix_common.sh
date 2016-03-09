@@ -56,13 +56,20 @@ vec3 shadePointLight(
 }
 
 
-float getFogFactor(float fog_coord, float fog_density, float fragment_height, vec4 fog_params) 
+float getFogFactor(vec3 camera_wpos, float fog_density, vec3 fragment_wpos, vec4 fog_params) 
 { 
-	float fResult = exp(-pow(fog_density * fog_coord, 2.0)); 
-	fResult = 1.0-clamp(fResult, 0.0, 1.0); 
-	fResult = fResult * clamp(((fog_params.x + fog_params.y) - fragment_height) / fog_params.y, 0, 1);
+	vec3 v = fragment_wpos - camera_wpos;
+	float to_top = max(0, camera_wpos.y - (fog_params.x + fog_params.y));
+	camera_wpos += v * to_top / -v.y;
+
+	float frag_to_top = max(0, fragment_wpos.y - (fog_params.x + fog_params.y));
+	fragment_wpos += v * frag_to_top / -v.y;
 	
-	return fResult;
+	float avg_y = (fragment_wpos.y + camera_wpos.y) * 0.5;
+	float avg_density = fog_density * clamp(1 - (avg_y - fog_params.x) / fog_params.y, 0, 1);
+	float res = exp(-pow(avg_density * length(fragment_wpos - camera_wpos), 2));
+	res =  1 - clamp(res, 0, 1);
+	return res;
 }
 
 

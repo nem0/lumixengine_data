@@ -26,15 +26,12 @@ vec3 get_world_normal(vec2 frag_coord)
 
 float getFogFactorSky(vec3 camera_wpos, float fog_density, vec3 eye_dir, vec4 fog_params) 
 {
-	if(eye_dir.y < 0.2) 
-		return clamp(1-eye_dir.y*5, 0, 1);
- 
 	float to_top = max(0, (fog_params.x + fog_params.y) - camera_wpos.y);
 
 	float avg_y = (fog_params.x + fog_params.y + camera_wpos.y) * 0.5;
 	float avg_density = fog_density * clamp(1 - (avg_y - fog_params.x) / fog_params.y, 0, 1);
 	float res = exp(-pow(avg_density * to_top / eye_dir.y, 2));
-	res =  1 - clamp(res, 0, 1);
+	res =  1 - clamp(res - (1-eye_dir.y*5), 0, 1);
 	return res;
 }
 

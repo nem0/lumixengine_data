@@ -122,7 +122,7 @@ void main()
 			#endif  
 
 			vec4 camera_wpos = mul(u_invView, vec4(0, 0, 0, 1.0));
-			float fog_factor = getFogFactor(camera_wpos.xyz / camera_wpos.w, u_fogColorDensity.w, v_wpos.y, u_fogParams);
+			float fog_factor = getFogFactor(camera_wpos.xyz / camera_wpos.w, u_fogColorDensity.w, v_wpos.xyz, u_fogParams);
 			#ifdef POINT_LIGHT
 				gl_FragColor.xyz = (1 - fog_factor) * (diffuse + ambient);
 			#else

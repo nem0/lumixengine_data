@@ -1,8 +1,9 @@
 camera_entity = -1
 PLAYER_SPEED = 1
 MOUSE_SENSITIVITY = 1
-
+dest_entity = -1
 Editor.setPropertyType("camera_entity", Editor.ENTITY_PROPERTY)
+Editor.setPropertyType("dest_entity", Editor.ENTITY_PROPERTY)
 
 local LSHIFT_KEY = 160
 
@@ -84,5 +85,25 @@ function update(dt)
 	if Engine.getInputActionValue(g_engine, BACK_ACTION) > 0 then
 		local v = Engine.multVecQuat({0, 0, speed}, {0, 1, 0}, yaw)
 		Physics.moveController(scene, cmp, v, dt)
+	end
+end
+
+local deb = false
+local deb_paths = false
+function onGUI()
+	if ImGui.Button("navmesh") then
+		Navigation.generateNavmesh(g_scene_navigation)
+	end
+	changed, deb = ImGui.Checkbox("Debug navmesh", deb)
+	if deb then
+		Navigation.debugDrawNavmesh(g_scene_navigation)
+	end
+	changed, deb_paths = ImGui.Checkbox("Debug paths", deb_paths)
+	if deb_paths then
+		Navigation.debugDrawPaths(g_scene_navigation)
+	end
+	if ImGui.Button("Navigate") then
+		local d = Engine.getEntityPosition(g_universe, dest_entity)
+		Navigation.navigate(g_scene_navigation, this, d, 12)
 	end
 end

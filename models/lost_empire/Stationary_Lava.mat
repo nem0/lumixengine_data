@@ -1,6 +1,0 @@
-{
-	"shader" : "shaders/rigid.shd"
-	, "texture" : {
-		"source" : "./lost_empire-RGB.dds", "srgb" : true
-	}
-}

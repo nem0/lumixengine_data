@@ -91,17 +91,6 @@ end
 local deb = false
 local deb_paths = false
 function onGUI()
-	if ImGui.Button("navmesh") then
-		Navigation.generateNavmesh(g_scene_navigation)
-	end
-	changed, deb = ImGui.Checkbox("Debug navmesh", deb)
-	if deb then
-		Navigation.debugDrawNavmesh(g_scene_navigation)
-	end
-	changed, deb_paths = ImGui.Checkbox("Debug paths", deb_paths)
-	if deb_paths then
-		Navigation.debugDrawPaths(g_scene_navigation)
-	end
 	if ImGui.Button("Navigate") then
 		local d = Engine.getEntityPosition(g_universe, dest_entity)
 		Navigation.navigate(g_scene_navigation, this, d, 12)

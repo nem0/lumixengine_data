@@ -1,7 +1,8 @@
 local debug_navmesh = false
 local debug_heightfield = false
 local debug_compact_heightfield = false
-local debug_contours = true;
+local debug_contours = true
+local debug_paths = true
 function onGUI()
     if ImGui.Button("Generate navmesh") then
         Navigation.generateNavmesh(g_scene_navigation)
@@ -24,4 +25,13 @@ function onGUI()
     if debug_contours then
         Navigation.debugDrawContours(g_scene_navigation)
     end
+	if ImGui.Button("Generate tile") then
+		Navigation.generateTile(g_scene_navigation, 1, 0, true)
+	end
+	
+	changed, debug_paths = ImGui.Checkbox("Debug paths", debug_paths)
+	if debug_paths then
+		Navigation.debugDrawPaths(g_scene_navigation)
+	end
+
 end 

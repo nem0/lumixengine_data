@@ -67,9 +67,7 @@ function deferred(camera_slot)
 			| STENCIL_TEST_ALWAYS)
 		setStencilRMask(this, 0xff)
 		setStencilRef(this, 1)
-		
-		renderModels(this, {deferred_view})
-		
+	
 	newView(this, "copyRenderbuffer");
 		copyRenderbuffer(this, "g_buffer", 3, ctx.main_framebuffer, 1)
 		
@@ -108,7 +106,11 @@ function deferred(camera_slot)
 			setFramebuffer(this, ctx.main_framebuffer)
 			setActiveGlobalLightUniforms(this)
 			disableDepthWrite(this)
-			drawQuad(this, -1, -1, 2, 2, sky_material)
+			if cube_sky_enabled then
+				drawQuad(this, -1, -1, 2, 2, cube_sky_material)
+			else
+				drawQuad(this, -1, -1, 2, 2, sky_material)
+			end
 	end
 end
 
@@ -149,7 +151,11 @@ function fur()
 		enableBlending(this, "alpha")
 		applyCamera(this, "editor")
 		setActiveGlobalLightUniforms(this)
-		renderModels(this, {main_view, fur_view})
+		if deferred_enabled then
+			renderModels(this, {deferred_view, fur_view})
+		else
+			renderModels(this, {main_view, fur_view})
+		end
 end
 
 

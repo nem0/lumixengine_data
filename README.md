@@ -6,10 +6,6 @@ Installation
 Download and install x86/x64 version of Visual C++ Redistributable Packages for Visual Studio 2013 from
 http://www.microsoft.com/en-us/download/details.aspx?id=40784
 
-Build Machine
------------
-Latest executables can be downloaded from [Appveyor](https://ci.appveyor.com/project/nem0/lumixengine/build/artifacts)
-
 Source Code
 -----------
 Source code of the engine and the editor is available @ https://github.com/nem0/LumixEngine

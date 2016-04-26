@@ -4,15 +4,18 @@ texture_slot("Normal","u_texNormal")
 texture_slot("Specular", "u_texSpecular")
 	texture_define = "SPECULAR_TEXTURE"
 
-
 pass "MAIN"
-	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT" }
+	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT"}
+	vs { "SKINNED" }
 	
 pass "SHADOW"
 	fs { "ALPHA_CUTOUT" }
+	vs { "SKINNED" }
 	
 pass "POINT_LIGHT"
 	fs { "NORMAL_MAPPING", "SPECULAR_TEXTURE", "HAS_SHADOWMAP", "ALPHA_CUTOUT" }
-
+	vs { "SKINNED" }
+	
 pass "DEFERRED"
 	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT" }
+	vs { "SKINNED" }

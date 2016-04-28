@@ -3,8 +3,8 @@ ctx = { pipeline = this, main_framebuffer = "forward" }
 do_gamma_mapping = true
 
 local sky_enabled = true
-local deferred_enabled = true
 local cube_sky_enabled = true
+local deferred_enabled = true
 
 addFramebuffer(this, "default", {
 	width = 1024,
@@ -77,11 +77,11 @@ function deferred(camera_slot)
 		applyCamera(this, camera_slot)
 		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
 		
+		setActiveGlobalLightUniforms(this)
 		bindFramebufferTexture(this, "g_buffer", 0, gbuffer0_uniform)
 		bindFramebufferTexture(this, "g_buffer", 1, gbuffer1_uniform)
 		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform)
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
-		bindFramebufferTexture(this, "shadowmap", 0, ctx.shadowmap_uniform)
 		drawQuad(this, -1, 1, 2, -2, deferred_material)
 	
 	newView(this, "deferred_local_light")

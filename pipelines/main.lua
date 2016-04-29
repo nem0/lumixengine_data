@@ -83,7 +83,19 @@ function deferred(camera_slot)
 		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform)
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
 		drawQuad(this, -1, 1, 2, -2, deferred_material)
-	
+
+	newView(this, "deferred_debug_shapes")
+		setPass(this, "EDITOR")
+		setFramebuffer(this, ctx.main_framebuffer)
+		applyCamera(this, camera_slot)
+		setStencil(this, STENCIL_OP_PASS_Z_REPLACE 
+			| STENCIL_OP_FAIL_Z_KEEP 
+			| STENCIL_OP_FAIL_S_KEEP 
+			| STENCIL_TEST_ALWAYS)
+		setStencilRMask(this, 0xff)
+		setStencilRef(this, 1)
+		renderDebugShapes(this)
+		
 	newView(this, "deferred_local_light")
 		setPass(this, "MAIN")
 		setFramebuffer(this, ctx.main_framebuffer)

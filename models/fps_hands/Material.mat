@@ -1,0 +1,6 @@
+{
+	"shader" : "shaders/skinned.shd"
+	, "texture" : {
+		"source" : "new_diff.dds", "srgb" : true
+ }
+}

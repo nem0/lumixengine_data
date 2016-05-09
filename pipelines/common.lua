@@ -4,7 +4,7 @@ local module = {}
 particles_enabled = true
 render_gizmos = true
 blur_shadowmap = true
-render_shadowmap_debug = false
+module.render_shadowmap_debug = false
 
 
 function module.editor(ctx)
@@ -26,8 +26,8 @@ function module.editor(ctx)
 	end
 end
 
-function module.shadowmapDebug(pipeline)
-	if render_shadowmap_debug then
+function module.shadowmapDebug(ctx)
+	if module.render_shadowmap_debug then
 		newView(ctx.pipeline, "shadowmap_debug")
 			setPass(ctx.pipeline, "SCREEN_SPACE")
 			setFramebuffer(ctx.pipeline, "default")
@@ -71,7 +71,7 @@ function module.initShadowmap(ctx)
 	})
 	ctx.shadowmap_uniform = createUniform(ctx.pipeline, "u_texShadowmap")
 	blur_shadowmap = true
-	render_shadowmap_debug = false
+	module.render_shadowmap_debug = false
 end
 
 

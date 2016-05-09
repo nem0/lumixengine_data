@@ -5,6 +5,8 @@ do_gamma_mapping = true
 local sky_enabled = true
 local cube_sky_enabled = true
 local deferred_enabled = true
+local render_debug_deferred = { false, false, false, false }
+local render_debug_deferred_fullsize = { false, false, false, false }
 
 addFramebuffer(this, "default", {
 	width = 1024,
@@ -182,6 +184,38 @@ function pointLight()
 end
 
 
+
+function renderDebug(ctx)
+	local offset_x = 0
+	local offset_y = 0
+	for i = 1, 4 do
+		if render_debug_deferred[i] then
+			newView(ctx.pipeline, "deferred_debug_"..tostring(i))
+				setPass(ctx.pipeline, "SCREEN_SPACE")
+				setFramebuffer(ctx.pipeline, "default")
+				bindFramebufferTexture(ctx.pipeline, "g_buffer", i - 1, ctx.texture_uniform)
+				drawQuad(ctx.pipeline, 0.52 - offset_x, 0.98 - offset_y, 0.46, -0.46, ctx.screen_space_material)
+				
+			offset_x = offset_x + 0.5
+			if offset_x > 1.6 then
+				offset_x = 0.0
+				offset_y = offset_y + 0.5
+			end
+		end
+	end
+	common.shadowmapDebug(ctx, offset_x, offset_y)
+	for i = 1, 4 do
+		if render_debug_deferred_fullsize[i] and render_debug_deferred[i] then
+			newView(ctx.pipeline, "deferred_debug_fullsize")
+				setPass(ctx.pipeline, "SCREEN_SPACE")
+				setFramebuffer(ctx.pipeline, "default")
+				bindFramebufferTexture(ctx.pipeline, "g_buffer", i - 1, ctx.texture_uniform)
+				drawQuad(ctx.pipeline, -0.98, 0.98, 1.96, -1.96, ctx.screen_space_material)
+		end
+	end
+end
+
+
 function render()
 	common.shadowmap(ctx, "editor")
 	if deferred_enabled then
@@ -205,6 +239,44 @@ function render()
 	end
 	
 	common.editor(ctx)
-	common.shadowmapDebug(ctx)
+	renderDebug(ctx)
 end
 
+function onGUI()
+	local changed
+	ImGui.SameLine()
+	if ImGui.Button("Debug") then
+		ImGui.OpenPopup("debug_popup")
+	end
+	if ImGui.BeginPopup("debug_popup") then
+		for i = 1, 4 do
+			changed, render_debug_deferred[i] = ImGui.Checkbox("GBuffer " .. tostring(i), render_debug_deferred[i])
+			if render_debug_deferred[i] then
+				ImGui.SameLine()
+				changed, render_debug_deferred_fullsize[i] = ImGui.Checkbox("Fullsize###gbf" .. tostring(i), render_debug_deferred_fullsize[i])
+				
+				if changed and render_debug_deferred_fullsize[i] then
+					for j = 1, 4 do
+						render_debug_deferred_fullsize[j] = false
+					end
+					render_debug_deferred_fullsize[i] = true
+				end
+			end
+		end
+		
+		changed, common.render_shadowmap_debug = ImGui.Checkbox("Shadowmap", common.render_shadowmap_debug)
+		if ImGui.Button("Toggle") then
+			local v = not render_debug_deferred[1]
+			common.render_shadowmap_debug = v 
+			render_debug_deferred[1] = v
+			render_debug_deferred[2] = v
+			render_debug_deferred[3] = v
+			render_debug_deferred[4] = v
+		end
+		changed, deferred_enabled = ImGui.Checkbox("Deferred", deferred_enabled)
+		changed, sky_enabled = ImGui.Checkbox("Sky", sky_enabled)
+		changed, cube_sky_enabled = ImGui.Checkbox("Cubemap sky", cube_sky_enabled)
+		
+		ImGui.EndPopup()
+	end
+end

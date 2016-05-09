@@ -26,13 +26,13 @@ function module.editor(ctx)
 	end
 end
 
-function module.shadowmapDebug(ctx)
+function module.shadowmapDebug(ctx, x, y)
 	if module.render_shadowmap_debug then
 		newView(ctx.pipeline, "shadowmap_debug")
 			setPass(ctx.pipeline, "SCREEN_SPACE")
 			setFramebuffer(ctx.pipeline, "default")
 			bindFramebufferTexture(ctx.pipeline, "shadowmap", 0, ctx.texture_uniform)
-			drawQuad(ctx.pipeline, 0.48, 0.98, 0.5, -0.5, ctx.screen_space_material)
+			drawQuad(ctx.pipeline, 0.52 - x, 0.98 - y, 0.46, -0.46, ctx.screen_space_material)
 	end
 end
 

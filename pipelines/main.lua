@@ -210,7 +210,7 @@ function renderDebug(ctx)
 				setPass(ctx.pipeline, "SCREEN_SPACE")
 				setFramebuffer(ctx.pipeline, "default")
 				bindFramebufferTexture(ctx.pipeline, "g_buffer", i - 1, ctx.texture_uniform)
-				drawQuad(ctx.pipeline, -0.98, 0.98, 1.96, -1.96, ctx.screen_space_material)
+				drawQuad(ctx.pipeline, -1, 1, 2, -2, ctx.screen_space_material)
 		end
 	end
 end
@@ -265,6 +265,10 @@ function onGUI()
 		end
 		
 		changed, common.render_shadowmap_debug = ImGui.Checkbox("Shadowmap", common.render_shadowmap_debug)
+		if common.render_shadowmap_debug then
+			ImGui.SameLine()
+			changed, common.render_shadowmap_debug_fullsize = ImGui.Checkbox("Fullsize###gbfsm", common.render_shadowmap_debug_fullsize)
+		end
 		if ImGui.Button("Toggle") then
 			local v = not render_debug_deferred[1]
 			common.render_shadowmap_debug = v 
@@ -273,6 +277,7 @@ function onGUI()
 			render_debug_deferred[3] = v
 			render_debug_deferred[4] = v
 		end
+		changed, common.blur_shadowmap = ImGui.Checkbox("Blur shadowmap", common.blur_shadowmap)
 		changed, deferred_enabled = ImGui.Checkbox("Deferred", deferred_enabled)
 		changed, sky_enabled = ImGui.Checkbox("Sky", sky_enabled)
 		changed, cube_sky_enabled = ImGui.Checkbox("Cubemap sky", cube_sky_enabled)

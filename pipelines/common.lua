@@ -3,8 +3,9 @@ local module = {}
 
 particles_enabled = true
 render_gizmos = true
-blur_shadowmap = true
+module.blur_shadowmap = true
 module.render_shadowmap_debug = false
+module.render_shadowmap_debug_fullsize = false
 
 
 function module.editor(ctx)
@@ -33,6 +34,13 @@ function module.shadowmapDebug(ctx, x, y)
 			setFramebuffer(ctx.pipeline, "default")
 			bindFramebufferTexture(ctx.pipeline, "shadowmap", 0, ctx.texture_uniform)
 			drawQuad(ctx.pipeline, 0.52 - x, 0.98 - y, 0.46, -0.46, ctx.screen_space_material)
+	end
+	if module.render_shadowmap_debug_fullsize then
+		newView(ctx.pipeline, "shadowmap_debug_fullsize")
+			setPass(ctx.pipeline, "SCREEN_SPACE")
+			setFramebuffer(ctx.pipeline, "default")
+			bindFramebufferTexture(ctx.pipeline, "shadowmap", 0, ctx.texture_uniform)
+			drawQuad(ctx.pipeline, -1, 1, 2, -2, ctx.screen_space_material)
 	end
 end
 
@@ -70,7 +78,7 @@ function module.initShadowmap(ctx)
 		}
 	})
 	ctx.shadowmap_uniform = createUniform(ctx.pipeline, "u_texShadowmap")
-	blur_shadowmap = true
+	module.blur_shadowmap = true
 	module.render_shadowmap_debug = false
 end
 
@@ -110,7 +118,7 @@ function module.shadowmap(ctx, camera_slot)
 		
 		renderLocalLightsShadowmaps(ctx.pipeline, camera_slot, { "point_light_shadowmap", "point_light2_shadowmap" })
 		
-	if blur_shadowmap then
+	if module.blur_shadowmap then
 		newView(ctx.pipeline, "blur_shadowmap_h")
 			setPass(ctx.pipeline, "BLUR_H")
 			setFramebuffer(ctx.pipeline, "shadowmap_blur")

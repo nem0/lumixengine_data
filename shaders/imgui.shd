@@ -1,7 +1,6 @@
 pass "IMGUI"
    
 
-backface_culling(false) 
 depth_test(false)
 alpha_blending "alpha"
   

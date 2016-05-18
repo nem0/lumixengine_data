@@ -1,4 +1,5 @@
 {"shader" : "shaders/hdr.shd",
+"backface_culling" : false,
 "defines" : [],
 "uniforms" : [
 {"name" : "midgray",

@@ -1,4 +1,5 @@
 {"shader" : "shaders/grass.shd",
+"backface_culling" : false,
 "texture" : {"source" : "/models/plants/grass01/diffus.dds",
 "srgb" : true},
 "texture" : {"source" : "/models/plants/bush/noise.dds"},

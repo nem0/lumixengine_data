@@ -2,6 +2,5 @@ pass "HDR_LUMINANCE"
 pass "HDR_AVG_LUMINANCE"
 pass "LUM1"
    
-backface_culling(false)   
 depth_test(false) 
  

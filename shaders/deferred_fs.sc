@@ -41,28 +41,6 @@ vec4 getViewPos(vec2 texCoord)
 	return posView;
 }
 
-vec3 shadeDirectionalLight2(vec3 light_dir
-	, vec3 view_dir
-	, vec3 light_color
-	, vec3 light_specular
-	, vec3 normal
-	, vec4 material_specular_shininess
-	, vec3 texture_specular)
-{
-	float ndotl = dot(normal, light_dir);
-	vec3 reflected = light_dir - 2.0 * ndotl * normal;
-	float rdotv = max(0.0, dot(reflected, view_dir));
-	return view_dir;
-	float spec = pow(max(0.0, rdotv), material_specular_shininess.w);
-	vec3 col = step(0.0, -ndotl) * 
-		(-ndotl * light_color
-			+ light_specular 
-				* material_specular_shininess.rgb 
-				* texture_specular 
-				* step(1.0, material_specular_shininess.w) * spec);
-	return col;	
-}
-
 void main()
 {
 	vec3 normal = texture2D(u_gbuffer1, v_texcoord0) * 2 - 1;

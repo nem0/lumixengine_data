@@ -1,6 +1,5 @@
 pass "SKY"
 
-backface_culling(false)
 depth_test(false)
 
 uniform("u_airColor", "color")

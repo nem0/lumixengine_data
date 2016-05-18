@@ -1,4 +1,3 @@
 pass "SCREEN_SPACE"
  
-backface_culling(false)
  

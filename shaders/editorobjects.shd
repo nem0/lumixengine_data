@@ -1,5 +1,4 @@
 pass "EDITOR"
    
-backface_culling(false)  
-   
+  
 texture_slot("Diffuse", "u_texColor")

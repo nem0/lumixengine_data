@@ -1,4 +1,5 @@
 {"shader" : "shaders/deferred.shd",
+"backface_culling" : false,
 "defines" : [],
 "uniforms" : [],
 "shininess" : 4.00000000,

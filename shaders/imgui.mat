@@ -1,3 +1,4 @@
 {"shader" : "shaders/imgui.shd",
-"uniforms" : []
+"uniforms" : [],
+"backface_culling" : false
 }

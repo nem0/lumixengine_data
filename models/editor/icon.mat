@@ -1,4 +1,5 @@
 {"shader" : "shaders/editorobjects.shd",
+"backface_culling" : false,
 "texture" : {"source" : "icon.tga", "srgb" : true},
 "uniforms" : [],
 "shininess" : 4.00000000,

@@ -1,4 +1,5 @@
 {"shader" : "shaders/sky.shd",
+"backface_culling" : false,
 "uniforms" : 
 [
 	{

@@ -5,8 +5,7 @@ pass "POINT_LIGHT"
 pass "DEFERRED"
 	fs { "ALPHA_CUTOUT" }
    
-backface_culling(false)
-  
+ 
 texture_slot("Diffuse", "u_texColor")
 texture_slot("Noise", "u_texNoise")
 

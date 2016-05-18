@@ -1,3 +1,4 @@
 {"shader" : "shaders/hdrlum.shd",
+"backface_culling" : false,
 "uniforms" : []
 }

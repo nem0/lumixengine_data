@@ -43,7 +43,7 @@ vec4 getViewPos(vec2 texCoord)
 
 void main()
 {
-	vec3 normal = texture2D(u_gbuffer1, v_texcoord0) * 2 - 1;
+	vec3 normal = texture2D(u_gbuffer1, v_texcoord0).xyz * 2 - 1;
 	vec4 color = texture2D(u_gbuffer0, v_texcoord0);
 	vec4 value2 = texture2D(u_gbuffer2, v_texcoord0) * 64.0;
 	

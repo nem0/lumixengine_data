@@ -95,7 +95,7 @@ void main()
 				, u_lightPosRadius
 				, u_lightRgbAttenuation
 				, u_materialColorShininess
-				, u_lightSpecular
+				, u_lightSpecular.rgb
 				, texture_specular
 				);
 				diffuse = diffuse.xyz * color.rgb;

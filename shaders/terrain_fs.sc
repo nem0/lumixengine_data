@@ -32,8 +32,8 @@ uniform mat4 u_terrainMatrix;
 
 vec2 getSubtextureUV4(vec2 uv, int z)
 {
-	static const float o = 1.0/(2.0*2*2);
-	static const vec2 origin[4] = {
+	const float o = 1.0/(2.0*2*2);
+	const vec2 origin[4] = {
 		vec2(0.0 + o, 0.0 + o),
 		vec2(0.5 + o, 0.0 + o),
 		vec2(0.0 + o, 0.5 + o),
@@ -46,8 +46,8 @@ vec2 getSubtextureUV4(vec2 uv, int z)
 
 vec2 getSubtextureUV9(vec2 uv, int z)
 {
-	static const float o = 1.0/(3.0*2*2);
-	static const vec2 origin[9] = {
+	const float o = 1.0/(3.0*2*2);
+	const vec2 origin[9] = {
 		vec2(0.0 + o, 0.0 + o),			vec2(1/3.0 + o, 0.0 + o),		vec2(2/3.0 + o, 0.0 + o),
 		vec2(0.0 + o, 1/3.0 + o),		vec2(1/3.0 + o, 1/3.0 + o),		vec2(2/3.0 + o, 1/3.0 + o),
 		vec2(0.0 + o, 2/3.0 + o),		vec2(1/3.0 + o, 2/3.0 + o),		vec2(2/3.0 + o, 2/3.0 + o)
@@ -58,8 +58,8 @@ vec2 getSubtextureUV9(vec2 uv, int z)
 
 vec2 getSubtextureUV16(vec2 uv, int z)
 {
-	static const float o = 1.0/(4.0*2*2);
-	static const vec2 origin[16] = {
+	const float o = 1.0/(4.0*2*2);
+	const vec2 origin[16] = {
 		vec2(0.0, 0.0 + o),			vec2(1/4.0, 0.0 + o),		vec2(2/4.0, 0.0 + o),		vec2(3/4.0, 0.0 + o),
 		vec2(0.0, 1/4.0 + o),		vec2(1/4.0, 1/4.0 + o),		vec2(2/4.0, 1/4.0 + o),		vec2(3/4.0, 1/4.0 + o),
 		vec2(0.0, 2/4.0 + o),		vec2(1/4.0, 2/4.0 + o),		vec2(2/4.0, 2/4.0 + o),		vec2(3/4.0, 2/4.0 + o),
@@ -236,7 +236,7 @@ void main()
 				, u_lightPosRadius
 				, u_lightRgbAttenuation
 				, u_materialColorShininess
-				, u_lightSpecular
+				, u_lightSpecular.rgb
 				, texture_specular
 				);
 				

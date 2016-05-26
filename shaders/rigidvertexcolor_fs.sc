@@ -91,7 +91,7 @@ void main()
 					, u_lightPosRadius
 					, u_lightRgbAttenuation
 					, u_materialColorShininess
-					, u_lightSpecular
+					, u_lightSpecular.rgb
 					, texture_specular
 					);
 				diffuse = diffuse.xyz * color.rgb;
@@ -102,7 +102,7 @@ void main()
 				diffuse = shadeDirectionalLight(u_lightDirFov.xyz
 					, view
 					, u_lightRgbAttenuation.rgb
-					, u_lightSpecular
+					, u_lightSpecular.rgb
 					, wnormal
 					, u_materialColorShininess
 					, texture_specular);

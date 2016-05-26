@@ -13,13 +13,13 @@ uniform vec4 u_strength;
 uniform vec4 u_sunSize;
 
 
-static const float rayleigh_collection_power = 0.51f;
-static const float mie_collection_power = 0.39f;
-static const float mie_distribution = 0.13f;
-    
-static const float surface_height = 0.993;
-static const float intensity = 1.8;
-static const int step_count = 4;
+const float rayleigh_collection_power = 0.51f;
+const float mie_collection_power = 0.39f;
+const float mie_distribution = 0.13f;
+
+const float surface_height = 0.993;
+const float intensity = 1.8;
+const int step_count = 4;
 
 //http://codeflow.org/entries/2011/apr/13/advanced-webgl-part-2-sky-rendering/
 
@@ -108,7 +108,7 @@ void main()
 	//return ;
 	float rayleigh_factor = phase(alpha, -0.01)*u_brightness.x;
 	float mie_factor = phase(alpha, mie_distribution)*u_brightness.y;
-	float spot = smoothstep(0.0, u_sunSize, phase(alpha, 0.9995))*u_brightness.z;
+	float spot = smoothstep(0.0, u_sunSize.x, phase(alpha, 0.9995))*u_brightness.z;
 	
 	vec3 eye_position = vec3(0.0, surface_height, 0.0);
 	float eye_depth = atmospheric_depth(eye_position, eyedir);

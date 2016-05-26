@@ -16,59 +16,61 @@ vec2 lit(vec3 _lightDir, vec3 _normal, vec3 _viewDir, float shininess)
 }
 
 
-vec3 shadePointLight(
-	vec4 dirFov, 
-	vec3 wpos, 
-	vec3 normal, 
-	vec3 view, 
-	vec2 uv,
-	vec4 light_pos_radius,
-	vec4 light_color_attenuation,
-	vec4 material_specular_shininess,
-	vec3 light_specular,
-	vec3 texture_specular
-	)
-{
-	vec3 lp = light_pos_radius.xyz - wpos;
-	float dist = length(lp);
-	float attn = pow(max(0, 1 - dist / light_pos_radius.w), light_color_attenuation.w);
-	
-	vec3 toLightDir = lp / dist;
-	
-	if(dirFov.w < 3.14159)
+#if BGFX_SHADER_TYPE_FRAGMENT == 1
+	vec3 shadePointLight(
+		vec4 dirFov, 
+		vec3 wpos, 
+		vec3 normal, 
+		vec3 view, 
+		vec2 uv,
+		vec4 light_pos_radius,
+		vec4 light_color_attenuation,
+		vec4 material_specular_shininess,
+		vec3 light_specular,
+		vec3 texture_specular
+		)
 	{
-		float cosDir = dot(normalize(dirFov.xyz), -toLightDir);
-		float cosCone = cos(dirFov.w * 0.5);
-	
-		if(cosDir < cosCone)
-			discard;
-		attn *= (cosDir - cosCone) / (1 - cosCone);
+		vec3 lp = light_pos_radius.xyz - wpos;
+		float dist = length(lp);
+		float attn = pow(max(0.0, 1.0 - dist / light_pos_radius.w), light_color_attenuation.w);
+		
+		vec3 toLightDir = lp / dist;
+		
+		if(dirFov.w < 3.14159)
+		{
+			float cosDir = dot(normalize(dirFov.xyz), -toLightDir);
+			float cosCone = cos(dirFov.w * 0.5);
+		
+			if(cosDir < cosCone)
+				discard;
+			attn *= (cosDir - cosCone) / (1.0 - cosCone);
+		}
+		
+		vec2 lc = lit(toLightDir, normal, view, material_specular_shininess.w);
+		vec3 rgb = 
+			attn * (light_color_attenuation.rgb * saturate(lc.x) 
+			+ light_specular 
+				* material_specular_shininess.rgb 
+				* texture_specular 
+				* saturate(lc.y));
+		return rgb;
 	}
-	
-	vec2 lc = lit(toLightDir, normal, view, material_specular_shininess.w);
-	vec3 rgb = 
-		attn * (light_color_attenuation.rgb * saturate(lc.x) 
-		+ light_specular 
-			* material_specular_shininess.rgb 
-			* texture_specular 
-			* saturate(lc.y));
-	return rgb;
-}
+#endif
 
 
 float getFogFactor(vec3 camera_wpos, float fog_density, vec3 fragment_wpos, vec4 fog_params) 
 { 
 	vec3 v = fragment_wpos - camera_wpos;
-	float to_top = max(0, camera_wpos.y - (fog_params.x + fog_params.y));
+	float to_top = max(0.0, camera_wpos.y - (fog_params.x + fog_params.y));
 	camera_wpos += v * to_top / -v.y;
 
-	float frag_to_top = max(0, fragment_wpos.y - (fog_params.x + fog_params.y));
+	float frag_to_top = max(0.0, fragment_wpos.y - (fog_params.x + fog_params.y));
 	fragment_wpos += v * frag_to_top / -v.y;
 	
 	float avg_y = (fragment_wpos.y + camera_wpos.y) * 0.5;
-	float avg_density = fog_density * clamp(1 - (avg_y - fog_params.x) / fog_params.y, 0, 1);
+	float avg_density = fog_density * clamp(1.0 - (avg_y - fog_params.x) / fog_params.y, 0, 1);
 	float res = exp(-pow(avg_density * length(fragment_wpos - camera_wpos), 2));
-	res =  1 - clamp(res, 0, 1);
+	res =  1 - clamp(res, 0.0, 1.0);
 	return res;
 }
 
@@ -216,7 +218,7 @@ float smoothShadow(sampler2D shadowmap, vec2 uv, float compare)
 
 float pointLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec4 position, float fov)
 {
-	const float DEPTH_MULTIPLIER = 900;
+	const float DEPTH_MULTIPLIER = 900.0;
 
 	if(fov > 3.14159)
 	{
@@ -231,10 +233,10 @@ float pointLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec4 posi
 		d = d / d.w;
 
 	
-		bool selection0 = all(lessThan(a.xy, vec2_splat(0.99))) && all(greaterThan(a.xy, vec2_splat(0.01))) && a.z < 1;
-		bool selection1 = all(lessThan(b.xy, vec2_splat(0.99))) && all(greaterThan(b.xy, vec2_splat(0.01))) && b.z < 1;
-		bool selection2 = all(lessThan(c.xy, vec2_splat(0.99))) && all(greaterThan(c.xy, vec2_splat(0.01))) && c.z < 1;
-		bool selection3 = all(lessThan(d.xy, vec2_splat(0.99))) && all(greaterThan(d.xy, vec2_splat(0.01))) && d.z < 1;
+		bool selection0 = all(lessThan(a.xy, vec2_splat(0.99))) && all(greaterThan(a.xy, vec2_splat(0.01))) && a.z < 1.0;
+		bool selection1 = all(lessThan(b.xy, vec2_splat(0.99))) && all(greaterThan(b.xy, vec2_splat(0.01))) && b.z < 1.0;
+		bool selection2 = all(lessThan(c.xy, vec2_splat(0.99))) && all(greaterThan(c.xy, vec2_splat(0.01))) && c.z < 1.0;
+		bool selection3 = all(lessThan(d.xy, vec2_splat(0.99))) && all(greaterThan(d.xy, vec2_splat(0.01))) && d.z < 1.0;
 		
 		
 		if(selection0)
@@ -266,7 +268,7 @@ float directionalLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec
 	vec2 shadow_subcoords[2];
 
 	int split_index = 3;
-	float weight = 0;
+	float weight = 0.0;
 	if(all(lessThan(shadow_coord[0].xy, vec2_splat(1.0))) && all(greaterThan(shadow_coord[0].xy, vec2_splat(0.0))))
 	{
 		shadow_subcoords[0] = vec2(shadow_coord[0].x * 0.5, shadow_coord[0].y * 0.5);
@@ -297,13 +299,13 @@ float directionalLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec
 	else
 		return 1.0;
 
-	const float offsets[5] = {0.0000009, 0.000005, 0.00001, 0.00005, -1}; // for distances 6, 14, 40, 100
+	const float offsets[5] = float[](0.0000009, 0.000005, 0.00001, 0.00005, -1.0); // for distances 6, 14, 40, 100
 	float nl_tan = tan(acos(ndotl));
-	float bias = clamp(offsets[split_index]*nl_tan, 0, 0.1); 
-	float next_bias = clamp(offsets[split_index+1]*nl_tan, 0, 0.1); 
+	float bias = clamp(offsets[split_index]*nl_tan, 0.0, 0.1); 
+	float next_bias = clamp(offsets[split_index+1]*nl_tan, 0.0, 0.1); 
 
-	float v1 = noCheckESM(shadowmap, shadow_subcoords[0], shadow_coord[split_index].z - bias, 15000);
-	float v2 = split_index == 3 ? 1.0 : noCheckESM(shadowmap, shadow_subcoords[1], shadow_coord[split_index + 1].z - next_bias, 15000);
+	float v1 = noCheckESM(shadowmap, shadow_subcoords[0], shadow_coord[split_index].z - bias, 15000.0);
+	float v2 = split_index == 3 ? 1.0 : noCheckESM(shadowmap, shadow_subcoords[1], shadow_coord[split_index + 1].z - next_bias, 15000.0);
 	return mix(v1, v2, weight);
 	
 	

@@ -94,7 +94,11 @@ void main()
 		float s12 = texture2D(u_texHeightmap, uv + off.yz).x;
 		vec3 va = normalize(vec3(1.0, (s21-s01) * u_terrainScale.y, 0.0));
 		vec3 vb = normalize(vec3(0.0, (s12-s10) * u_terrainScale.y, 1.0));
-		mat3 terrain_matrix3 = mat3(u_terrainMatrix);
+		#if BGFX_SHADER_LANGUAGE_HLSL
+			mat3 terrain_matrix3 = (mat3)(u_terrainMatrix);
+		#else
+			mat3 terrain_matrix3 = mat3(u_terrainMatrix);
+		#endif
 		vec3 terrain_normal = normalize(mul(terrain_matrix3, cross(vb,va) ));
 		vec3 terrain_tangent = normalize(cross(terrain_normal, mul(terrain_matrix3, vb)));
 		vec3 terrain_bitangent = normalize(cross(terrain_normal, terrain_tangent));

@@ -22,7 +22,7 @@ uniform mat4 u_camInvView;
 
 
 
-vec4 getViewPos(vec2 texCoord)
+vec3 getViewPos(vec2 texCoord)
 {
 	float z = texture2D(u_gbuffer_depth, texCoord).r;
 	#if BGFX_SHADER_LANGUAGE_HLSL
@@ -37,8 +37,7 @@ vec4 getViewPos(vec2 texCoord)
 	
 	vec4 posView = mul(u_camInvViewProj, posProj);
 	
-	posView /= posView.w;
-	return posView;
+	return posView.xyz / posView.w;
 }
 
 void main()
@@ -47,7 +46,7 @@ void main()
 	vec4 color = texture2D(u_gbuffer0, v_texcoord0);
 	vec4 value2 = texture2D(u_gbuffer2, v_texcoord0) * 64.0;
 	
-	vec4 wpos = getViewPos(v_texcoord0);
+	vec3 wpos = getViewPos(v_texcoord0);
 
 	vec4 camera_wpos = mul(u_camInvView, vec4(0, 0, 0, 1));
 	vec3 view = normalize(camera_wpos.xyz - wpos);
@@ -62,11 +61,10 @@ void main()
 					, normal
 					, mat_specular_shininess
 					, vec3(1, 1, 1));
-	diffuse = diffuse * color;
-					
+	diffuse = diffuse * color.rgb;
 					
 	float ndotl = -dot(normal, u_lightDirFov.xyz);
-	diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, wpos, ndotl); 
+	diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(wpos, 1), ndotl); 
 
 	vec3 ambient = u_ambientColor.rgb * color.rgb;
 	float fog_factor = getFogFactor(camera_wpos.xyz / camera_wpos.w, u_fogColorDensity.w, wpos.xyz, u_fogParams);

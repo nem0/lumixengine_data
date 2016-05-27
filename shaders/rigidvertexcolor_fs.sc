@@ -30,7 +30,7 @@ void main()
 	#ifdef ALPHA_CUTOUT
 		if(color.a < u_alphaRef) discard;
 	#endif
-	color.xyz *= v_color * u_materialColorShininess.rgb;
+	color.xyz *= v_color.rgb * u_materialColorShininess.rgb;
 	#ifdef DEFERRED
 		gl_FragData[0] = color;
 		vec3 normal;

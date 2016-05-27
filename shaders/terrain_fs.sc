@@ -30,42 +30,42 @@ uniform vec4 u_terrainScale;
 uniform mat4 u_terrainMatrix;
 
 
-vec2 getSubtextureUV4(vec2 uv, int z)
+vec2 getSubtextureUV4(vec2 uv, float z)
 {
 	const float o = 1.0/(2.0*2*2);
-	const vec2 origin[4] = {
+	BEGIN_CONST_ARRAY(vec2, 4, origin)
 		vec2(0.0 + o, 0.0 + o),
 		vec2(0.5 + o, 0.0 + o),
 		vec2(0.0 + o, 0.5 + o),
 		vec2(0.5 + o, 0.5 + o)
-	};
+	END_CONST_ARRAY;
 
-	return origin[z] + uv / 4.0;
+	return origin[int(z)] + uv / 4.0;
 }
 
 
-vec2 getSubtextureUV9(vec2 uv, int z)
+vec2 getSubtextureUV9(vec2 uv, float z)
 {
 	const float o = 1.0/(3.0*2*2);
-	const vec2 origin[9] = {
+	BEGIN_CONST_ARRAY(vec2, 9, origin)
 		vec2(0.0 + o, 0.0 + o),			vec2(1/3.0 + o, 0.0 + o),		vec2(2/3.0 + o, 0.0 + o),
 		vec2(0.0 + o, 1/3.0 + o),		vec2(1/3.0 + o, 1/3.0 + o),		vec2(2/3.0 + o, 1/3.0 + o),
 		vec2(0.0 + o, 2/3.0 + o),		vec2(1/3.0 + o, 2/3.0 + o),		vec2(2/3.0 + o, 2/3.0 + o)
-	};
-	return origin[z] + uv / 6.0;
+	END_CONST_ARRAY;
+	return origin[int(z)] + uv / 6.0;
 }
 
 
-vec2 getSubtextureUV16(vec2 uv, int z)
+vec2 getSubtextureUV16(vec2 uv, float z)
 {
 	const float o = 1.0/(4.0*2*2);
-	const vec2 origin[16] = {
+	BEGIN_CONST_ARRAY(vec2, 16, origin)
 		vec2(0.0, 0.0 + o),			vec2(1/4.0, 0.0 + o),		vec2(2/4.0, 0.0 + o),		vec2(3/4.0, 0.0 + o),
 		vec2(0.0, 1/4.0 + o),		vec2(1/4.0, 1/4.0 + o),		vec2(2/4.0, 1/4.0 + o),		vec2(3/4.0, 1/4.0 + o),
 		vec2(0.0, 2/4.0 + o),		vec2(1/4.0, 2/4.0 + o),		vec2(2/4.0, 2/4.0 + o),		vec2(3/4.0, 2/4.0 + o),
 		vec2(0.0, 3/4.0 + o),		vec2(1/4.0, 3/4.0 + o),		vec2(2/4.0, 3/4.0 + o),		vec2(3/4.0, 3/4.0 + o)
-	};
-	return origin[z] + uv / 8.0;
+	END_CONST_ARRAY;
+	return origin[int(z)] + uv / 8.0;
 }
 
 float mipmapLevel(vec2 uv, vec2 textureSize)
@@ -92,10 +92,11 @@ void main()
 		float s21 = texture2D(u_texHeightmap, uv + off.zy).x;
 		float s10 = texture2D(u_texHeightmap, uv + off.yx).x;
 		float s12 = texture2D(u_texHeightmap, uv + off.yz).x;
-		vec3 va = normalize(vec3(1, (s21-s01) * u_terrainScale.y, 0));
-		vec3 vb = normalize(vec3(0, (s12-s10) * u_terrainScale.y, 1));
-		vec3 terrain_normal = normalize(mul(u_terrainMatrix, cross(vb,va) ).xyz);
-		vec3 terrain_tangent = normalize(cross(terrain_normal, mul(u_terrainMatrix, vb)));
+		vec3 va = normalize(vec3(1.0, (s21-s01) * u_terrainScale.y, 0.0));
+		vec3 vb = normalize(vec3(0.0, (s12-s10) * u_terrainScale.y, 1.0));
+		mat3 terrain_matrix3 = mat3(u_terrainMatrix);
+		vec3 terrain_normal = normalize(mul(terrain_matrix3, cross(vb,va) ));
+		vec3 terrain_tangent = normalize(cross(terrain_normal, mul(terrain_matrix3, vb)));
 		vec3 terrain_bitangent = normalize(cross(terrain_normal, terrain_tangent));
 		
 		mat3 tbn = mat3(
@@ -107,45 +108,45 @@ void main()
 
 		float splatmap_size = u_terrainParams.w;
 		float half_texel = 0.5 / splatmap_size;
-		int texture_count = u_terrainParams.z * u_terrainParams.z;
-		int detail_size = u_terrainParams.y / (2*u_terrainParams.z);
+		int texture_count = int(u_terrainParams.z * u_terrainParams.z);
+		int detail_size = int(u_terrainParams.y / (2.0 * u_terrainParams.z));
 					
 		vec2 ff = fract(detail_uv);
 
 		float u = v_texcoord1.x * splatmap_size - 1.0;
 		float v = v_texcoord1.y * splatmap_size - 1.0;
-		int x = floor(u);
-		int y = floor(v);
+		float x = floor(u);
+		float y = floor(v);
 		float u_ratio = u - x;
 		float v_ratio = v - y;
-		float u_opposite = 1 - u_ratio;
-		float v_opposite = 1 - v_ratio;
+		float u_opposite = 1.0 - u_ratio;
+		float v_opposite = 1.0 - v_ratio;
 		vec4 splat00 = texture2D(u_texSplatmap, vec2(x/splatmap_size, y/splatmap_size)).rgba;
-		vec4 splat01 = texture2D(u_texSplatmap, vec2(x/splatmap_size, (y+1)/splatmap_size)).rgba;
-		vec4 splat10 = texture2D(u_texSplatmap, vec2((x+1)/splatmap_size, y/splatmap_size)).rgba;
-		vec4 splat11 = texture2D(u_texSplatmap, vec2((x+1)/splatmap_size, (y+1)/splatmap_size)).rgba;
+		vec4 splat01 = texture2D(u_texSplatmap, vec2(x/splatmap_size, (y+1.0)/splatmap_size)).rgba;
+		vec4 splat10 = texture2D(u_texSplatmap, vec2((x+1.0)/splatmap_size, y/splatmap_size)).rgba;
+		vec4 splat11 = texture2D(u_texSplatmap, vec2((x+1.0)/splatmap_size, (y+1.0)/splatmap_size)).rgba;
 	
 		vec2 duv00, duv01, duv10, duv11;
 		if(texture_count < 5)
 		{
-			duv00 = getSubtextureUV4(ff, splat00.x * 256);
-			duv01 = getSubtextureUV4(ff, splat01.x * 256);
-			duv10 = getSubtextureUV4(ff, splat10.x * 256);
-			duv11 = getSubtextureUV4(ff, splat11.x * 256);
+			duv00 = getSubtextureUV4(ff, splat00.x * 256.0);
+			duv01 = getSubtextureUV4(ff, splat01.x * 256.0);
+			duv10 = getSubtextureUV4(ff, splat10.x * 256.0);
+			duv11 = getSubtextureUV4(ff, splat11.x * 256.0);
 		}
 		else if(texture_count < 10)
 		{
-			duv00 = getSubtextureUV9(ff, splat00.x * 256);
-			duv01 = getSubtextureUV9(ff, splat01.x * 256);
-			duv10 = getSubtextureUV9(ff, splat10.x * 256);
-			duv11 = getSubtextureUV9(ff, splat11.x * 256);
+			duv00 = getSubtextureUV9(ff, splat00.x * 256.0);
+			duv01 = getSubtextureUV9(ff, splat01.x * 256.0);
+			duv10 = getSubtextureUV9(ff, splat10.x * 256.0);
+			duv11 = getSubtextureUV9(ff, splat11.x * 256.0);
 		}
 		else
 		{
-			duv00 = getSubtextureUV16(ff, splat00.x * 256);
-			duv01 = getSubtextureUV16(ff, splat01.x * 256);
-			duv10 = getSubtextureUV16(ff, splat10.x * 256);
-			duv11 = getSubtextureUV16(ff, splat11.x * 256);
+			duv00 = getSubtextureUV16(ff, splat00.x * 256.0);
+			duv01 = getSubtextureUV16(ff, splat01.x * 256.0);
+			duv10 = getSubtextureUV16(ff, splat10.x * 256.0);
+			duv11 = getSubtextureUV16(ff, splat11.x * 256.0);
 		}
 		
 		float mipmap_level = mipmapLevel(v_texcoord0 * texture_scale.x, vec2(detail_size, detail_size));
@@ -181,7 +182,7 @@ void main()
 		
 		vec4 color = 
 			texture2D(u_texColormap, v_texcoord1) * 
-			vec4((c00.rgb * b1 + c01.rgb * b2 + c10.rgb * b3 + c11.rgb * b4) / (b1 + b2 + b3 + b4), 1);
+			vec4((c00.rgb * b1 + c01.rgb * b2 + c10.rgb * b3 + c11.rgb * b4) / (b1 + b2 + b3 + b4), 1.0);
 		color.rgb *= u_materialColorShininess.rgb;
 			
 		vec3 wnormal;
@@ -204,19 +205,19 @@ void main()
 		
 		float dist = length(v_view);
 		float t = (dist - detail_texture_distance.x) / detail_texture_distance.x;
-		color = mix(color, texture2D(u_texSatellitemap, v_texcoord1), clamp(t, 0, 1));
-		wnormal = mix(wnormal, terrain_normal, clamp(t, 0, 1));
+		color = mix(color, texture2D(u_texSatellitemap, v_texcoord1), clamp(t, 0.0, 1.0));
+		wnormal = mix(wnormal, terrain_normal, clamp(t, 0.0, 1.0));
 
 		#ifdef DEFERRED
 				gl_FragData[0] = color;
-				gl_FragData[1].xyz = (wnormal + vec3_splat(1)) * 0.5;
-				gl_FragData[1].w = 1;
+				gl_FragData[1].xyz = (wnormal + vec3_splat(1.0)) * 0.5;
+				gl_FragData[1].w = 1.0;
 				float spec = u_materialColorShininess.g / 64.0;
 				float shininess = u_materialColorShininess.a / 64.0;
 				#ifdef SPECULAR_TEXTURE
 					spec *= texture2D(u_texSpecular, v_texcoord0).g;
 				#endif
-				gl_FragData[2] = vec4(spec, shininess, 0, 1);
+				gl_FragData[2] = vec4(spec, shininess, 0.0, 1.0);
 		#else
 			vec3 view = normalize(v_view);
 			vec3 diffuse;
@@ -224,7 +225,7 @@ void main()
 			#ifdef SPECULAR_TEXTURE
 				texture2D(u_texSpecular, v_texcoord0).rgb;
 			#else
-				vec3(1, 1, 1);
+				vec3_splat(1.0);
 			#endif
 			#ifdef POINT_LIGHT
 				diffuse = 
@@ -261,14 +262,14 @@ void main()
 			#ifdef MAIN
 				vec3 ambient = u_ambientColor.rgb * color.rgb;
 			#else
-				vec3 ambient = vec3(0, 0, 0);
+				vec3 ambient = vec3_splat(0.0);
 			#endif  
 
-			vec4 camera_wpos = mul(u_invView, vec4(0, 0, 0, 1));
+			vec4 camera_wpos = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0));
 			float fog_factor = getFogFactor(camera_wpos.xyz / camera_wpos.w, u_fogColorDensity.w, v_wpos.xyz, u_fogParams);
 
 			#ifdef POINT_LIGHT
-				gl_FragColor.xyz = (1 - fog_factor) * (diffuse + ambient);
+				gl_FragColor.xyz = (1.0 - fog_factor) * (diffuse + ambient);
 			#else
 				gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
 			#endif

@@ -18,7 +18,7 @@ void main()
 	vec3 wpos = i_data0.xyz + (up * a_position.y + right * a_position.x).xyz * i_data0.w;
 	v_wpos = wpos;
 	v_texcoord0 = a_texcoord0;
-	v_common = i_data1;
+	v_common = i_data1.xyz;
 	
 	gl_Position = mul(u_viewProj, vec4(wpos, 1.0) );	
 }

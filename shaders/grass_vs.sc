@@ -38,8 +38,8 @@ void main()
 	{
 		float len = length(displaced_vertex);
 		int totalTime = int(u_time.x);
-		uint pixelY = int(totalTime/64);
-		uint pixelX = totalTime / -(pixelY + 1e-5);
+		int pixelY = int(totalTime/64);
+		int pixelX = int(totalTime / -(pixelY + 1e-5));
 		float noiseFactor = texture2DLod(u_texNoise, vec2( pixelX*10, pixelY*10 ), 0).r;
 		vec3 wpos = mul(model, vec4(displaced_vertex, 1.0) ).xyz;
 		displaced_vertex.x += move_factor * sin(frequency * u_time.x * texture2DLod(u_texNoise, wpos.xz*50.0, 0).r + len) + (wind_strength * noiseFactor * wind_dir.x)/10.0;

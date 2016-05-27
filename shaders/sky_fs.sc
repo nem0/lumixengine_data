@@ -76,7 +76,7 @@ vec3 get_world_normal(vec2 frag_coord)
 	vec4 posProj = vec4(frag_coord * 2 - 1, z, 1.0);
 	vec4 wpos = mul(u_camInvViewProj, posProj);
 	wpos /= wpos.w;
-	vec3 view = mul(u_camInvView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - wpos;
+	vec3 view = mul(u_camInvView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - wpos.xyz;
 
     return -normalize(view);
 }

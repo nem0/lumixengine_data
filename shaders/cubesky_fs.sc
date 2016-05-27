@@ -18,9 +18,9 @@ vec3 get_world_normal(vec2 frag_coord)
 	vec4 posProj = vec4(frag_coord * 2 - 1, z, 1.0);
 	vec4 wpos = mul(u_camInvViewProj, posProj);
 	wpos /= wpos.w;
-	vec3 view = mul(u_camInvView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - wpos;
+	vec3 view = mul(u_camInvView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - wpos.xyz;
 
-    return -normalize(view);
+	return -normalize(view);
 }
 
 
@@ -41,6 +41,6 @@ void main()
 	vec3 camera_wpos = mul(u_camInvView, vec4(0, 0, 0, 1)).xyz;
 	float fog_factor = getFogFactorSky(camera_wpos, u_fogColorDensity.w, eye_dir, u_fogParams);
 	vec4 sky_color = textureCube(u_texColor, eye_dir);
-	gl_FragColor.xyz = mix(sky_color, u_fogColorDensity.rgb, fog_factor);
+	gl_FragColor.xyz = mix(sky_color.rgb, u_fogColorDensity.rgb, fog_factor);
 	gl_FragColor.w = 1;
 }

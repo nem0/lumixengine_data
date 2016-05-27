@@ -129,7 +129,7 @@ void main()
 				gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
 			#endif
 			#ifdef FUR
-				gl_FragColor.rgb *= lerp(u_darkening.x, 1, u_layer.x);
+				gl_FragColor.rgb *= mix(u_darkening.x, 1, u_layer.x);
 				float alpha = clamp(0, 1, color.a * u_alphaMultiplier.x - u_layer.x);
 				#ifdef ALPHA_CUTOUT
 					if(alpha < u_alphaRef) discard;

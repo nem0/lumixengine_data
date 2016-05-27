@@ -2,6 +2,15 @@
 #define __LUMIX_COMMON_SH__
 
 
+#if BGFX_SHADER_LANGUAGE_HLSL
+	#define BEGIN_CONST_ARRAY(type, count, name) static const type name[count] = {
+	#define END_CONST_ARRAY }
+#else
+	#define BEGIN_CONST_ARRAY(type, count, name) const type name[count] = type[](
+	#define END_CONST_ARRAY )
+#endif
+
+
 vec2 lit(vec3 _lightDir, vec3 _normal, vec3 _viewDir, float shininess)
 {
 	float ndotl = dot(_normal, _lightDir);
@@ -299,7 +308,7 @@ float directionalLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec
 	else
 		return 1.0;
 
-	const float offsets[5] = {0.0000009, 0.000005, 0.00001, 0.00005, -1.0}; // for distances 6, 14, 40, 100
+	BEGIN_CONST_ARRAY(float, 5, offsets) 0.0000009, 0.000005, 0.00001, 0.00005, -1.0 END_CONST_ARRAY; // for distances 6, 14, 40, 100
 	float nl_tan = tan(acos(ndotl));
 	float bias = clamp(offsets[split_index]*nl_tan, 0.0, 0.1); 
 	float next_bias = clamp(offsets[split_index+1]*nl_tan, 0.0, 0.1); 

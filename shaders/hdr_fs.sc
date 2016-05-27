@@ -46,7 +46,7 @@ float reinhard2(float x, float whiteSqr)
 }
 
 // Unchared2 tone mapping (See http://filmicgames.com)
-vec3 Uncharted2Tonemap(vec3 x)
+float Uncharted2Tonemap(float x)
 {
 	const float A = 0.15;
 	const float B = 0.50;
@@ -141,7 +141,7 @@ vec3 filmGrain(vec3 in_col, vec2 texCoord)
 
 void main()
 {
-	float avg_loglum = max(0.1, exp(texture2D(u_avgLuminance, half2(0.5, 0.5)).r));
+	float avg_loglum = max(0.1, exp(texture2D(u_avgLuminance, vec2(0.5, 0.5)).r));
 	vec3 hdr_color = texture2D(u_hdrBuffer, v_texcoord0).xyz;
 	#ifdef DOF
 	
@@ -163,17 +163,17 @@ void main()
 		t = min(t, max_dof_blur.x);
 		vec3 dof_color = texture2D(u_dofBuffer, v_texcoord0).xyz;
 		if (-linear_depth_v.z > 10000) t = 0;
-		hdr_color = lerp(hdr_color, dof_color, t);
+		hdr_color = mix(hdr_color, dof_color, t);
 	#endif		
 	hdr_color *= exposure.x;
-	float lum = luma(hdr_color);
+	float lum = luma(hdr_color).x;
 
 	float map_middle = (midgray.r / (avg_loglum + 0.001)) * lum;
 	
 	//float ld = reinhard2(map_middle, 1.1*1.1);
 	//float ld = map_middle / (map_middle + 1);
 	
-	float ld = Uncharted2Tonemap(map_middle) / Uncharted2Tonemap(11);
+	float ld = Uncharted2Tonemap(map_middle) / Uncharted2Tonemap(11.0);
 	
 	vec3 finalColor = (hdr_color / lum) * ld;
 	#ifdef FILM_GRAIN

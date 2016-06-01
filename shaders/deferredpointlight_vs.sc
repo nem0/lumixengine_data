@@ -16,9 +16,7 @@ void main()
 	v_dir_fov = i_data6;
 	v_specular = i_data7;
 	
-	model = transpose(model);
-
-	vec3 wpos = mul(model, vec4(a_position, 1.0) ).xyz;
+	vec3 wpos = instMul(model, vec4(a_position, 1.0) ).xyz;
 	v_wpos = wpos;
 	v_texcoord0 = a_position.xy;
 	

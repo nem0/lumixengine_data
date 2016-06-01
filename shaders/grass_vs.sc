@@ -25,12 +25,10 @@ void main()
 	model[1] = i_data1;
 	model[2] = i_data2;
 	model[3] = i_data3;
-
-	model = transpose(model);
 	
 	const float min_dist = 60;
 	const float scale_dist = 10;
-	vec3 view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - mul(model, vec4(a_position, 1.0) ).xyz;
+	vec3 view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - instMul(model, vec4(a_position, 1.0) ).xyz;
 	float scale = clamp(1 - (length(view) - min_dist)/scale_dist, 0, 1);
 	
 	vec3 displaced_vertex = scale*a_position;
@@ -41,11 +39,11 @@ void main()
 		int pixelY = int(totalTime/64);
 		int pixelX = int(totalTime / -(pixelY + 1e-5));
 		float noiseFactor = texture2DLod(u_texNoise, vec2( pixelX*10, pixelY*10 ), 0).r;
-		vec3 wpos = mul(model, vec4(displaced_vertex, 1.0) ).xyz;
+		vec3 wpos = instMul(model, vec4(displaced_vertex, 1.0) ).xyz;
 		displaced_vertex.x += move_factor * sin(frequency * u_time.x * texture2DLod(u_texNoise, wpos.xz*50.0, 0).r + len) + (wind_strength * noiseFactor * wind_dir.x)/10.0;
 		displaced_vertex.z += move_factor * cos(frequency * u_time.x * texture2DLod(u_texNoise, wpos.zx*50.0, 0).r + len) + (wind_strength * noiseFactor * wind_dir.y)/10.0;
 	}
-	v_wpos = mul(model, vec4(displaced_vertex, 1.0)).xyz;
+	v_wpos = instMul(model, vec4(displaced_vertex, 1.0)).xyz;
 	v_view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - v_wpos;
 	gl_Position = mul(u_viewProj, vec4(v_wpos, 1.0));
 }

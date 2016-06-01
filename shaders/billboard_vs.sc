@@ -12,15 +12,13 @@ void main()
 	model[2] = i_data2;
 	model[3] = i_data3;
 
-	model = transpose(model);
-	
-    v_wpos = mul(model, vec4(a_position, 1.0) ).xyz;
+    v_wpos = instMul(model, vec4(a_position, 1.0) ).xyz;
 	#ifndef SHADOW
 		vec4 normal = a_normal * 2.0 - 1.0;
 		vec4 tangent = a_tangent * 2.0 - 1.0;
 
-		v_normal = mul(model, vec4(normal.xyz, 0.0) ).xyz;
-		v_tangent = mul(model, vec4(tangent.xyz, 0.0) ).xyz;
+		v_normal = instMul(model, vec4(normal.xyz, 0.0) ).xyz;
+		v_tangent = instMul(model, vec4(tangent.xyz, 0.0) ).xyz;
 		v_bitangent = cross(v_normal, v_tangent);
 		v_view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - v_wpos;
 	#endif

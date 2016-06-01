@@ -16,9 +16,7 @@ void main()
 	model[2] = i_data2;
 	model[3] = i_data3;
 	
-	model = transpose(model);
-
-	vec3 wpos = mul(model, vec4(a_position, 1.0) ).xyz;
+	vec3 wpos = instMul(model, vec4(a_position, 1.0) ).xyz;
 	gl_Position = mul(u_viewProj, vec4(wpos, 1.0) );
 
 	v_wpos = wpos;

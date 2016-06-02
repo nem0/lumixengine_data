@@ -82,21 +82,6 @@ vec3 get_world_normal(vec2 frag_coord)
 }
 
 
-vec3 getEyeDir(vec2 uv)
-{
-	uv = uv * 2 - 1;
-	
-	mat3 m;
-	m[0] = vec3(1, 0, 0);
-	m[1] = vec3(0, 1, 0);
-	m[2] = vec3(0, 0, 1);
-	
-	vec3 v = mul(m, normalize(vec3(-uv.x, -uv.y, 1)));
-	
-	return v; 
-}
-
-
 void main()
 {
 	vec3 lightdir = -u_lightDirFov.xyz;

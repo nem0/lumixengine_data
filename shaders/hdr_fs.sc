@@ -133,7 +133,7 @@ vec3 filmGrain(vec3 in_col, vec2 texCoord)
 	float lum = smoothstep(0.2,0.0,luminance);
 	lum += luminance;
 	
-	noise = mix(noise,vec3_splat(0.0),pow(lum,4.0));
+	noise = mix(vec3_splat(0.0),vec3_splat(pow(lum,4.0)), noise);
 	col = col+noise*grainamount;
    
 	return col;

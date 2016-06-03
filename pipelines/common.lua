@@ -33,14 +33,14 @@ function module.shadowmapDebug(ctx, x, y)
 			setPass(ctx.pipeline, "SCREEN_SPACE")
 			setFramebuffer(ctx.pipeline, "default")
 			bindFramebufferTexture(ctx.pipeline, "shadowmap", 0, ctx.texture_uniform)
-			drawQuad(ctx.pipeline, 0.52 - x, 0.98 - y, 0.46, -0.46, ctx.screen_space_material)
+			drawQuad(ctx.pipeline, 0.01 + x, 0.01 + y, 0.23, 0.23, ctx.screen_space_material)
 	end
 	if module.render_shadowmap_debug_fullsize then
 		newView(ctx.pipeline, "shadowmap_debug_fullsize")
 			setPass(ctx.pipeline, "SCREEN_SPACE")
 			setFramebuffer(ctx.pipeline, "default")
 			bindFramebufferTexture(ctx.pipeline, "shadowmap", 0, ctx.texture_uniform)
-			drawQuad(ctx.pipeline, -1, 1, 2, -2, ctx.screen_space_material)
+			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.screen_space_material)
 	end
 end
 
@@ -124,7 +124,7 @@ function module.shadowmap(ctx, camera_slot)
 			setFramebuffer(ctx.pipeline, "shadowmap_blur")
 			disableDepthWrite(ctx.pipeline)
 			bindFramebufferTexture(ctx.pipeline, "shadowmap", 0, ctx.shadowmap_uniform)
-			drawQuad(ctx.pipeline, -1, -1, 2, 2, ctx.blur_material)
+			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material)
 			enableDepthWrite(ctx.pipeline)
 
 		newView(ctx.pipeline, "blur_shadowmap_v")
@@ -132,7 +132,7 @@ function module.shadowmap(ctx, camera_slot)
 			setFramebuffer(ctx.pipeline, "shadowmap")
 			disableDepthWrite(ctx.pipeline)
 			bindFramebufferTexture(ctx.pipeline, "shadowmap_blur", 0, ctx.shadowmap_uniform)
-			drawQuad(ctx.pipeline, -1, -1, 2, 2, ctx.blur_material);
+			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material);
 			enableDepthWrite(ctx.pipeline)
 	end
 end

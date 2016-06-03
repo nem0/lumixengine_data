@@ -176,8 +176,9 @@ void main()
 	float ld = Uncharted2Tonemap(map_middle) / Uncharted2Tonemap(11.0);
 	
 	vec3 finalColor = (hdr_color / lum) * ld;
+
 	#ifdef FILM_GRAIN
-		vec3 grained = filmGrain(toGamma(finalColor), v_texcoord0);
+		vec3 grained = filmGrain(toGamma(finalColor), v_wpos.xy);
 		gl_FragColor =  vec4(grained, 1.0f);
 	#else
 		gl_FragColor =  vec4(toGamma(finalColor), 1.0f);

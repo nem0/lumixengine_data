@@ -37,7 +37,7 @@ float getFogFactorSky(vec3 camera_wpos, float fog_density, vec3 eye_dir, vec4 fo
 
 void main()
 {
-	vec3 eye_dir = get_world_normal(v_texcoord0);
+	vec3 eye_dir = get_world_normal(v_wpos.xy);
 	vec3 camera_wpos = mul(u_camInvView, vec4(0, 0, 0, 1)).xyz;
 	float fog_factor = getFogFactorSky(camera_wpos, u_fogColorDensity.w, eye_dir, u_fogParams);
 	vec4 sky_color = textureCube(u_texColor, eye_dir);

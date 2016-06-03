@@ -140,28 +140,28 @@ function hdr(ctx, camera_slot)
 		disableBlending(ctx.pipeline)
 		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[128])
 		bindFramebufferTexture(ctx.pipeline, "hdr", 0, ctx.hdr_buffer_uniform)
-		drawQuad(ctx.pipeline, -1, -1, 2, 2, ctx.lum_material)
+		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
 	
 	newView(ctx.pipeline, "hdr_avg_luminance")
 		setPass(ctx.pipeline, "HDR_AVG_LUMINANCE")
 		setFramebuffer(ctx.pipeline, "lum64")
 		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[64])
 		bindFramebufferTexture(ctx.pipeline, "lum128", 0, ctx.hdr_buffer_uniform)
-		drawQuad(ctx.pipeline, -1, -1, 2, 2, ctx.lum_material)
+		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
 
 	newView(ctx.pipeline, "lum16")
 		setPass(ctx.pipeline, "HDR_AVG_LUMINANCE")
 		setFramebuffer(ctx.pipeline, "lum16")
 		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[16])
 		bindFramebufferTexture(ctx.pipeline, "lum64", 0, ctx.hdr_buffer_uniform)
-		drawQuad(ctx.pipeline, -1, -1, 2, 2, ctx.lum_material)
+		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
 	
 	newView(ctx.pipeline, "lum4")
 		setPass(ctx.pipeline, "HDR_AVG_LUMINANCE")
 		setFramebuffer(ctx.pipeline, "lum4")
 		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[4])
 		bindFramebufferTexture(ctx.pipeline, "lum16", 0, ctx.hdr_buffer_uniform)
-		drawQuad(ctx.pipeline, -1, -1, 2, 2, ctx.lum_material)
+		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
 
 	local old_lum1 = "lum1b"
 	if ctx.current_lum1 == "lum1a" then 
@@ -177,7 +177,7 @@ function hdr(ctx, camera_slot)
 		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[1])
 		bindFramebufferTexture(ctx.pipeline, "lum4", 0, ctx.hdr_buffer_uniform)
 		bindFramebufferTexture(ctx.pipeline, old_lum1, 0, ctx.avg_luminance_uniform)
-		drawQuad(ctx.pipeline, -1, -1, 2, 2, ctx.lum_material)
+		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
 
 	setMaterialDefine(ctx.pipeline, ctx.hdr_material, "FILM_GRAIN", film_grain_enabled)
 	setMaterialDefine(ctx.pipeline, ctx.hdr_material, "DOF", dof_enabled)
@@ -187,7 +187,7 @@ function hdr(ctx, camera_slot)
 			setPass(ctx.pipeline, "SCREEN_SPACE")
 			setFramebuffer(ctx.pipeline, "dof")
 			bindFramebufferTexture(ctx.pipeline, "hdr", 0, ctx.texture_uniform)
-			drawQuad(ctx.pipeline, -1, 1.0, 2, -2, ctx.screen_space_material)
+			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.screen_space_material)
 
 
 		newView(ctx.pipeline, "blur_dof_h")
@@ -195,7 +195,7 @@ function hdr(ctx, camera_slot)
 			setFramebuffer(ctx.pipeline, "dof_blur")
 			disableDepthWrite(ctx.pipeline)
 			bindFramebufferTexture(ctx.pipeline, "dof", 0, ctx.shadowmap_uniform)
-			drawQuad(ctx.pipeline, -1, -1, 2, 2, ctx.blur_material)
+			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material)
 			enableDepthWrite(ctx.pipeline)
 
 		newView(ctx.pipeline, "blur_dof_v")
@@ -203,7 +203,7 @@ function hdr(ctx, camera_slot)
 			setFramebuffer(ctx.pipeline, "dof")
 			disableDepthWrite(ctx.pipeline)
 			bindFramebufferTexture(ctx.pipeline, "dof_blur", 0, ctx.shadowmap_uniform)
-			drawQuad(ctx.pipeline, -1, -1, 2, 2, ctx.blur_material);
+			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material);
 			enableDepthWrite(ctx.pipeline)
 
 		newView(ctx.pipeline, "hdr_dof")
@@ -240,7 +240,7 @@ function hdr(ctx, camera_slot)
 		setUniform(ctx.pipeline, ctx.grain_size_uniform, {{grain_size, 0, 0, 0}})
 	end
 	setUniform(ctx.pipeline, ctx.hdr_exposure_uniform, {{hdr_exposure, 0, 0, 0}})
-	drawQuad(ctx.pipeline, -1, 1, 2, -2, ctx.hdr_material)
+	drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.hdr_material)
 end
 
 function onDestroy()

@@ -85,7 +85,7 @@ vec3 get_world_normal(vec2 frag_coord)
 void main()
 {
 	vec3 lightdir = -u_lightDirFov.xyz;
-	vec3 eyedir = get_world_normal(v_texcoord0);
+	vec3 eyedir = get_world_normal(v_wpos.xy);
 	
 	float alpha = dot(eyedir, lightdir);
 	

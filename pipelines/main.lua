@@ -4,7 +4,7 @@ do_gamma_mapping = true
 
 local sky_enabled = true
 local cube_sky_enabled = true
-local deferred_enabled = true
+local deferred_enabled = false
 local render_debug_deferred = { false, false, false, false }
 local render_debug_deferred_fullsize = { false, false, false, false }
 
@@ -84,7 +84,7 @@ function deferred(camera_slot)
 		bindFramebufferTexture(this, "g_buffer", 1, gbuffer1_uniform)
 		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform)
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
-		drawQuad(this, -1, 1, 2, -2, deferred_material)
+		drawQuad(this, 0, 0, 1, 1, deferred_material)
 
 	newView(this, "deferred_debug_shapes")
 		setPass(this, "EDITOR")
@@ -121,9 +121,9 @@ function deferred(camera_slot)
 			setActiveGlobalLightUniforms(this)
 			disableDepthWrite(this)
 			if cube_sky_enabled then
-				drawQuad(this, -1, -1, 2, 2, cube_sky_material)
+				drawQuad(this, 0, 0, 1, 1, cube_sky_material)
 			else
-				drawQuad(this, -1, -1, 2, 2, sky_material)
+				drawQuad(this, 0, 0, 1, 1, sky_material)
 			end
 	end
 end
@@ -137,9 +137,9 @@ function main()
 			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
 			setActiveGlobalLightUniforms(this, sky_material)
 			if cube_sky_enabled then
-				drawQuad(this, -1, -1, 2, 2, cube_sky_material)
+				drawQuad(this, 0, 0, 1, 1, cube_sky_material)
 			else
-				drawQuad(this, -1, -1, 2, 2, sky_material)
+				drawQuad(this, 0, 0, 1, 1, sky_material)
 			end
 	end
 
@@ -194,12 +194,12 @@ function renderDebug(ctx)
 				setPass(ctx.pipeline, "SCREEN_SPACE")
 				setFramebuffer(ctx.pipeline, "default")
 				bindFramebufferTexture(ctx.pipeline, "g_buffer", i - 1, ctx.texture_uniform)
-				drawQuad(ctx.pipeline, 0.52 - offset_x, 0.98 - offset_y, 0.46, -0.46, ctx.screen_space_material)
+				drawQuad(ctx.pipeline, 0.01 + offset_x, 0.01 + offset_y, 0.23, 0.23, ctx.screen_space_material)
 				
-			offset_x = offset_x + 0.5
-			if offset_x > 1.6 then
+			offset_x = offset_x + 0.25
+			if offset_x > 0.76 then
 				offset_x = 0.0
-				offset_y = offset_y + 0.5
+				offset_y = offset_y + 0.25
 			end
 		end
 	end
@@ -210,7 +210,7 @@ function renderDebug(ctx)
 				setPass(ctx.pipeline, "SCREEN_SPACE")
 				setFramebuffer(ctx.pipeline, "default")
 				bindFramebufferTexture(ctx.pipeline, "g_buffer", i - 1, ctx.texture_uniform)
-				drawQuad(ctx.pipeline, -1, 1, 2, -2, ctx.screen_space_material)
+				drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.screen_space_material)
 		end
 	end
 end
@@ -235,7 +235,7 @@ function render()
 			setPass(this, "GAMMA_MAPPING")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "forward", 0, texture_uniform)
-			drawQuad(this, -1, 1, 2, -2, gamma_mapping_material)
+			drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
 	end
 	
 	common.editor(ctx)

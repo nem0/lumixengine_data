@@ -2,7 +2,9 @@ $input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_common2
 
 #include "common.sh"
 
-SAMPLER2D(u_texColor, 0);
+#ifdef DIFFUSE_TEXTURE
+	SAMPLER2D(u_texColor, 0);
+#endif
 #ifdef NORMAL_MAPPING
 	SAMPLER2D(u_texNormal, 1);
 #endif
@@ -17,7 +19,7 @@ uniform vec4 u_lightRgbAttenuation;
 uniform vec4 u_ambientColor;
 uniform vec4 u_lightDirFov; 
 uniform mat4 u_shadowmapMatrices[4];
-uniform vec4 u_fogColorDensity; 
+uniform vec4 u_fogColorDensity;
 uniform vec4 u_lightSpecular;
 uniform vec4 u_materialColorShininess;
 uniform vec4 u_attenuationParams;
@@ -26,7 +28,11 @@ uniform vec4 u_fogParams;
 
 void main()
 {     
-	vec4 color = texture2D(u_texColor, v_texcoord0);
+	#ifdef DIFFUSE_TEXTURE
+		vec4 color = texture2D(u_texColor, v_texcoord0);
+	#else
+		vec4 color = vec4(1, 1, 1, 1);
+	#endif
 	#ifdef ALPHA_CUTOUT
 		if(color.a < u_alphaRef) discard;
 	#endif

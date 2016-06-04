@@ -22,7 +22,7 @@ addFramebuffer(this, "forward", {
 	size_ratio = {1, 1},
 	renderbuffers = {
 		{ format = "rgba8" },
-		{ format = "depth24" }
+		{ format = "depth24stencil8" }
 	}
 })
 
@@ -34,7 +34,7 @@ addFramebuffer(this, "g_buffer", {
 		{ format = "rgba8" },
 		{ format = "rgba8" },
 		{ format = "rgba8" },
-		{ format = "depth24" }
+		{ format = "depth24stencil8" }
 	}
 })
   

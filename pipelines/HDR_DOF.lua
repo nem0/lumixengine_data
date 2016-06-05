@@ -93,7 +93,7 @@ function initHDR(ctx)
 		screen_size = true,
 		renderbuffers = {
 			{ format = "rgba16f" },
-			{ format = "depth24" }
+			{ format = "depth24stencil8" }
 		}
 	})
 

@@ -1,3 +1,4 @@
-{"shader" : "shaders/editorobjects.shd",
-"backface_culling" : false,
-"texture" : {"source" : "camera_icon.dds", "srgb" : true}}
+{
+	"shader" : "shaders/editorplastic.shd"
+,
+	"color" : [0.0586630, 0.3240160, 0.6400000]}

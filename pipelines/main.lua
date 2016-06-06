@@ -12,7 +12,7 @@ addFramebuffer(this, "default", {
 	width = 1024,
 	height = 1024,
 	renderbuffers = {
-		{ format = "rgba8" },
+		{ format = "rgba8" }
 	}
 })
 
@@ -227,18 +227,21 @@ function render()
 		pointLight(this)		
 	end
 	fur(this)
+	common.renderEditorIcons(ctx)
 
 	postprocessCallback(this, "editor")
 
+	
 	if do_gamma_mapping then
 		newView(this, "SRGB")
+			clear(this, CLEAR_ALL, 0x00000000)
 			setPass(this, "GAMMA_MAPPING")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "forward", 0, texture_uniform)
 			drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
 	end
 	
-	common.editor(ctx)
+	common.renderGizmo(ctx)
 	renderDebug(ctx)
 end
 

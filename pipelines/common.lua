@@ -7,17 +7,20 @@ module.blur_shadowmap = true
 module.render_shadowmap_debug = false
 module.render_shadowmap_debug_fullsize = false
 
-
-function module.editor(ctx)
+function module.renderEditorIcons(ctx)
 	if render_gizmos then
 		newView(ctx.pipeline, "editor")
 			setPass(ctx.pipeline, "EDITOR")
-			setFramebuffer(ctx.pipeline, "default")
-			disableDepthWrite(ctx.pipeline)
-			disableBlending(ctx.pipeline)
+			setFramebuffer(ctx.pipeline, ctx.main_framebuffer)
+			enableDepthWrite(ctx.pipeline)
+			--disableBlending(ctx.pipeline)
 			applyCamera(ctx.pipeline, "editor")
 			renderIcons(ctx.pipeline)
+	end
+end
 
+function module.renderGizmo(ctx)
+	if render_gizmos then
 		newView(ctx.pipeline, "gizmo")
 			setPass(ctx.pipeline, "EDITOR")
 			disableDepthWrite(ctx.pipeline)

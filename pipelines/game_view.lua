@@ -4,7 +4,7 @@ do_gamma_mapping = true
 
 local sky_enabled = true
 local cube_sky_enabled = true
-local deferred_enabled = true
+local deferred_enabled = false
 local render_debug_deferred = { false, false, false, false }
 local render_debug_deferred_fullsize = { false, false, false, false }
 

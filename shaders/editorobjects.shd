@@ -1,4 +1,5 @@
 pass "EDITOR"
-   
+	fs { "DIFFUSE_TEXTURE" }
   
 texture_slot("Diffuse", "u_texColor")
+	texture_define "DIFFUSE_TEXTURE"

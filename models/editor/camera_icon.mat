@@ -1,4 +1,4 @@
 {
-	"shader" : "shaders/editorplastic.shd"
+	"shader" : "shaders/editorobjects.shd"
 ,
-	"color" : [0.0586630, 0.3240160, 0.6400000]}
+	"color" : [0.176662, 0.414470, 0.798995]}

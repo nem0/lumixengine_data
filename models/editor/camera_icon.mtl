@@ -1,0 +1,12 @@
+# Blender MTL File: 'directional_light_icon.blend'
+# Material Count: 1
+
+newmtl directional_light_icon
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.077822 0.393622 0.640000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2

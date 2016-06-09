@@ -1,3 +1,4 @@
-{"shader" : "shaders/editorobjects.shd",
-"backface_culling" : false,
-"texture" : {"source" : "directional_light_icon.dds", "srgb" : true}}
+{
+	"shader" : "shaders/editorplastic.shd"
+,
+	"color" : [0.0778220, 0.3936220, 0.6400000]}

@@ -19,7 +19,7 @@ void main()
 	vec3 wpos = instMul(model, vec4(a_position, 1.0) ).xyz;
 	gl_Position = mul(u_viewProj, vec4(wpos, 1.0) );
 	vec4 normal = a_normal * 2.0 - 1.0;
-	v_normal = vec4(normal.xyz, 0.0);
+	v_normal = normal.xyz;
 	
 	v_wpos = wpos;
 	v_texcoord0 = a_texcoord0;

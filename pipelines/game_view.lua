@@ -183,6 +183,14 @@ function pointLight()
 		renderPointLightLitGeometry(this)
 end
 
+function ingameGUI()
+	newView(this, "ingame_gui")
+		setPass(this, "IMGUI")
+		setFramebuffer(this, "default")
+		clear(this, CLEAR_DEPTH, 0x303030ff)
+		renderIngameGUI(this)
+end
+
 function render()
 	common.shadowmap(ctx, "main")
 	if deferred_enabled then
@@ -204,4 +212,6 @@ function render()
 			bindFramebufferTexture(this, "forward", 0, texture_uniform)
 			drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
 	end
+	
+	ingameGUI(ctx)
 end

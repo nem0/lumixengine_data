@@ -1,0 +1,3 @@
+{"shader" : "shaders/decal.shd",
+"texture" : {"source" : "blood.dds", "srgb" : true},
+"uniforms" : []}

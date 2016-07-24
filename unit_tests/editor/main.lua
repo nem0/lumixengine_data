@@ -1,8 +1,9 @@
 Engine.logInfo("Commencing editor tests");
 local failed_count = 0
 local tests = { 
-	"unit_tests/editor/simple", 
+	"unit_tests/editor/joints",
 	"unit_tests/editor/particles", 
+	"unit_tests/editor/simple", 
 	"unit_tests/editor/terrain" 
 }
 

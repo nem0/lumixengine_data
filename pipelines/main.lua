@@ -73,6 +73,14 @@ function deferred(camera_slot)
 	newView(this, "copyRenderbuffer");
 		copyRenderbuffer(this, "g_buffer", 3, ctx.main_framebuffer, 1)
 		
+	newView(this, "decals")
+		setPass(this, "DEFERRED")
+		disableDepthWrite(this)
+		setFramebuffer(this, "g_buffer")
+		applyCamera(this, camera_slot)
+		bindFramebufferTexture(this, ctx.main_framebuffer, 1, gbuffer_depth_uniform)
+		renderDecalsVolumes(this)
+	
 	newView(this, "main")
 		setPass(this, "MAIN")
 		setFramebuffer(this, ctx.main_framebuffer)
@@ -85,7 +93,7 @@ function deferred(camera_slot)
 		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform)
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
 		drawQuad(this, 0, 0, 1, 1, deferred_material)
-
+		
 	newView(this, "deferred_debug_shapes")
 		setPass(this, "EDITOR")
 		setFramebuffer(this, ctx.main_framebuffer)

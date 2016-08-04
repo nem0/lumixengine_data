@@ -1,5 +1,9 @@
-$input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_common2
-
+#if defined BUMP_TEXTURE && !defined SKINNED
+	$input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_common2, v_tangent_view_pos
+#else
+	$input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_common2
+#endif	
+	
 #include "common.sh"
 
 #ifdef DIFFUSE_TEXTURE
@@ -10,6 +14,9 @@ $input v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_common2
 #endif
 #ifdef SPECULAR_TEXTURE
 	SAMPLER2D(u_texSpecular, 2);
+#endif
+#ifdef BUMP_TEXTURE
+	SAMPLER2D(u_texBump, 3);
 #endif
 #ifndef SHADOW
 	SAMPLER2D(u_texShadowmap, 15);
@@ -24,12 +31,56 @@ uniform vec4 u_lightSpecular;
 uniform vec4 u_materialColorShininess;
 uniform vec4 u_attenuationParams;
 uniform vec4 u_fogParams;
+uniform vec4 u_parallaxScale;
+
+
+#ifdef BUMP_TEXTURE
+vec2 parallaxMapping(sampler2D bump_map, vec2 texCoords, vec3 viewDir)
+{ 
+	const float height_scale = u_parallaxScale.x;
+    const float minLayers = 10;
+    const float maxLayers = 20;
+    float numLayers = mix(maxLayers, minLayers, abs(viewDir.y));  
+    float layerDepth = 1.0 / numLayers;
+    float currentLayerDepth = 0.0;
+    vec2 P = viewDir.xz * height_scale; 
+    vec2 deltaTexCoords = P / numLayers;
+  
+    vec2  currentTexCoords     = texCoords;
+    float currentDepthMapValue = texture2D(bump_map, currentTexCoords).r;
+      
+	[unroll(20)]
+    while(currentLayerDepth < currentDepthMapValue)
+    {
+        currentTexCoords += deltaTexCoords;
+        currentDepthMapValue = texture2D(bump_map, currentTexCoords).r;  
+        currentLayerDepth += layerDepth;  
+    }
+    
+    vec2 prevTexCoords = currentTexCoords - deltaTexCoords;
+
+    float afterDepth  = currentDepthMapValue - currentLayerDepth;
+    float beforeDepth = texture2D(bump_map, prevTexCoords).r - currentLayerDepth + layerDepth;
+ 
+    float weight = afterDepth / (afterDepth - beforeDepth);
+    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
+
+    return finalTexCoords;
+}
+
+#endif
 
 
 void main()
 {     
+	#ifdef BUMP_TEXTURE
+		vec2 tex_coords = parallaxMapping(u_texBump, v_texcoord0, normalize(-v_tangent_view_pos));
+	#else
+		vec2 tex_coords = v_texcoord0;
+	#endif
+
 	#ifdef DIFFUSE_TEXTURE
-		vec4 color = texture2D(u_texColor, v_texcoord0);
+		vec4 color = texture2D(u_texColor, tex_coords);
 	#else
 		vec4 color = vec4(1, 1, 1, 1);
 	#endif
@@ -47,7 +98,7 @@ void main()
 				normalize(v_bitangent)
 				);
 			tbn = transpose(tbn);
-			normal.xzy = texture2D(u_texNormal, v_texcoord0).xyz * 2.0 - 1.0;
+			normal.xzy = texture2D(u_texNormal, tex_coords).xyz * 2.0 - 1.0;
 			normal = normalize(mul(tbn, normal));
 		#else
 			normal = normalize(v_normal);
@@ -57,7 +108,7 @@ void main()
 		float spec = u_materialColorShininess.g / 64.0;
 		float shininess = u_materialColorShininess.a / 64.0;
 		#ifdef SPECULAR_TEXTURE
-			spec *= texture2D(u_texSpecular, v_texcoord0).g;
+			spec *= texture2D(u_texSpecular, tex_coords).g;
 		#endif
 		gl_FragData[2] = vec4(spec, shininess, 0, 1);
 	#else
@@ -74,7 +125,7 @@ void main()
 						
 			vec3 wnormal;
 			#ifdef NORMAL_MAPPING
-				wnormal.xzy = texture2D(u_texNormal, v_texcoord0).xyz * 2.0 - 1.0;
+				wnormal.xzy = texture2D(u_texNormal, tex_coords).xyz * 2.0 - 1.0;
 				wnormal = mul(tbn, wnormal);
 			#else
 				wnormal = normalize(v_normal.xyz);
@@ -83,7 +134,7 @@ void main()
 					 
 			vec3 texture_specular = 
 			#ifdef SPECULAR_TEXTURE
-				texture2D(u_texSpecular, v_texcoord0).rgb;
+				texture2D(u_texSpecular, tex_coords).rgb;
 			#else
 				vec3(1, 1, 1);
 			#endif
@@ -93,7 +144,7 @@ void main()
 				, v_wpos
 				, wnormal
 				, view
-				, v_texcoord0
+				, tex_coords
 				, u_lightPosRadius
 				, u_lightRgbAttenuation
 				, u_materialColorShininess
@@ -134,6 +185,10 @@ void main()
 				gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
 			#endif
 			gl_FragColor.w = 1.0;
+			#ifdef BUMP_TEXTURE
+				vec3 tmp = normalize(v_tangent_view_pos);
+				//gl_FragColor = vec4(tmp.x, tmp.y, tmp.z, 1);
+			#endif
 		#endif       
 	#endif		
 }

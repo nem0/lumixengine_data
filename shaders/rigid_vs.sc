@@ -5,7 +5,11 @@
 	uniform mat4 u_boneMatrices[128];
 #else
 	$input a_position, a_normal, a_tangent, a_texcoord0, i_data0, i_data1, i_data2, i_data3
-	$output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_common2
+	#ifdef BUMP_TEXTURE
+		$output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_common2, v_tangent_view_pos
+	#else
+		$output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_common2
+	#endif
 #endif
 
 #include "common.sh"
@@ -58,13 +62,19 @@ void main()
 	#endif
 	
 	#ifndef SHADOW
-		vec4 normal = a_normal * 2.0 - 1.0;
-		vec4 tangent = a_tangent * 2.0 - 1.0;
+		vec3 normal = (a_normal * 2.0 - 1.0).xyz;
+		vec3 tangent = (a_tangent * 2.0 - 1.0).xyz;
 
-		v_normal = instMul(model, vec4(normal.xyz, 0.0) ).xyz;
-		v_tangent = instMul(model, vec4(tangent.xyz, 0.0) ).xyz;
-		v_bitangent = cross(v_normal, v_tangent);
+		v_normal = instMul(model, vec4(normal, 0.0) ).xyz;
+		v_tangent = instMul(model, vec4(tangent, 0.0) ).xyz;
+		v_bitangent = cross(v_tangent, v_normal);
 		v_view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - v_wpos;
+		
+		#if defined BUMP_TEXTURE && !defined SKINNED
+			mat3 TBN = mat3(v_tangent, v_normal, v_bitangent);
+			v_tangent_view_pos = mul(TBN, v_view);
+		#endif
+
 	#endif
 	v_texcoord0 = a_texcoord0;
 	v_common2 = mul(u_viewProj, vec4(v_wpos, 1.0) ); 

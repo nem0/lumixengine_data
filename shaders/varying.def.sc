@@ -6,6 +6,7 @@ vec3 v_normal    		: NORMAL    = vec3(0.0, 0.0, 1.0);
 vec3 v_tangent   	: TANGENT   = vec3(1.0, 0.0, 0.0);
 vec3 v_bitangent 	: BINORMAL  = vec3(0.0, 1.0, 0.0);
 vec3 v_common 		: TEXCOORD4  = vec3(0.0, 1.0, 0.0);
+vec3 v_tangent_view_pos	: TEXCOORD4 = vec3(0.0, 0.0, 0.0);
 vec4 v_common2 	: TEXCOORD5 = vec4(0.0, 0.0, 0.0, 0.0);
 vec4 v_pos_radius 	: TEXCOORD6 = vec4(0.0, 0.0, 0.0, 0.0);
 vec4 v_color_attn 	: TEXCOORD7 = vec4(0.0, 0.0, 0.0, 0.0);

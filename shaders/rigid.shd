@@ -4,19 +4,23 @@ texture_slot("Normal","u_texNormal")
 	texture_define "NORMAL_MAPPING"
 texture_slot("Specular", "u_texSpecular")
 	texture_define "SPECULAR_TEXTURE"
+texture_slot("Wind", "u_noise")
+	texture_define "WIND_ANIMATION"
 
 pass "MAIN"
 	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT", "DIFFUSE_TEXTURE"}
-	vs { "SKINNED" }
+	vs { "SKINNED", "WIND_ANIMATION" }
 	
 pass "SHADOW"
 	fs { "ALPHA_CUTOUT" }
-	vs { "SKINNED" }
+	vs { "SKINNED", "WIND_ANIMATION" }
 	
 pass "POINT_LIGHT"
 	fs { "NORMAL_MAPPING", "SPECULAR_TEXTURE", "HAS_SHADOWMAP", "ALPHA_CUTOUT", "DIFFUSE_TEXTURE" }
-	vs { "SKINNED" }
+	vs { "SKINNED", "WIND_ANIMATION" }
 	
 pass "DEFERRED"
 	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT", "DIFFUSE_TEXTURE" }
-	vs { "SKINNED" }
+	vs { "SKINNED", "WIND_ANIMATION" }
+	
+uniform("u_time", "time")

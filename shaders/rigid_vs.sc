@@ -17,16 +17,12 @@
 
 void main()
 {
-	const float MOVE_FACTOR = 0.26;
+	const float MOVE_FACTOR = 0.06;
 	const float FREQUENCY = 2;
 	const float WIND_STRENGTH = 1.0;
 	const vec3 WIND_DIR = vec3(1, 0, 0);
 	#ifdef SKINNED
-		mat4 model = 
-			mul(u_model[0], a_weight.x * u_boneMatrices[int(a_indices.x)] + 
-			a_weight.y * u_boneMatrices[int(a_indices.y)] +
-			a_weight.z * u_boneMatrices[int(a_indices.z)] +
-			a_weight.w * u_boneMatrices[int(a_indices.w)]);
+		mat4 model = u_model[0];
 	#else
 		mat4 model;
 		model[0] = i_data0;
@@ -50,7 +46,12 @@ void main()
 		}
 	#endif	
 
-	#ifdef SKINNED
+	#ifdef SKINNED	
+		model = mul(u_model[0], a_weight.x * u_boneMatrices[int(a_indices.x)] + 
+			a_weight.y * u_boneMatrices[int(a_indices.y)] +
+			a_weight.z * u_boneMatrices[int(a_indices.z)] +
+			a_weight.w * u_boneMatrices[int(a_indices.w)]);
+
 		v_wpos = mul(model, vec4(position, 1.0) ).xyz;
 	#else
 		v_wpos = instMul(model, vec4(position, 1.0) ).xyz;

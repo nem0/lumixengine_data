@@ -1,6 +1,11 @@
-{
-	"shader" : "shaders/skinned.shd"
-	, "texture" : {
-		"source" : "deer-head.dds", "srgb" : true
- }
-}
+{"shader" : "shaders/rigid.shd",
+"texture" : {"source" : "/models/creatures/deer/deer-head.dds",
+"srgb" : true},
+"defines" : ["DIFFUSE_TEXTURE"],
+"uniforms" : [{"name" : "u_time",
+"time" : 0}],
+"shininess" : 4.00000000,
+"alpha_ref" : 0.30000000,
+"color" : [1.00000000,
+1.00000000,
+1.00000000]}

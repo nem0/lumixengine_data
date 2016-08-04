@@ -3,7 +3,7 @@ $input v_wpos, v_texcoord0 // in...
 #include "common.sh"
 
 SAMPLER2D(u_texture, 15);
-
+uniform vec4 u_light_screen_pos;
 
 void main()
 {	
@@ -11,7 +11,7 @@ void main()
 	const float decay = 0.99;
 	const float density = 0.5;
 	const float weight = 1.0;
-	const vec2 lightPositionOnScreen = vec2(0.5, 0.2);
+	const vec2 lightPositionOnScreen = u_light_screen_pos.xy;
 	const int NUM_SAMPLES = 100;
 	float illuminationDecay = 0.5;
 

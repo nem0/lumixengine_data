@@ -2,8 +2,6 @@ common = require "pipelines/common"
 ctx = { pipeline = this, main_framebuffer = "forward" }
 do_gamma_mapping = true
 
-local sky_enabled = true
-local cube_sky_enabled = true
 local deferred_enabled = false
 local render_debug_deferred = { false, false, false, false }
 local render_debug_deferred_fullsize = { false, false, false, false }
@@ -45,8 +43,6 @@ common.initShadowmap(ctx)
 local texture_uniform = createUniform(this, "u_texture")
 local blur_material = loadMaterial(this, "shaders/blur.mat")
 local screen_space_material = loadMaterial(this, "shaders/screen_space.mat")
-local sky_material = loadMaterial(this, "shaders/sky.mat")
-local cube_sky_material = loadMaterial(this, "models/sky/miramar/sky.mat")
 local gbuffer0_uniform = createUniform(this, "u_gbuffer0")
 local gbuffer1_uniform = createUniform(this, "u_gbuffer1")
 local gbuffer2_uniform = createUniform(this, "u_gbuffer2")
@@ -114,49 +110,20 @@ function deferred(camera_slot)
 		applyCamera(this, camera_slot)
 		renderLightVolumes(this, deferred_point_light_material)
 		disableBlending(this)
-		
-	if sky_enabled then
-		newView(this, "sky")
-			setPass(this, "SKY")
-			setStencil(this, STENCIL_OP_PASS_Z_KEEP 
-				| STENCIL_OP_FAIL_Z_KEEP 
-				| STENCIL_OP_FAIL_S_KEEP 
-				| STENCIL_TEST_NOTEQUAL)
-			setStencilRMask(this, 1)
-			setStencilRef(this, 1)
-
-			setFramebuffer(this, ctx.main_framebuffer)
-			setActiveGlobalLightUniforms(this)
-			disableDepthWrite(this)
-			if cube_sky_enabled then
-				drawQuad(this, 0, 0, 1, 1, cube_sky_material)
-			else
-				drawQuad(this, 0, 0, 1, 1, sky_material)
-			end
-	end
+	
 end
 
 function main()
-	if sky_enabled then
-		newView(this, "sky")
-			setPass(this, "SKY")
-			setFramebuffer(this, ctx.main_framebuffer)
-			disableDepthWrite(this)
-			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
-			setActiveGlobalLightUniforms(this, sky_material)
-			if cube_sky_enabled then
-				drawQuad(this, 0, 0, 1, 1, cube_sky_material)
-			else
-				drawQuad(this, 0, 0, 1, 1, sky_material)
-			end
-	end
-
 	main_view = newView(this, "MAIN")
+		setStencil(this, STENCIL_OP_PASS_Z_REPLACE 
+			| STENCIL_OP_FAIL_Z_KEEP 
+			| STENCIL_OP_FAIL_S_KEEP 
+			| STENCIL_TEST_ALWAYS)
+		setStencilRMask(this, 0xff)
+		setStencilRef(this, 1)
 		setPass(this, "MAIN")
 		enableDepthWrite(this)
-		if not sky_enabled then
-			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
-		end
+		clear(this, CLEAR_ALL, 0xffffFFFF)
 		enableRGBWrite(this)
 		setFramebuffer(this, ctx.main_framebuffer)
 		applyCamera(this, "editor")
@@ -290,8 +257,6 @@ function onGUI()
 		end
 		changed, common.blur_shadowmap = ImGui.Checkbox("Blur shadowmap", common.blur_shadowmap)
 		changed, deferred_enabled = ImGui.Checkbox("Deferred", deferred_enabled)
-		changed, sky_enabled = ImGui.Checkbox("Sky", sky_enabled)
-		changed, cube_sky_enabled = ImGui.Checkbox("Cubemap sky", cube_sky_enabled)
 		
 		ImGui.EndPopup()
 	end

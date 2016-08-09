@@ -31,7 +31,7 @@ end
 
 
 function initPostprocess(pipeline, env)
-	env.ctx.ssao_material = loadMaterial(pipeline, "shaders/ssao.mat")
+	env.ctx.ssao_material = Engine.loadResource(g_engine, "shaders/ssao.mat", "material")
 
 	addFramebuffer(pipeline,  "SSAO", {
 		width = 512,

@@ -2,7 +2,7 @@ enabled = true
 local camera_cmp_type = Engine.getComponentType("camera")
 
 function initPostprocess(pipeline, env)
-	env.ctx.godrays_material = loadMaterial(pipeline, "shaders/godrays.mat")
+	env.ctx.godrays_material = Engine.loadResource(g_engine, "shaders/godrays.mat", "material")
 	env.ctx.global_light_screen_pos_uniform = createUniform(pipeline, "u_light_screen_pos")
 end
 

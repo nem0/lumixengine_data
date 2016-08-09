@@ -1,13 +1,9 @@
-cube_sky_enabled = true
-
-
-function initPostprocess(pipeline, env)
-	env.ctx.sky_material = loadMaterial(pipeline, "shaders/sky.mat")
-	env.ctx.cube_sky_material = loadMaterial(pipeline, "models/sky/miramar/sky.mat")
-end
+sky_material = -1
+Editor.setPropertyType("sky_material", Editor.RESOURCE_PROPERTY, "material")
 
 
 function postprocess(pipeline, env)
+	if sky_material < 0 then return end
 	newView(pipeline, "sky")
 		setPass(pipeline, "SKY")
 		setStencil(pipeline, STENCIL_OP_PASS_Z_KEEP 
@@ -20,9 +16,5 @@ function postprocess(pipeline, env)
 		setFramebuffer(pipeline, env.ctx.main_framebuffer)
 		setActiveGlobalLightUniforms(pipeline)
 		disableDepthWrite(pipeline)
-		if cube_sky_enabled then
-			drawQuad(pipeline, 0, 0, 1, 1, env.ctx.cube_sky_material)
-		else
-			drawQuad(pipeline, 0, 0, 1, 1, env.ctx.sky_material)
-		end
+		drawQuad(pipeline, 0, 0, 1, 1, sky_material)
 end

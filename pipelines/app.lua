@@ -8,9 +8,9 @@ common.initShadowmap(ctx)
 
 
 local texture_uniform = createUniform(this, "u_texture")
-local blur_material = loadMaterial(this, "shaders/blur.mat")
-local screen_space_material = loadMaterial(this, "shaders/screen_space.mat")
-local sky_material = loadMaterial(this, "models/sky/miramar/sky.mat")--"shaders/sky.mat")
+local blur_material = Engine.loadResource(g_engine, "shaders/blur.mat", "material")
+local screen_space_material = Engine.loadResource(g_engine, "shaders/screen_space.mat", "material")
+local sky_material = Engine.loadResource(g_engine, "models/sky/miramar/sky.mat", "material")--"shaders/sky.mat")
 
 
 function main()

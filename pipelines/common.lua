@@ -93,9 +93,9 @@ end
 
 
 function module.init(ctx)
-	ctx.screen_space_material = loadMaterial(ctx.pipeline, "shaders/screen_space.mat")
+	ctx.screen_space_material = Engine.loadResource(g_engine, "shaders/screen_space.mat", "material")
 	ctx.texture_uniform = createUniform(ctx.pipeline, "u_texture")
-	ctx.blur_material = loadMaterial(ctx.pipeline, "shaders/blur.mat")
+	ctx.blur_material = Engine.loadResource(g_engine, "shaders/blur.mat", "material")
 	ctx.depth_buffer_uniform = createUniform(ctx.pipeline, "u_depthBuffer")
 end
 

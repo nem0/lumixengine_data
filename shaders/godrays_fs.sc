@@ -11,7 +11,7 @@ void main()
 	const float decay = 0.99;
 	const float density = 0.5;
 	const float weight = 1.0;
-	const vec2 lightPositionOnScreen = u_light_screen_pos.xy;
+	vec2 lightPositionOnScreen = u_light_screen_pos.xy;
 	const int NUM_SAMPLES = 100;
 	float illuminationDecay = 0.5;
 

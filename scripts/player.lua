@@ -4,6 +4,7 @@ MOUSE_SENSITIVITY = 1
 dest_entity = -1
 Editor.setPropertyType("camera_entity", Editor.ENTITY_PROPERTY)
 Editor.setPropertyType("dest_entity", Editor.ENTITY_PROPERTY)
+input_enabled = true
 
 local LSHIFT_KEY = 160
 
@@ -41,6 +42,8 @@ function init()
 end
 
 function update(dt)
+	if not input_enabled then return end
+
 	yaw = yaw + Engine.getInputActionValue(g_engine, ROT_H_ACTION) * -0.01 * MOUSE_SENSITIVITY;
 	pitch = pitch + Engine.getInputActionValue(g_engine, ROT_V_ACTION) * -0.01 * MOUSE_SENSITIVITY;
 	
@@ -85,14 +88,5 @@ function update(dt)
 	if Engine.getInputActionValue(g_engine, BACK_ACTION) > 0 then
 		local v = Engine.multVecQuat({0, 0, speed}, {0, 1, 0}, yaw)
 		Physics.moveController(scene, cmp, v, dt)
-	end
-end
-
-local deb = false
-local deb_paths = false
-function onGUI()
-	if ImGui.Button("Navigate") then
-		local d = Engine.getEntityPosition(g_universe, dest_entity)
-		Navigation.navigate(g_scene_navigation, this, d, 12)
 	end
 end

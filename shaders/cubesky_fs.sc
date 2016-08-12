@@ -26,7 +26,7 @@ vec3 get_world_normal(vec2 frag_coord)
 
 float getFogFactorSky(vec3 camera_wpos, float fog_density, vec3 eye_dir, vec4 fog_params) 
 {
-	if(eye_dir.y == 0) return 1;
+	if(eye_dir.y == 0) return 1.0;
 	float camera_height = camera_wpos.y;
 	float to_top = max(0, (fog_params.x + fog_params.y) - camera_height);
 

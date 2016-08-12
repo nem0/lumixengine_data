@@ -37,7 +37,7 @@ uniform vec4 u_parallaxScale;
 #ifdef BUMP_TEXTURE
 vec2 parallaxMapping(sampler2D bump_map, vec2 texCoords, vec3 viewDir)
 { 
-	const float height_scale = u_parallaxScale.x;
+	float height_scale = u_parallaxScale.x;
     const float minLayers = 10;
     const float maxLayers = 20;
     float numLayers = mix(maxLayers, minLayers, abs(viewDir.y));  
@@ -49,7 +49,9 @@ vec2 parallaxMapping(sampler2D bump_map, vec2 texCoords, vec3 viewDir)
     vec2  currentTexCoords     = texCoords;
     float currentDepthMapValue = texture2D(bump_map, currentTexCoords).r;
       
+	#if BGFX_SHADER_LANGUAGE_HLSL
 	[unroll(20)]
+	#endif
     while(currentLayerDepth < currentDepthMapValue)
     {
         currentTexCoords += deltaTexCoords;

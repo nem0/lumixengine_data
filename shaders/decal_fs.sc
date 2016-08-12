@@ -36,7 +36,7 @@ void main()
 	
 	vec3 tmp = mul(u_decalMatrix, vec4(wpos, 1)).xyz;
 	
-	clip(1.0 - abs(tmp));
+	if(any(greaterThan(abs(tmp), vec3_splat(1.0)))) discard;
 	
 	vec4 color = texture2D(u_texColor, tmp.xy * 0.5 - 0.5);
 	if(color.a < 0.5) discard;

@@ -9,11 +9,13 @@ enabled = true
 max_dof_blur = 0.5
 dof_clear_range = 0
 dof_near_multiplier = 100
+fxaa_enabled = true
 
 local pipeline_env = nil
 
 local current_lum1 = "lum1a"
 local lum_uniforms = {}
+
 
 function computeLumUniforms()
 	local sizes = {64, 16, 4, 1 }
@@ -114,14 +116,27 @@ function initHDR(ctx)
 			{ format = "rgba8" },
 		}
 	})
+
+	if fxaa_enabled then	
+		addFramebuffer(ctx.pipeline, "fxaa", {
+			width = 1024,
+			height = 1024,
+			size_ratio = {1, 1},
+			renderbuffers = {
+				{ format = "rgba8" },
+			}
+		})
+	end
 	
 	ctx.avg_luminance_uniform = createUniform(ctx.pipeline, "u_avgLuminance")
 	ctx.grain_amount_uniform = createUniform(ctx.pipeline, "u_grainAmount")
 	ctx.grain_size_uniform = createUniform(ctx.pipeline, "u_grainSize")
 	ctx.lum_material = Engine.loadResource(g_engine, "shaders/hdrlum.mat", "material")
 	ctx.hdr_material = Engine.loadResource(g_engine, "shaders/hdr.mat", "material")
+	ctx.fxaa_material = Engine.loadResource(g_engine, "shaders/fxaa.mat", "material")
 	ctx.hdr_buffer_uniform = createUniform(ctx.pipeline, "u_hdrBuffer")
 	ctx.dof_buffer_uniform = createUniform(ctx.pipeline, "u_dofBuffer")
+	ctx.fxaa_buffer_uniform = createUniform(ctx.pipeline, "u_fxaaBuffer")
 	ctx.hdr_exposure_uniform = createVec4ArrayUniform(ctx.pipeline, "exposure", 1)
 	ctx.dof_focal_distance_uniform = createUniform(ctx.pipeline, "focal_distance", 1)
 	ctx.dof_focal_range_uniform = createUniform(ctx.pipeline, "focal_range", 1)
@@ -208,7 +223,11 @@ function hdr(ctx, camera_slot)
 
 		newView(ctx.pipeline, "hdr_dof")
 			setPass(ctx.pipeline, "POSTPROCESS")
-			setFramebuffer(ctx.pipeline, "default")
+			if fxaa_enabled then
+				setFramebuffer(ctx.pipeline, "fxaa")
+			else
+				setFramebuffer(ctx.pipeline, "default")
+			end
 			disableBlending(ctx.pipeline)
 			applyCamera(ctx.pipeline, camera_slot)
 			disableDepthWrite(ctx.pipeline)
@@ -227,7 +246,11 @@ function hdr(ctx, camera_slot)
 	else
 		newView(ctx.pipeline, "hdr")
 			setPass(ctx.pipeline, "POSTPROCESS")
-			setFramebuffer(ctx.pipeline, "default")
+			if fxaa_enabled then
+				setFramebuffer(ctx.pipeline, "fxaa")
+			else
+				setFramebuffer(ctx.pipeline, "default")
+			end
 			disableBlending(ctx.pipeline)
 			applyCamera(ctx.pipeline, camera_slot)
 			disableDepthWrite(ctx.pipeline)
@@ -241,6 +264,22 @@ function hdr(ctx, camera_slot)
 	end
 	setUniform(ctx.pipeline, ctx.hdr_exposure_uniform, {{hdr_exposure, 0, 0, 0}})
 	drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.hdr_material)
+
+	fxaa(ctx, camera_slot)
+end
+
+function fxaa(ctx, camera_slot)
+		if not fxaa_enabled then return end
+		
+		newView(ctx.pipeline, "fxaa")
+			setPass(ctx.pipeline, "POSTPROCESS")
+			setFramebuffer(ctx.pipeline, "default")
+			disableBlending(ctx.pipeline)
+			applyCamera(ctx.pipeline, camera_slot)
+			disableDepthWrite(ctx.pipeline)
+			clear(ctx.pipeline, CLEAR_DEPTH, 0x00000000)
+			bindFramebufferTexture(ctx.pipeline, "fxaa", 0, ctx.fxaa_buffer_uniform)
+			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.fxaa_material)
 end
 
 function onDestroy()

@@ -712,7 +712,6 @@ void main()
 {
 	vec2 pixel_offset = 1.0 / u_textureSize.xy;
 	vec4 tmp = FxaaPixelShader(v_texcoord0, u_fxaaBuffer, pixel_offset, 0.75, 0.166, 0.0833);
-	vec4 ldr = texture2D(u_fxaaBuffer, v_texcoord0);
 	gl_FragColor = tmp;
 }
 

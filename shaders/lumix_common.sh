@@ -11,23 +11,22 @@
 #endif
 
 
-vec2 lit(vec3 _lightDir, vec3 _normal, vec3 _viewDir, float shininess)
+vec2 lit(vec3 light_dir, vec3 normal, vec3 view_dir, float shininess)
 {
-	float ndotl = dot(_normal, _lightDir);
-	vec3 reflected = _lightDir - 2.0 * ndotl * _normal;
-	float rdotv = max(0.0, dot(-reflected, _viewDir));
+	float ndotl = dot(normal, light_dir);
+	vec3 reflected = light_dir - 2.0 * ndotl * normal;
+	float rdotv = max(0.0, dot(-reflected, view_dir));
 
 	float diff = max(0.0, ndotl);
 	
-	float _exp = shininess;
-	float spec = step(0.0, ndotl) * pow(max(0.0, rdotv), _exp);
+	float spec = step(0.0, ndotl) * pow(max(0.0, rdotv), shininess);
 	return vec2(diff, step(1.0, shininess) * spec);
 }
 
 
 #if BGFX_SHADER_TYPE_FRAGMENT == 1
 	vec3 shadePointLight(
-		vec4 dirFov, 
+		vec4 dir_fov, 
 		vec3 wpos, 
 		vec3 normal, 
 		vec3 view, 
@@ -43,19 +42,18 @@ vec2 lit(vec3 _lightDir, vec3 _normal, vec3 _viewDir, float shininess)
 		float dist = length(lp);
 		float attn = pow(max(0.0, 1.0 - dist / light_pos_radius.w), light_color_attenuation.w);
 		
-		vec3 toLightDir = lp / dist;
+		vec3 to_light_dir = lp / dist;
 		
-		if(dirFov.w < 3.14159)
+		if(dir_fov.w < 3.14159)
 		{
-			float cosDir = dot(normalize(dirFov.xyz), -toLightDir);
-			float cosCone = cos(dirFov.w * 0.5);
+			float cosDir = dot(normalize(dir_fov.xyz), -to_light_dir);
+			float cosCone = cos(dir_fov.w * 0.5);
 		
-			if(cosDir < cosCone)
-				discard;
+			if(cosDir < cosCone) discard;
 			attn *= (cosDir - cosCone) / (1.0 - cosCone);
 		}
 		
-		vec2 lc = lit(toLightDir, normal, view, material_specular_shininess.w);
+		vec2 lc = lit(to_light_dir, normal, view, material_specular_shininess.w);
 		vec3 rgb = 
 			attn * (light_color_attenuation.rgb * saturate(lc.x) 
 			+ light_specular 
@@ -79,8 +77,7 @@ float getFogFactor(vec3 camera_wpos, float fog_density, vec3 fragment_wpos, vec4
 	float avg_y = (fragment_wpos.y + camera_wpos.y) * 0.5;
 	float avg_density = fog_density * clamp(1.0 - (avg_y - fog_params.x) / fog_params.y, 0, 1);
 	float res = exp(-pow(avg_density * length(fragment_wpos - camera_wpos), 2));
-	res =  1 - clamp(res, 0.0, 1.0);
-	return res;
+	return 1 - clamp(res, 0.0, 1.0);
 }
 
 
@@ -105,136 +102,43 @@ vec3 shadeDirectionalLight(vec3 light_dir
 	return col;	
 }
 
-
-float hardShadow(sampler2D _sampler, vec4 _shadowCoord, float _bias)
+float noCheckESM(sampler2D shadowmap, vec2 shadow_coord, float receiver, float depth_multiplier)
 {
-	vec2 texCoord = _shadowCoord.xy/_shadowCoord.w;
+	float occluder = texture2D(shadowmap, shadow_coord).r * 0.5 + 0.5;
+
+	float visibility = clamp(exp(depth_multiplier * (occluder - receiver)), 0.0, 1.0);
+
+	return visibility;
+}
+
+float ESM(sampler2D shadowmap, vec4 shadow_coord, float bias, float depth_multiplier)
+{
+	vec2 texCoord = shadow_coord.xy / shadow_coord.w;
 
 	bool outside = any(greaterThan(texCoord, vec2_splat(1.0)))
-				|| any(lessThan   (texCoord, vec2_splat(0.0)))
-				 ;
+				|| any(lessThan   (texCoord, vec2_splat(0.0)));
 
-	if (outside)
-	{
-		return 1.0;
-	}
+	if (outside) return 1.0;
 
-	float receiver = (_shadowCoord.z-_bias)/_shadowCoord.w;
-	float occluder = //unpackRgbaToFloat(texture2D(_sampler, texCoord) );
-		texture2D(_sampler, texCoord).x * 0.5 + 0.5;
-	float visibility = step(receiver, occluder);
-	return visibility;
-}
+	float receiver = (shadow_coord.z - bias) / shadow_coord.w;
+	float occluder = (texture2D(shadowmap, texCoord).r * 0.5 + 0.5);
 
-
-float PCF(sampler2D _sampler, vec4 _shadowCoord, float _bias, vec4 _pcfParams, vec2 _texelSize)
-{
-	float result = 0.0;
-	vec2 offset = _pcfParams.zw * _texelSize * _shadowCoord.w;
-
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-1.5, -1.5) * offset, 0.0, 0.0), _bias);
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-1.5, -0.5) * offset, 0.0, 0.0), _bias);
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-1.5,  0.5) * offset, 0.0, 0.0), _bias);
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-1.5,  1.5) * offset, 0.0, 0.0), _bias);
-
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-0.5, -1.5) * offset, 0.0, 0.0), _bias);
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-0.5, -0.5) * offset, 0.0, 0.0), _bias);
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-0.5,  0.5) * offset, 0.0, 0.0), _bias);
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(-0.5,  1.5) * offset, 0.0, 0.0), _bias);
-
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(0.5, -1.5) * offset, 0.0, 0.0), _bias);
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(0.5, -0.5) * offset, 0.0, 0.0), _bias);
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(0.5,  0.5) * offset, 0.0, 0.0), _bias);
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(0.5,  1.5) * offset, 0.0, 0.0), _bias);
-
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(1.5, -1.5) * offset, 0.0, 0.0), _bias);
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(1.5, -0.5) * offset, 0.0, 0.0), _bias);
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(1.5,  0.5) * offset, 0.0, 0.0), _bias);
-	result += hardShadow(_sampler, _shadowCoord + vec4(vec2(1.5,  1.5) * offset, 0.0, 0.0), _bias);
-
-	return result / 16.0;
-}
-
-
-float noCheckESM(sampler2D _sampler, vec2 _shadowCoord, float receiver, float _depthMultiplier)
-{
-	float occluder = texture2D(_sampler, _shadowCoord).r * 0.5 + 0.5;
-
-	float visibility = clamp(exp(_depthMultiplier * (occluder-receiver) ), 0.0, 1.0);
-
-	return visibility;
-}
-
-float ESM(sampler2D _sampler, vec4 _shadowCoord, float _bias, float _depthMultiplier)
-{
-	vec2 texCoord = _shadowCoord.xy/_shadowCoord.w;
-
-	bool outside = any(greaterThan(texCoord, vec2_splat(1.0)))
-				|| any(lessThan   (texCoord, vec2_splat(0.0)))
-				 ;
-
-	if (outside)
-	{
-		return 1.0;
-	}
-
-	float receiver = (_shadowCoord.z-_bias)/_shadowCoord.w;
-	float occluder = (texture2D(_sampler, texCoord).r * 0.5 + 0.5);
-
-	float visibility = clamp(exp(_depthMultiplier * (occluder-receiver) ), 0.0, 1.0);
+	float visibility = clamp(exp(depth_multiplier * (occluder - receiver)), 0.0, 1.0);
 
 	return visibility;
 }
 
 
-float VSM(sampler2D _sampler, vec4 _shadowCoord, float _bias, float _depthMultiplier, float _minVariance)
-{
-	vec2 texCoord = _shadowCoord.xy/_shadowCoord.w;
-
-	bool outside = any(greaterThan(texCoord, vec2_splat(1.0)))
-				|| any(lessThan   (texCoord, vec2_splat(0.0)))
-				 ;
-
-	if (outside)
-	{
-		return 1.0;
-	}
-
-	float receiver = (_shadowCoord.z*0.5+0.5-_bias)/_shadowCoord.w * _depthMultiplier;
-	vec4 rgba = texture2D(_sampler, texCoord);
-	vec2 occluder = vec2(unpackHalfFloat(rgba.rg), unpackHalfFloat(rgba.ba)) * _depthMultiplier;
-	
-	if (receiver < occluder.x)
-	{
-		return 1.0;
-	}
-	
-	//return 0;
-	float variance = max(occluder.y - (occluder.x*occluder.x), _minVariance);
-	float d = receiver - occluder.x;
-
-	float visibility = variance / (variance + d*d);
-
-	return visibility;
-}
-
-
-float smoothShadow(sampler2D shadowmap, vec2 uv, float compare)
-{
-	return smoothstep(compare-0.00001, compare, texture2D(shadowmap, uv).x * 0.5 + 0.5);
-}
-
-
-float pointLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec4 position, float fov)
+float pointLightShadow(sampler2D shadowmap, mat4 shadowmap_matrices[4], vec4 position, float fov)
 {
 	const float DEPTH_MULTIPLIER = 900.0;
 
 	if(fov > 3.14159)
 	{
-		vec4 a = mul(shadowmapMatrices[0], position);
-		vec4 b = mul(shadowmapMatrices[1], position);
-		vec4 c = mul(shadowmapMatrices[2], position);
-		vec4 d = mul(shadowmapMatrices[3], position);
+		vec4 a = mul(shadowmap_matrices[0], position);
+		vec4 b = mul(shadowmap_matrices[1], position);
+		vec4 c = mul(shadowmap_matrices[2], position);
+		vec4 d = mul(shadowmap_matrices[3], position);
 		
 		a = a / a.w;
 		b = b / b.w;
@@ -243,36 +147,32 @@ float pointLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec4 posi
 
 	
 		bool selection0 = all(lessThan(a.xy, vec2_splat(0.99))) && all(greaterThan(a.xy, vec2_splat(0.01))) && a.z < 1.0;
+		if(selection0) return noCheckESM(shadowmap, vec2(a.x*0.5, a.y*0.5), a.z, DEPTH_MULTIPLIER);
+
 		bool selection1 = all(lessThan(b.xy, vec2_splat(0.99))) && all(greaterThan(b.xy, vec2_splat(0.01))) && b.z < 1.0;
+		if(selection1) return noCheckESM(shadowmap, vec2(0.5+b.x*0.5, b.y*0.5), b.z, DEPTH_MULTIPLIER);
+		
 		bool selection2 = all(lessThan(c.xy, vec2_splat(0.99))) && all(greaterThan(c.xy, vec2_splat(0.01))) && c.z < 1.0;
-		bool selection3 = all(lessThan(d.xy, vec2_splat(0.99))) && all(greaterThan(d.xy, vec2_splat(0.01))) && d.z < 1.0;
+		if(selection2) return noCheckESM(shadowmap, vec2(c.x*0.5, 0.5+c.y*0.5), c.z, DEPTH_MULTIPLIER);
 		
-		
-		if(selection0)
-			return noCheckESM(shadowmap, vec2(a.x*0.5, a.y*0.5), a.z, DEPTH_MULTIPLIER);
-		else if(selection1)
-			return noCheckESM(shadowmap, vec2(0.5+b.x*0.5, b.y*0.5), b.z, DEPTH_MULTIPLIER);
-		else if(selection2)
-			return noCheckESM(shadowmap, vec2(c.x*0.5, 0.5+c.y*0.5), c.z, DEPTH_MULTIPLIER);
-		else 
-			return noCheckESM(shadowmap, vec2(0.5+d.x*0.5, 0.5+d.y*0.5), d.z, DEPTH_MULTIPLIER);
+		return noCheckESM(shadowmap, vec2(0.5+d.x*0.5, 0.5+d.y*0.5), d.z, DEPTH_MULTIPLIER);
 	}
 	else
 	{
-		vec4 tmp = mul(shadowmapMatrices[0], position);
+		vec4 tmp = mul(shadowmap_matrices[0], position);
 		vec3 shadow_coord = tmp.xyz / tmp.w;
 			return ESM(shadowmap, vec4(shadow_coord.xy, shadow_coord.z, 1.0), 0.0, DEPTH_MULTIPLIER);
 	}
 }
 
 
-float directionalLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec4 position, float ndotl)
+float directionalLightShadow(sampler2D shadowmap, mat4 shadowmap_matrices[4], vec4 position, float ndotl)
 {
 	vec3 shadow_coord[4];
-	shadow_coord[0] = mul(shadowmapMatrices[0], position).xyz;
-	shadow_coord[1] = mul(shadowmapMatrices[1], position).xyz;
-	shadow_coord[2] = mul(shadowmapMatrices[2], position).xyz;
-	shadow_coord[3] = mul(shadowmapMatrices[3], position).xyz;
+	shadow_coord[0] = mul(shadowmap_matrices[0], position).xyz;
+	shadow_coord[1] = mul(shadowmap_matrices[1], position).xyz;
+	shadow_coord[2] = mul(shadowmap_matrices[2], position).xyz;
+	shadow_coord[3] = mul(shadowmap_matrices[3], position).xyz;
 
 	vec2 shadow_subcoords[2];
 
@@ -316,12 +216,6 @@ float directionalLightShadow(sampler2D shadowmap, mat4 shadowmapMatrices[4], vec
 	float v1 = noCheckESM(shadowmap, shadow_subcoords[0], shadow_coord[split_index].z - bias, 15000.0);
 	float v2 = split_index == 3 ? 1.0 : noCheckESM(shadowmap, shadow_subcoords[1], shadow_coord[split_index + 1].z - next_bias, 15000.0);
 	return mix(v1, v2, weight);
-	
-	
-		//VSM(shadowmap, vec4(shadow_subcoords[0].xy, shadow_coord[split_index].z, 1.0), 0.001, 450, 0.0002);
-		//hardShadow(shadowmap, vec4(shadow_subcoords[0].xy, shadow_coord[split_index].z, 1.0), bias);
-		//PCF(shadowmap, vec4(shadow_subcoords[0].xy, shadow_coord[split_index].z, 1.0), bias, vec4(1, 1, 1, 1), vec2(1/1024.0,1/1024.0));
-		//step(shadow_coord[split_index].z, 1) * smoothShadow(shadowmap, shadow_subcoords[0], shadow_coord[split_index].z);
 }
 
 #endif

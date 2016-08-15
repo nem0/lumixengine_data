@@ -47,7 +47,7 @@ void main()
 	for (int i = 0; i < SAMPLE_COUNT; ++i)
 	{
 		vec2 sample = vec2(POISSON_DISK_16[i].x * c + POISSON_DISK_16[i].y * s, POISSON_DISK_16[i].x * -s + POISSON_DISK_16[i].y * c);
-		sample = sample * radius.x;
+		sample = sample * radius.x / view_pos.z;
 			
 		vec3 vpos_a = getViewPos(v_texcoord0 + sample);
 		vec3 vpos_b = getViewPos(v_texcoord0 - sample);

@@ -11,6 +11,57 @@
 #endif
 
 
+BEGIN_CONST_ARRAY (vec2, 8, POISSON_DISK_8) 
+	vec2(0.9107129, -0.1382225),
+	vec2(0.1669144, 0.1477467),
+	vec2(0.2404192, -0.9629959),
+	vec2(0.7414493, 0.4999895),
+	vec2(-0.1282596, -0.3942416),
+	vec2(-0.08354819, 0.7726957),
+	vec2(-0.7772845, -0.5541942),
+	vec2(-0.6782485, 0.119899)
+END_CONST_ARRAY;
+
+
+
+BEGIN_CONST_ARRAY (vec2, 16, POISSON_DISK_16) 
+	vec2(0.3568125,-0.5825516),
+	vec2(-0.2828444,-0.1149732),
+	vec2(-0.2575171,-0.579991),
+	vec2(0.3328768,-0.0916517),
+	vec2(-0.0177952,-0.9652126),
+	vec2(0.7636694,-0.3370355),
+	vec2(0.9381924,0.05975571),
+	vec2(0.6547356,0.373677),
+	vec2(-0.1999273,0.4483816),
+	vec2(0.167026,0.2838214),
+	vec2(0.2164582,0.6978411),
+	vec2(-0.7202712,-0.07400024),
+	vec2(-0.6624036,0.559697),
+	vec2(-0.1909649,0.8721116),
+	vec2(-0.6493049,-0.4945979),
+	vec2(0.6104985,0.7838438)
+END_CONST_ARRAY;
+
+
+float rand(vec4 seed)
+{
+	float dot_product = dot(seed, vec4(12.9898,78.233,45.164,94.673));
+    return fract(sin(dot_product) * 43758.5453);
+}
+
+float rand(vec3 seed)
+{
+	float dot_product = dot(seed, vec3(12.9898,78.233,45.164));
+    return fract(sin(dot_product) * 43758.5453);
+}
+
+float rand(vec2 seed)
+{
+	float dot_product = dot(seed, vec2(12.9898,78.233));
+    return fract(sin(dot_product) * 43758.5453);
+}
+
 vec2 lit(vec3 light_dir, vec3 normal, vec3 view_dir, float shininess)
 {
 	float ndotl = dot(normal, light_dir);
@@ -144,18 +195,17 @@ float pointLightShadow(sampler2D shadowmap, mat4 shadowmap_matrices[4], vec4 pos
 		b = b / b.w;
 		c = c / c.w;
 		d = d / d.w;
-
 	
 		bool selection0 = all(lessThan(a.xy, vec2_splat(0.99))) && all(greaterThan(a.xy, vec2_splat(0.01))) && a.z < 1.0;
-		if(selection0) return noCheckESM(shadowmap, vec2(a.x*0.5, a.y*0.5), a.z, DEPTH_MULTIPLIER);
+		if(selection0) return noCheckESM(shadowmap, vec2(a.x * 0.5, a.y * 0.5), a.z, DEPTH_MULTIPLIER);
 
 		bool selection1 = all(lessThan(b.xy, vec2_splat(0.99))) && all(greaterThan(b.xy, vec2_splat(0.01))) && b.z < 1.0;
-		if(selection1) return noCheckESM(shadowmap, vec2(0.5+b.x*0.5, b.y*0.5), b.z, DEPTH_MULTIPLIER);
+		if(selection1) return noCheckESM(shadowmap, vec2(0.5 + b.x * 0.5, b.y * 0.5), b.z, DEPTH_MULTIPLIER);
 		
 		bool selection2 = all(lessThan(c.xy, vec2_splat(0.99))) && all(greaterThan(c.xy, vec2_splat(0.01))) && c.z < 1.0;
-		if(selection2) return noCheckESM(shadowmap, vec2(c.x*0.5, 0.5+c.y*0.5), c.z, DEPTH_MULTIPLIER);
+		if(selection2) return noCheckESM(shadowmap, vec2(c.x * 0.5, 0.5 + c.y * 0.5), c.z, DEPTH_MULTIPLIER);
 		
-		return noCheckESM(shadowmap, vec2(0.5+d.x*0.5, 0.5+d.y*0.5), d.z, DEPTH_MULTIPLIER);
+		return noCheckESM(shadowmap, vec2(0.5 + d.x * 0.5, 0.5 + d.y * 0.5), d.z, DEPTH_MULTIPLIER);
 	}
 	else
 	{
@@ -210,8 +260,8 @@ float directionalLightShadow(sampler2D shadowmap, mat4 shadowmap_matrices[4], ve
 
 	BEGIN_CONST_ARRAY(float, 5, offsets) 0.0000009, 0.000005, 0.00001, 0.00005, -1.0 END_CONST_ARRAY; // for distances 6, 14, 40, 100
 	float nl_tan = tan(acos(ndotl));
-	float bias = clamp(offsets[split_index]*nl_tan, 0.0, 0.1); 
-	float next_bias = clamp(offsets[split_index+1]*nl_tan, 0.0, 0.1); 
+	float bias = clamp(offsets[split_index] * nl_tan, 0.0, 0.1); 
+	float next_bias = clamp(offsets[split_index + 1] * nl_tan, 0.0, 0.1); 
 
 	float v1 = noCheckESM(shadowmap, shadow_subcoords[0], shadow_coord[split_index].z - bias, 15000.0);
 	float v2 = split_index == 3 ? 1.0 : noCheckESM(shadowmap, shadow_subcoords[1], shadow_coord[split_index + 1].z - next_bias, 15000.0);

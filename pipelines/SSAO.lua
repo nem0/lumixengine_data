@@ -32,7 +32,8 @@ end
 
 function initPostprocess(pipeline, env)
 	env.ctx.ssao_material = Engine.loadResource(g_engine, "shaders/ssao.mat", "material")
-
+	env.ctx.normal_buffer_uniform = createUniform(pipeline, "u_normal_buffer")
+	
 	addFramebuffer(pipeline,  "SSAO", {
 		width = 512,
 		height = 512,
@@ -63,6 +64,7 @@ function postprocess(pipeline, env)
 		disableBlending(pipeline)
 		disableDepthWrite(pipeline)
 		setFramebuffer(pipeline, "SSAO")
+		bindFramebufferTexture(pipeline, "g_buffer", 1, env.ctx.normal_buffer_uniform)
 		bindFramebufferTexture(pipeline, env.ctx.main_framebuffer, 1, env.ctx.texture_uniform)
 		drawQuad(pipeline, 0, 0, 1, 1, env.ctx.ssao_material)
 

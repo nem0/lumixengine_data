@@ -3,6 +3,7 @@ local tests = {
 	"height_fog", 
 	"hidden_mesh", 
 	"light_color", 
+	"parallax", 
 	"pointlight", 
 	"pointlight_shadows", 
 	"shadow",

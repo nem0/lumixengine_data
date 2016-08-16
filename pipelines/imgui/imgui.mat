@@ -1,4 +1,4 @@
-{"shader" : "shaders/imgui.shd",
+{"shader" : "pipelines/imgui/imgui.shd",
 "uniforms" : [],
 "backface_culling" : false
 }

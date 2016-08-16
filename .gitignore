@@ -10,8 +10,8 @@ scripts/*.pdb
 *_autosave.unv
 *.unv.lst
 *.unv.bkp
-shaders/compiled/*.*
-shaders/compiled_gl/*.*
+pipelines/compiled/*.*
+pipelines/compiled_gl/*.*
 unit_tests/render_tests/*_res.tga
 metadata.bin
 minidump.dmp

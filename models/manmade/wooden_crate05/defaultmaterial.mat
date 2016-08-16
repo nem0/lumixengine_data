@@ -1,4 +1,4 @@
-{"shader" : "shaders/rigid.shd",
+{"shader" : "pipelines/rigid/rigid.shd",
 "texture" : {"source" : "/models/manmade/wooden_crate05/diffuse.dds",
 "srgb" : true},
 "texture" : {"source" : "/models/manmade/wooden_crate05/normal.dds"},

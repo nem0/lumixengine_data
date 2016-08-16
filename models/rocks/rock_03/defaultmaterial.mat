@@ -1,4 +1,4 @@
-{"shader" : "shaders/rigid.shd",
+{"shader" : "pipelines/rigid/rigid.shd",
 "texture" : {"source" : "/models/rocks/rock_03/diffuse.dds",
 "srgb" : true},
 "texture" : {"source" : "/models/rocks/rock_03/normal.dds"},

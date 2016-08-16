@@ -31,13 +31,13 @@ end
 
 
 function initPostprocess(pipeline, env)
-	env.ctx.ssao_material = Engine.loadResource(g_engine, "shaders/ssao.mat", "material")
+	env.ctx.ssao_material = Engine.loadResource(g_engine, "pipelines/ssao/ssao.mat", "material")
 	env.ctx.normal_buffer_uniform = createUniform(pipeline, "u_normal_buffer")
 	
 	addFramebuffer(pipeline,  "SSAO", {
 		width = 512,
 		height = 512,
-		size_ratio = {0.25, 0.25},
+		size_ratio = {1, 1},
 		renderbuffers = {
 			{format="rgba8"},
 			{format = "depth24"}
@@ -47,7 +47,7 @@ function initPostprocess(pipeline, env)
 	addFramebuffer(pipeline, "blur_rgba8", {
 		width = 2048,
 		height = 2048,
-		size_ratio = {0.25, 0.25},
+		size_ratio = {1, 1},
 		renderbuffers = {
 			{ format = "rgba8" }
 		}

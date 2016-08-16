@@ -1,4 +1,4 @@
-{"shader" : "shaders/rigid.shd",
+{"shader" : "pipelines/rigid/rigid.shd",
 "texture" : {"source" : "/models/fps_hands/new_diff.dds",
 "srgb" : true},
 "defines" : ["DIFFUSE_TEXTURE",

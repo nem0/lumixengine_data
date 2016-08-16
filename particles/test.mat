@@ -1,5 +1,5 @@
 {
-	"shader" : "shaders/particles.shd"
+	"shader" : "pipelines/particles/particles.shd"
 	, "texture" : {
 		"source" : "default.dds", "srgb" : true
 	}

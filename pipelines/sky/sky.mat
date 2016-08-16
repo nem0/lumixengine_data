@@ -1,4 +1,4 @@
-{"shader" : "shaders/sky.shd",
+{"shader" : "pipelines/sky/sky.shd",
 "backface_culling" : false,
 "uniforms" : 
 [

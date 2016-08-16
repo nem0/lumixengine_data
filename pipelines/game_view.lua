@@ -2,8 +2,6 @@ common = require "pipelines/common"
 ctx = { pipeline = this, main_framebuffer = "forward" }
 do_gamma_mapping = true
 
-local sky_enabled = true
-local cube_sky_enabled = true
 local deferred_enabled = false
 local render_debug_deferred = { false, false, false, false }
 local render_debug_deferred_fullsize = { false, false, false, false }
@@ -43,17 +41,14 @@ common.initShadowmap(ctx)
 
 
 local texture_uniform = createUniform(this, "u_texture")
-local blur_material = Engine.loadResource(g_engine,"shaders/blur.mat", "material")
-local screen_space_material = Engine.loadResource(g_engine,"shaders/screen_space.mat", "material")
-local sky_material = Engine.loadResource(g_engine,"shaders/sky.mat", "material")
-local cube_sky_material = Engine.loadResource(g_engine,"models/sky/miramar/sky.mat", "material")
+local screen_space_material = Engine.loadResource(g_engine,"pipelines/screenspace/screenspace.mat", "material")
 local gbuffer0_uniform = createUniform(this, "u_gbuffer0")
 local gbuffer1_uniform = createUniform(this, "u_gbuffer1")
 local gbuffer2_uniform = createUniform(this, "u_gbuffer2")
 local gbuffer_depth_uniform = createUniform(this, "u_gbuffer_depth")
-local deferred_material = Engine.loadResource(g_engine,"shaders/deferred.mat", "material")
-local deferred_point_light_material = Engine.loadResource(g_engine,"shaders/deferredpointlight.mat", "material")
-local gamma_mapping_material = Engine.loadResource(g_engine,"shaders/gamma_mapping.mat", "material")
+local deferred_material = Engine.loadResource(g_engine,"pipelines/common/deferred.mat", "material")
+local deferred_point_light_material = Engine.loadResource(g_engine,"pipelines/common/deferredpointlight.mat", "material")
+local gamma_mapping_material = Engine.loadResource(g_engine,"pipelines/common/gamma_mapping.mat", "material")
 
 
 function deferred(camera_slot)
@@ -106,49 +101,13 @@ function deferred(camera_slot)
 		applyCamera(this, camera_slot)
 		renderLightVolumes(this, deferred_point_light_material)
 		disableBlending(this)
-		
-	if sky_enabled then
-		newView(this, "sky")
-			setPass(this, "SKY")
-			setStencil(this, STENCIL_OP_PASS_Z_KEEP 
-				| STENCIL_OP_FAIL_Z_KEEP 
-				| STENCIL_OP_FAIL_S_KEEP 
-				| STENCIL_TEST_NOTEQUAL)
-			setStencilRMask(this, 1)
-			setStencilRef(this, 1)
-
-			setFramebuffer(this, ctx.main_framebuffer)
-			setActiveGlobalLightUniforms(this)
-			disableDepthWrite(this)
-			if cube_sky_enabled then
-				drawQuad(this, 0, 0, 1, 1, cube_sky_material)
-			else
-				drawQuad(this, 0, 0, 1, 1, sky_material)
-			end
-	end
 end
 
 function main()
-	if sky_enabled then
-		newView(this, "sky")
-			setPass(this, "SKY")
-			setFramebuffer(this, ctx.main_framebuffer)
-			disableDepthWrite(this)
-			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
-			setActiveGlobalLightUniforms(this, sky_material)
-			if cube_sky_enabled then
-				drawQuad(this, 0, 0, 1, 1, cube_sky_material)
-			else
-				drawQuad(this, 0, 0, 1, 1, sky_material)
-			end
-	end
-
 	main_view = newView(this, "MAIN")
 		setPass(this, "MAIN")
 		enableDepthWrite(this)
-		if not sky_enabled then
-			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
-		end
+		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
 		enableRGBWrite(this)
 		setFramebuffer(this, ctx.main_framebuffer)
 		applyCamera(this, "main")

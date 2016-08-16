@@ -1,4 +1,4 @@
-{"shader" : "shaders/leaves.shd",
+{"shader" : "pipelines/leaves/leaves.shd",
 "texture" : {"source" : "/models/buildings/speakingstones_01/3td_greenhanger_01.dds",
 "srgb" : true},
 "defines" : ["ALPHA_CUTOUT"],

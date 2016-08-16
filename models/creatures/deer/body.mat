@@ -1,4 +1,4 @@
-{"shader" : "shaders/fur.shd",
+{"shader" : "pipelines/fur/fur.shd",
 "layer" : {"pass" : "FUR",
 "count" : 25},
 "texture" : {"source" : "/models/creatures/deer/deer-body.dds"},

@@ -1,4 +1,4 @@
-{"shader" : "shaders/rigid.shd",
+{"shader" : "pipelines/rigid/rigid.shd",
 "texture" : {"source" : "/models/buildings/foundationruin_01/3td_brickoldround_01.dds",
 "srgb" : true},
 "texture" : {"source" : "/models/buildings/foundationruin_01/3td_brickoldround_01_nrm.dds"},

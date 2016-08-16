@@ -2,7 +2,7 @@ enabled = true
 local camera_cmp_type = Engine.getComponentType("camera")
 
 function initPostprocess(pipeline, env)
-	env.ctx.godrays_material = Engine.loadResource(g_engine, "shaders/godrays.mat", "material")
+	env.ctx.godrays_material = Engine.loadResource(g_engine, "pipelines/godrays/godrays.mat", "material")
 	env.ctx.global_light_screen_pos_uniform = createUniform(pipeline, "u_light_screen_pos")
 end
 
@@ -33,7 +33,6 @@ function computeLightScreenPos()
 end
 
 function onGUI()
-	ImGui.Text("x = " .. xxx[1] .. " " .. xxx[2])
 end
 
 

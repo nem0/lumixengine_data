@@ -4,8 +4,7 @@ ctx = { pipeline = this }
 
 shadowmap_uniform = createUniform(this, "u_texShadowmap")
 texture_uniform = createUniform(this, "u_texture")
-blur_material = Engine.loadResource(g_engine, "shaders/blur.mat", "material")
-screen_space_material = Engine.loadResource(g_engine, "shaders/screen_space.mat", "material")
+screen_space_material = Engine.loadResource(g_engine, "pipelines/screenspace/screenspace.mat", "material")
 ssao_material = Engine.loadResource(g_engine, "shaders/ssao.mat", "material")
 common.init(ctx)
 common.initShadowmap(ctx)

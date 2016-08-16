@@ -1,4 +1,4 @@
-{"shader" : "shaders/terrain.shd",
+{"shader" : "pipelines/terrain/terrain.shd",
 "texture" : {"source" : "/terrains/big/hm.raw",
 "keep_data" : true},
 "texture" : {"source" : "/terrains/big/splatmap.tga",

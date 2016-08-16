@@ -1,4 +1,4 @@
-{"shader" : "shaders/fxaa.shd",
+{"shader" : "pipelines/hdr_dof_fxaa/hdr.shd",
 "backface_culling" : false,
 "defines" : [],
 "uniforms" : [

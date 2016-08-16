@@ -1,4 +1,4 @@
-{"shader" : "shaders/rigid.shd",
+{"shader" : "pipelines/rigid/rigid.shd",
 "texture" : {"source" : "/models/buildings/catherdral_ruins/3td_concretedirty_01.dds",
 "srgb" : true},
 "texture" : {"source" : "/models/buildings/catherdral_ruins/3td_concretedirty_01_nrm.dds"},

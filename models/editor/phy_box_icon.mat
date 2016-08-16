@@ -1,4 +1,4 @@
-{"shader" : "shaders/editorobjects.shd",
+{"shader" : "pipelines/editor/editorobjects.shd",
 "backface_culling" : false,
 "texture" : {"source" : "phy_box_icon.dds", "srgb" : true},
 "uniforms" : []}

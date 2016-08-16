@@ -1,4 +1,4 @@
-{"shader" : "shaders/rigid.shd",
+{"shader" : "pipelines/rigid/rigid.shd",
 "texture" : {"source" : "texture3.dds", "srgb" : true},
 "texture" : {"source" : "texture2.dds"},
 "uniforms" : [],

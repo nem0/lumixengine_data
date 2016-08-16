@@ -1,5 +1,5 @@
 {
-	"shader" : "shaders/rigid.shd"
+	"shader" : "pipelines/rigid/rigid.shd"
 	, "texture" : {
 		"source" : "texture0.dds", "srgb" : true
  }

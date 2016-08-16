@@ -1,4 +1,4 @@
-{"shader" : "shaders/rigid.shd",
+{"shader" : "pipelines/rigid/rigid.shd",
 "texture" : {"source" : "/models/plants/trees/oldstump/deadtree.dds",
 "srgb" : true},
 "texture" : {"source" : "/models/plants/trees/oldstump/deadtree_nrm.dds"},

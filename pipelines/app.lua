@@ -1,35 +1,19 @@
 common = require "pipelines/common"
 ctx = { pipeline = this, main_framebuffer = "default" }
 
-local sky_enabled = true
-  
 common.init(ctx)
 common.initShadowmap(ctx)
 
 
 local texture_uniform = createUniform(this, "u_texture")
-local blur_material = Engine.loadResource(g_engine, "shaders/blur.mat", "material")
-local screen_space_material = Engine.loadResource(g_engine, "shaders/screen_space.mat", "material")
-local sky_material = Engine.loadResource(g_engine, "models/sky/miramar/sky.mat", "material")--"shaders/sky.mat")
+local screen_space_material = Engine.loadResource(g_engine, "pipelines/screenspace/screenspace.mat", "material")
 
 
 function main()
-	if sky_enabled then
-		newView(this, "sky")
-			setPass(this, "SKY")
-			setFramebuffer(this, ctx.main_framebuffer)
-			disableDepthWrite(this)
-			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
-			setActiveGlobalLightUniforms(this, sky_material)
-			drawQuad(this, -1, -1, 2, 2, sky_material)
-	end
-
 	main_view = newView(this, "MAIN")
 		setPass(this, "MAIN")
 		enableDepthWrite(this)
-		if not sky_enabled then
-			clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
-		end
+		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
 		enableRGBWrite(this)
 		setFramebuffer(this, ctx.main_framebuffer)
 		applyCamera(this, "main")

@@ -1,4 +1,4 @@
-{"shader" : "shaders/grass.shd",
+{"shader" : "pipelines/grass/grass.shd",
 "backface_culling" : false,
 "texture" : {"source" : "/models/plants/grass01/diffus.dds",
 "srgb" : true},

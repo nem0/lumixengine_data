@@ -1,0 +1,4 @@
+{"shader" : "pipelines/hdr_dof_fxaa/hdrlum.shd",
+"backface_culling" : false,
+"uniforms" : []
+}

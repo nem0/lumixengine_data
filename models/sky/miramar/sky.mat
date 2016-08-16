@@ -1,5 +1,6 @@
-{"shader" : "shaders/cubesky.shd",
-"texture" : {"source" : "/models/sky/clouded01/sky.dds", "srgb" : true},
+{"shader" : "pipelines/cubesky/cubesky.shd",
+"texture" : {"source" : "/models/sky/clouded01/sky.dds",
+"srgb" : true},
 "defines" : [],
 "uniforms" : [],
 "shininess" : 4.00000000,

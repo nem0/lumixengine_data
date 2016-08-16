@@ -41,15 +41,14 @@ common.initShadowmap(ctx)
 
 
 local texture_uniform = createUniform(this, "u_texture")
-local blur_material = Engine.loadResource(g_engine, "shaders/blur.mat", "material")
-local screen_space_material = Engine.loadResource(g_engine, "shaders/screen_space.mat", "material")
+local screen_space_material = Engine.loadResource(g_engine, "pipelines/screenspace/screenspace.mat", "material")
 local gbuffer0_uniform = createUniform(this, "u_gbuffer0")
 local gbuffer1_uniform = createUniform(this, "u_gbuffer1")
 local gbuffer2_uniform = createUniform(this, "u_gbuffer2")
 local gbuffer_depth_uniform = createUniform(this, "u_gbuffer_depth")
-local deferred_material = Engine.loadResource(g_engine, "shaders/deferred.mat", "material")
-local deferred_point_light_material = Engine.loadResource(g_engine, "shaders/deferredpointlight.mat", "material")
-local gamma_mapping_material = Engine.loadResource(g_engine, "shaders/gamma_mapping.mat", "material")
+local deferred_material = Engine.loadResource(g_engine, "pipelines/common/deferred.mat", "material")
+local deferred_point_light_material = Engine.loadResource(g_engine, "pipelines/common/deferredpointlight.mat", "material")
+local gamma_mapping_material = Engine.loadResource(g_engine, "pipelines/common/gamma_mapping.mat", "material")
 
 
 function deferred(camera_slot)

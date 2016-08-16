@@ -3,6 +3,6 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#include <bgfx_shader.sh>
-#include "shaderlib.sh"
-#include "lumix_common.sh"
+#include "common/bgfx_shader.sh"
+#include "common/shaderlib.sh"
+#include "common/lumix_common.sh"

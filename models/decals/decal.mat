@@ -1,3 +1,10 @@
-{"shader" : "shaders/decal.shd",
-"texture" : {"source" : "blood.dds", "srgb" : true},
-"uniforms" : []}
+{"shader" : "shaders/decal/decal.shd",
+"texture" : {"source" : "/models/decals/blood.dds",
+"srgb" : true},
+"defines" : [],
+"uniforms" : [],
+"shininess" : 4.00000000,
+"alpha_ref" : 0.30000000,
+"color" : [1.00000000,
+1.00000000,
+1.00000000]}

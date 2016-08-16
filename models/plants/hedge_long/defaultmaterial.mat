@@ -1,4 +1,4 @@
-{"shader" : "shaders/leaves.shd",
+{"shader" : "pipelines/leaves/leaves.shd",
 "texture" : {"source" : "/models/plants/hedge_long/diffuse.dds",
 "srgb" : true},
 "texture" : {"source" : "/models/plants/hedge_long/normal.dds"},

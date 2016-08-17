@@ -1,4 +1,1 @@
 pass "SSAO"
-
-uniform("intensity", "float")
-uniform("radius", "float")

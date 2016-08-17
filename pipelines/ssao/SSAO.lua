@@ -1,5 +1,7 @@
 enabled = true
 blur_enabled = true
+radius = 0.03
+intensity = 1
 local SSAO_debug = false
 local SSAO_debug_fullscreen = false
 
@@ -33,6 +35,8 @@ end
 function initPostprocess(pipeline, env)
 	env.ctx.ssao_material = Engine.loadResource(g_engine, "pipelines/ssao/ssao.mat", "material")
 	env.ctx.normal_buffer_uniform = createUniform(pipeline, "u_normal_buffer")
+	env.ctx.ssao_intensity_uniform = createUniform(pipeline, "u_intensity");
+	env.ctx.ssao_radius_uniform = createUniform(pipeline, "u_radius")
 	
 	addFramebuffer(pipeline,  "SSAO", {
 		width = 512,
@@ -66,6 +70,8 @@ function postprocess(pipeline, env)
 		setFramebuffer(pipeline, "SSAO")
 		bindFramebufferTexture(pipeline, "g_buffer", 1, env.ctx.normal_buffer_uniform)
 		bindFramebufferTexture(pipeline, env.ctx.main_framebuffer, 1, env.ctx.texture_uniform)
+		setUniform(pipeline, env.ctx.ssao_radius_uniform, {{radius, 0, 0, 0}})
+		setUniform(pipeline, env.ctx.ssao_intensity_uniform, {{intensity, 0, 0, 0}})
 		drawQuad(pipeline, 0, 0, 1, 1, env.ctx.ssao_material)
 
 	if blur_enabled then

@@ -38,7 +38,7 @@ for key, value in pairs(tests) do
 	App.frame(App.instance)
 	dif = Renderer.compareTGA(g_scene_renderer, out_tga, template_tga, 10)
 	local log_msg = "Universe unit_tests/render_tests/" .. value .. ".unv => difference " .. tostring(dif)
-	if dif > 100 then
+	if dif > 5000 then
 		different_files = different_files + 1
 		Engine.logError(log_msg)
 	else

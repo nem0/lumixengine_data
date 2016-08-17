@@ -9,7 +9,8 @@ local tests = {
 	"shadow",
 	"simple",
 	"simple_terrain",
-	"spotlight"
+	"spotlight",
+	"ssao"
 }
 
 local function waitForLoad()

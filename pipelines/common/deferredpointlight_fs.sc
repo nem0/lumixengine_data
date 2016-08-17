@@ -6,9 +6,11 @@ SAMPLER2D(u_gbuffer0, 15);
 SAMPLER2D(u_gbuffer1, 14);
 SAMPLER2D(u_gbuffer2, 13);
 SAMPLER2D(u_gbuffer_depth, 12);
-SAMPLER2D(u_texShadowmap, 11);
-
-uniform mat4 u_shadowmapMatrices[4];
+#ifdef HAS_SHADOWMAP
+	SAMPLER2D(u_texShadowmap, 11);
+	uniform mat4 u_shadowmapMatrices[4];
+#endif
+	
 uniform vec4 u_fogColorDensity; 
 uniform vec4 u_fogParams;
 uniform mat4 u_camInvViewProj;
@@ -96,7 +98,11 @@ void main()
 		, v_color_attn.xyz
 		, v_color_attn.w
 		, v_specular.xyz); 
+	#ifdef HAS_SHADOWMAP
+		diffuse = diffuse * pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(wpos, 1.0), v_dir_fov.w); 
+	#endif
 
+		
 	gl_FragColor.xyz = diffuse;
 	gl_FragColor.w = 1;
 }

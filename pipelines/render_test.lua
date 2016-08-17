@@ -2,10 +2,6 @@ common = require "pipelines/common"
 ctx = { pipeline = this, main_framebuffer = "forward" }
 do_gamma_mapping = true
 
-local deferred_enabled = true
-local render_debug_deferred = { false, false, false, false }
-local render_debug_deferred_fullsize = { false, false, false, false }
-
 addFramebuffer(this, "forward", {
 	width = 1024,
 	height = 1024,
@@ -99,6 +95,10 @@ function deferred(camera_slot)
 		disableDepthWrite(this)
 		enableBlending(this, "add")
 		applyCamera(this, camera_slot)
+		bindFramebufferTexture(this, "g_buffer", 0, gbuffer0_uniform)
+		bindFramebufferTexture(this, "g_buffer", 1, gbuffer1_uniform)
+		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform)
+		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
 		renderLightVolumes(this, deferred_point_light_material)
 		disableBlending(this)
 	
@@ -113,11 +113,7 @@ function fur()
 		enableBlending(this, "alpha")
 		applyCamera(this, "editor")
 		setActiveGlobalLightUniforms(this)
-		if deferred_enabled then
-			renderModels(this, {deferred_view, fur_view})
-		else
-			renderModels(this, {main_view, fur_view})
-		end
+		renderModels(this, {deferred_view, fur_view})
 end
 
 
@@ -134,14 +130,8 @@ end
 
 function render()
 	common.shadowmap(ctx, "editor")
-	if deferred_enabled then
-		deferred("editor")
-		common.particles(ctx, "editor")
-	else
-		main(this)
-		common.particles(ctx, "editor")
-		pointLight(this)		
-	end
+	deferred("editor")
+	common.particles(ctx, "editor")
 	fur(this)
 
 	postprocessCallback(this, "editor")

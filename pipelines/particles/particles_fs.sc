@@ -21,9 +21,9 @@ void main()
 	vec4 linear_prjz_v = mul(u_invProj, vec4(0, 0, prj.z, 1));
 	linear_prjz_v /= linear_prjz_v.w;
 
-	float depth_diff = linear_depth_v.z - linear_prjz_v.z;
+	float depth_diff = linear_prjz_v.z - linear_depth_v.z;
 	
 	vec4 col = texture2D(u_texColor, v_texcoord0) * v_common.x;
-	col.a *= clamp(-depth_diff * SOFT_MULTIPLIER, 0, 1);
+	col.a *= clamp(depth_diff * SOFT_MULTIPLIER, 0, 1);
 	gl_FragColor.rgba = col; 
 }

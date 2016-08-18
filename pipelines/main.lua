@@ -11,7 +11,7 @@ addFramebuffer(this, "default", {
 	height = 1024,
 	renderbuffers = {
 		{ format = "rgba8" },
-		{ format = "depth24" }
+		{ format = "depth24stencil8" }
 	}
 })
 

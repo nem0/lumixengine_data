@@ -13,26 +13,6 @@ SAMPLER2D(u_gbuffer_depth, 12);
 	
 uniform vec4 u_fogColorDensity; 
 uniform vec4 u_fogParams;
-uniform mat4 u_camInvViewProj;
-
-vec3 getViewPos(vec2 texCoord)
-{
-	float z = texture2D(u_gbuffer_depth, texCoord).r;
-	#if BGFX_SHADER_LANGUAGE_HLSL
-		z = z;
-	#else
-		z = z * 2.0 - 1.0;
-	#endif // BGFX_SHADER_LANGUAGE_HLSL
-	vec4 posProj = vec4(texCoord * 2 - 1, z, 1.0);
-	#if BGFX_SHADER_LANGUAGE_HLSL
-		posProj.y = -posProj.y;
-	#endif // BGFX_SHADER_LANGUAGE_HLSL
-	
-	vec4 posView = mul(u_camInvViewProj, posProj);
-	
-	posView /= posView.w;
-	return posView.xyz;
-}
 
 
 vec3 calcLight(vec4 dirFov
@@ -84,7 +64,7 @@ void main()
 	vec3 normal = texture2D(u_gbuffer1, (prj.xy + 1) * 0.5).xyz * 2 - 1;
 	vec4 color = texture2D(u_gbuffer0, (prj.xy + 1) * 0.5);
 
-	vec3 wpos = getViewPos((prj.xy + 1) * 0.5);
+	vec3 wpos = getViewPosition(u_gbuffer_depth, u_camInvViewProj, prj.xy * 0.5 + 0.5);
 	
 	float ndotl = -dot(normal, v_dir_fov.xyz);
 	vec3 view = normalize(v_view);

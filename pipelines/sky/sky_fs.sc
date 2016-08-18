@@ -3,10 +3,6 @@ $input v_wpos, v_texcoord0
 #include "common.sh"
 
 uniform vec4 u_lightDirFov; 
-uniform mat4 u_camView;
-uniform mat4 u_camInvView;
-uniform mat4 u_camInvViewProj;
-uniform mat4 u_camInvProj;
 uniform vec4 u_airColor;
 uniform vec4 u_brightness;
 uniform vec4 u_strength;

@@ -23,7 +23,6 @@ uniform vec4 u_lightSpecular;
 uniform vec4 u_materialColorShininess;
 uniform vec4 u_attenuationParams;
 uniform vec4 u_fogParams;
-uniform mat4 u_camView;
 uniform vec4 u_layer;
 uniform vec4 u_alphaMultiplier;
 uniform vec4 u_darkening;

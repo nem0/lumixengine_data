@@ -16,29 +16,7 @@ uniform mat4 u_shadowmapMatrices[4];
 uniform vec4 u_fogColorDensity; 
 uniform vec4 u_lightSpecular;
 uniform vec4 u_fogParams;
-uniform mat4 u_camInvViewProj;
-uniform mat4 u_camView;
-uniform mat4 u_camInvView;
 
-
-
-vec3 getViewPos(vec2 texCoord)
-{
-	float z = texture2D(u_gbuffer_depth, texCoord).r;
-	#if BGFX_SHADER_LANGUAGE_HLSL
-		z = z;
-	#else
-		z = z * 2.0 - 1.0;
-	#endif // BGFX_SHADER_LANGUAGE_HLSL
-	vec4 posProj = vec4(texCoord * 2 - 1, z, 1.0);
-	#if BGFX_SHADER_LANGUAGE_HLSL
-		posProj.y = -posProj.y;
-	#endif // BGFX_SHADER_LANGUAGE_HLSL
-	
-	vec4 posView = mul(u_camInvViewProj, posProj);
-	
-	return posView.xyz / posView.w;
-}
 
 void main()
 {
@@ -46,7 +24,7 @@ void main()
 	vec4 color = texture2D(u_gbuffer0, v_texcoord0);
 	vec4 value2 = texture2D(u_gbuffer2, v_texcoord0) * 64.0;
 	
-	vec3 wpos = getViewPos(v_texcoord0);
+	vec3 wpos = getViewPosition(u_gbuffer_depth, u_camInvViewProj, v_texcoord0);
 
 	vec4 camera_wpos = mul(u_camInvView, vec4(0, 0, 0, 1));
 	vec3 view = normalize(camera_wpos.xyz - wpos);

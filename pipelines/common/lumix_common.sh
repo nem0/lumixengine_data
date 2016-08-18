@@ -11,6 +11,15 @@
 #endif
 
 
+uniform mat4 u_camInvViewProj;
+uniform mat4 u_camInvProj;
+uniform mat4 u_camProj;
+uniform mat4 u_camInvView;
+uniform mat4 u_camView;
+
+
+
+
 BEGIN_CONST_ARRAY (vec2, 8, POISSON_DISK_8) 
 	vec2(0.9107129, -0.1382225),
 	vec2(0.1669144, 0.1477467),
@@ -266,6 +275,40 @@ float directionalLightShadow(sampler2D shadowmap, mat4 shadowmap_matrices[4], ve
 	float v1 = noCheckESM(shadowmap, shadow_subcoords[0], shadow_coord[split_index].z - bias, 15000.0);
 	float v2 = split_index == 3 ? 1.0 : noCheckESM(shadowmap, shadow_subcoords[1], shadow_coord[split_index + 1].z - next_bias, 15000.0);
 	return mix(v1, v2, weight);
+}
+
+
+vec3 getScreenCoord(vec3 world_pos)
+{
+	vec4 prj = mul(u_viewProj, vec4(world_pos, 1.0) );
+	prj.y = -prj.y;
+	prj /= prj.w;
+	return prj.xyz;
+}
+
+
+float toLinearDepth(float ndc_depth)
+{
+	vec4 linear_depth_v = mul(u_invProj, vec4(0, 0, ndc_depth, 1));
+	return linear_depth_v.z / linear_depth_v.w;
+}
+
+vec3 getViewPosition(sampler2D depth_buffer, mat4 inv_view_proj, vec2 tex_coord)
+{
+	float z = texture2D(depth_buffer, tex_coord).r;
+	#if BGFX_SHADER_LANGUAGE_HLSL
+		z = z;
+	#else
+		z = z * 2.0 - 1.0;
+	#endif // BGFX_SHADER_LANGUAGE_HLSL
+	vec4 pos_proj = vec4(tex_coord * 2 - 1, z, 1.0);
+	#if BGFX_SHADER_LANGUAGE_HLSL
+		pos_proj.y = -pos_proj.y;
+	#endif // BGFX_SHADER_LANGUAGE_HLSL
+	
+	vec4 view_pos = mul(inv_view_proj, pos_proj);
+	
+	return view_pos.xyz / view_pos.w;
 }
 
 #endif

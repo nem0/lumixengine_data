@@ -7,19 +7,7 @@ SAMPLER2D(u_texture, 14);
 
 uniform vec4 u_intensity; 
 uniform vec4 u_radius; 
-uniform mat4 u_camInvProj;
-uniform mat4 u_camProj;
-uniform mat4 u_camView;
 
-
-vec4 getViewPos(vec2 tex_coord)
-{
-	float z = texture2D(u_texture, tex_coord).r * 2.0 - 1.0; 
-	vec4 posProj = vec4(tex_coord * 2 - 1, z, 1.0);
-	vec4 posView = mul(u_camInvProj, posProj);
-	posView /= posView.w;
-	return posView;
-}
 
 vec3 getViewNormal(vec2 tex_coord)
 {
@@ -33,7 +21,7 @@ void main()
 {
 	const float max_distance = 1.0;
 	
-	vec4 view_pos = getViewPos(v_texcoord0);
+	vec3 view_pos = getViewPosition(u_texture, u_camInvProj, v_texcoord0);
 	vec3 view_normal = getViewNormal(v_texcoord0);
 	
 	float occlusion = 0;
@@ -49,8 +37,8 @@ void main()
 		vec2 sample = vec2(POISSON_DISK_16[i].x * c + POISSON_DISK_16[i].y * s, POISSON_DISK_16[i].x * -s + POISSON_DISK_16[i].y * c);
 		sample = sample * u_radius.x / view_pos.z;
 			
-		vec3 vpos_a = getViewPos(v_texcoord0 + sample);
-		vec3 vpos_b = getViewPos(v_texcoord0 - sample);
+		vec3 vpos_a = getViewPosition(u_texture, u_camInvProj, v_texcoord0 + sample);
+		vec3 vpos_b = getViewPosition(u_texture, u_camInvProj, v_texcoord0 - sample);
 
 		vec3 sample_vec_a = normalize(vpos_a - view_pos);
 		vec3 sample_vec_b = normalize(vpos_b - view_pos);

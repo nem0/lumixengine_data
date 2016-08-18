@@ -21,7 +21,6 @@ SAMPLER2D(u_avgLuminance, 14);
 
 uniform vec4 exposure;
 uniform vec4 midgray;
-uniform mat4 u_camInvProj;
 uniform vec4 focal_distance;
 uniform vec4 focal_range;
 uniform vec4 u_time;

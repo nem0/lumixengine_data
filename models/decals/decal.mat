@@ -1,4 +1,4 @@
-{"shader" : "shaders/decal/decal.shd",
+{"shader" : "pipelines/decal/decal.shd",
 "texture" : {"source" : "/models/decals/blood.dds",
 "srgb" : true},
 "defines" : [],

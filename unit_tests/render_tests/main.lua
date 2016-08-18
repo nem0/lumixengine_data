@@ -1,4 +1,5 @@
-local tests = { 
+local tests = {
+	"decals",
 	"fog", 
 	"height_fog", 
 	"hidden_mesh", 

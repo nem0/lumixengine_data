@@ -28,6 +28,7 @@ uniform vec4 u_time;
 uniform vec4 u_textureSize;
 uniform vec4 u_grainAmount;
 uniform vec4 u_grainSize;
+uniform vec4 u_vignette;
 uniform vec4 max_dof_blur;
 uniform vec4 clear_range;
 uniform vec4 dof_near_multiplier;
@@ -143,6 +144,7 @@ void main()
 {
 	float avg_loglum = max(0.1, exp(texture2D(u_avgLuminance, vec2(0.5, 0.5)).r));
 	vec3 hdr_color = texture2D(u_hdrBuffer, v_texcoord0).xyz;
+	
 	#ifdef DOF
 	
 		float depth = texture2D(u_depthBuffer, v_texcoord0).x;
@@ -177,6 +179,11 @@ void main()
 	
 	vec3 finalColor = (hdr_color / lum) * ld;
 
+	float dist = distance(v_texcoord0, vec2(0.5, 0.5));
+	float vignette = smoothstep(u_vignette.x, u_vignette.x - u_vignette.y, dist);
+	finalColor = mix(finalColor, finalColor * vignette, 0.5);
+
+	
 	#ifdef FILM_GRAIN
 		vec3 grained = filmGrain(toGamma(finalColor), v_wpos.xy);
 		gl_FragColor =  vec4(grained, 1.0f);

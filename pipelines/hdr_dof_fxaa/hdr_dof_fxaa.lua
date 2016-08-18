@@ -10,6 +10,8 @@ max_dof_blur = 0.5
 dof_clear_range = 0
 dof_near_multiplier = 100
 fxaa_enabled = true
+vignette_radius = 0.5
+vignette_softness = 0.35
 
 local pipeline_env = nil
 
@@ -144,6 +146,7 @@ function initHDR(ctx)
 	ctx.dof_near_multiplier_uniform = createUniform(ctx.pipeline, "dof_near_multiplier", 100)
 	ctx.dof_clear_range_uniform = createUniform(ctx.pipeline, "clear_range", 0)
 	ctx.lum_size_uniform = createVec4ArrayUniform(ctx.pipeline, "u_offset", 16)
+	ctx.vignette_uniform = createUniform(ctx.pipeline, "u_vignette")
 	computeLumUniforms()
 end
 
@@ -243,6 +246,7 @@ function hdr(ctx, camera_slot)
 			setUniform(ctx.pipeline, ctx.max_dof_blur_uniform, {{max_dof_blur, 0, 0, 0}})
 			setUniform(ctx.pipeline, ctx.dof_clear_range_uniform, {{dof_clear_range, 0, 0, 0}})
 			setUniform(ctx.pipeline, ctx.dof_near_multiplier_uniform, {{dof_near_multiplier, 0, 0, 0}})
+			setUniform(ctx.pipeline, ctx.vignette_uniform, {{vignette_radius, vignette_softness, 0, 0}})
 	else
 		newView(ctx.pipeline, "hdr")
 			setPass(ctx.pipeline, "POSTPROCESS")

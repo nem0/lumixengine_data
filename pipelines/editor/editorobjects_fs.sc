@@ -17,9 +17,7 @@ uniform vec4 u_materialColorShininess;
 	
 void main()
 {
-	vec4 prj = mul(u_viewProj, vec4(v_wpos, 1.0) );
-	prj.y = -prj.y;
-	prj /= prj.w;
+	vec3 screen_coord = getScreenCoord(v_wpos);
 
 	#ifdef DIFFUSE_TEXTURE
 		vec3 color = texture2D(u_texColor, v_texcoord0).rgb;
@@ -31,6 +29,6 @@ void main()
 		vec3 color = ndotl * diffuse + ambient;
 	#endif
 	color *= u_materialColorShininess.rgb;
-	float depth = texture2D(u_depthBuffer, prj.xy * 0.5 + 0.5).x;
-	gl_FragColor = vec4(toGamma(color.rgb), prj.z < depth ? 1 : 0.1);
+	float depth = texture2D(u_depthBuffer, screen_coord.xy * 0.5 + 0.5).x;
+	gl_FragColor = vec4(toGamma(color.rgb), screen_coord.z < depth ? 1 : 0.1);
 }

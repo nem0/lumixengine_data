@@ -57,14 +57,12 @@ vec3 calcLight(vec4 dirFov
 
 void main()
 {
-	vec4 prj = mul(u_viewProj, vec4(v_wpos, 1.0)); // todo: get rid of this
-	prj.y = -prj.y;
-	prj /= prj.w;
+	vec3 screen_coord = getScreenCoord(v_wpos);
 	
-	vec3 normal = texture2D(u_gbuffer1, (prj.xy + 1) * 0.5).xyz * 2 - 1;
-	vec4 color = texture2D(u_gbuffer0, (prj.xy + 1) * 0.5);
+	vec3 normal = texture2D(u_gbuffer1, screen_coord.xy * 0.5 + 0.5).xyz * 2 - 1;
+	vec4 color = texture2D(u_gbuffer0, screen_coord.xy * 0.5 + 0.5);
 
-	vec3 wpos = getViewPosition(u_gbuffer_depth, u_camInvViewProj, prj.xy * 0.5 + 0.5);
+	vec3 wpos = getViewPosition(u_gbuffer_depth, u_camInvViewProj, screen_coord.xy * 0.5 + 0.5);
 	
 	float ndotl = -dot(normal, v_dir_fov.xyz);
 	vec3 view = normalize(v_view);
@@ -72,7 +70,7 @@ void main()
 		, wpos
 		, normal
 		, view
-		, prj.xy
+		, screen_coord.xy
 		, v_pos_radius.xyz
 		, v_pos_radius.w
 		, v_color_attn.xyz

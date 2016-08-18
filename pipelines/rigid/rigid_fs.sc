@@ -83,11 +83,11 @@ void main()
 
 	#ifdef DIFFUSE_TEXTURE
 		vec4 color = texture2D(u_texColor, tex_coords);
+		#ifdef ALPHA_CUTOUT
+			if(color.a < u_alphaRef) discard;
+		#endif
 	#else
 		vec4 color = vec4(1, 1, 1, 1);
-	#endif
-	#ifdef ALPHA_CUTOUT
-		if(color.a < u_alphaRef) discard;
 	#endif
 	color.xyz *= u_materialColorShininess.rgb;
 	#ifdef DEFERRED
@@ -118,15 +118,14 @@ void main()
 			float depth = v_common2.z / v_common2.w;
 			gl_FragColor = vec4_splat(depth);
 		#else
-			mat3 tbn = mat3(
-						normalize(v_tangent),
-						normalize(v_normal),
-						normalize(v_bitangent)
-						);
-			tbn = transpose(tbn);
-						
 			vec3 wnormal;
 			#ifdef NORMAL_MAPPING
+				mat3 tbn = mat3(
+					normalize(v_tangent),
+					normalize(v_normal),
+					normalize(v_bitangent)
+				);
+				tbn = transpose(tbn);
 				wnormal.xzy = texture2D(u_texNormal, tex_coords).xyz * 2.0 - 1.0;
 				wnormal = mul(tbn, wnormal);
 			#else
@@ -187,10 +186,6 @@ void main()
 				gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
 			#endif
 			gl_FragColor.w = 1.0;
-			#ifdef BUMP_TEXTURE
-				vec3 tmp = normalize(v_tangent_view_pos);
-				//gl_FragColor = vec4(tmp.x, tmp.y, tmp.z, 1);
-			#endif
 		#endif       
 	#endif		
 }

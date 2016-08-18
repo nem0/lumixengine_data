@@ -1,4 +1,4 @@
-{"shader" : "pipelines/leaves/leaves.shd",
+{"shader" : "pipelines/rigid/rigid.shd",
 "texture" : {"source" : "/models/plants/bushes/bush03/diffuse.dds",
 "srgb" : true},
 "defines" : ["ALPHA_CUTOUT"],

@@ -260,6 +260,7 @@ function onGUI()
 		end
 		changed, common.blur_shadowmap = ImGui.Checkbox("Blur shadowmap", common.blur_shadowmap)
 		changed, deferred_enabled = ImGui.Checkbox("Deferred", deferred_enabled)
+		changed, common.render_gizmos = ImGui.Checkbox("Render gizmos", common.render_gizmos)
 		
 		ImGui.EndPopup()
 	end

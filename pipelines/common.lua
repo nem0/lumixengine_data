@@ -1,14 +1,14 @@
 local module = {}
 
 
-particles_enabled = true
-render_gizmos = true
+module.particles_enabled = true
+module.render_gizmos = true
 module.blur_shadowmap = true
 module.render_shadowmap_debug = false
 module.render_shadowmap_debug_fullsize = false
 
 function module.renderEditorIcons(ctx)
-	if render_gizmos then
+	if module.render_gizmos then
 		newView(ctx.pipeline, "copy_depth_editor")
 			copyRenderbuffer(ctx.pipeline, ctx.main_framebuffer, 1, "default", 1)
 		
@@ -24,7 +24,7 @@ function module.renderEditorIcons(ctx)
 end
 
 function module.renderGizmo(ctx)
-	if render_gizmos then
+	if module.render_gizmos then
 		newView(ctx.pipeline, "gizmo")
 			setPass(ctx.pipeline, "EDITOR")
 			disableDepthWrite(ctx.pipeline)
@@ -145,11 +145,12 @@ function module.shadowmap(ctx, camera_slot)
 end
 
 function module.particles(ctx, camera_slot)
-	if particles_enabled then
+	if module.particles_enabled then
 		newView(ctx.pipeline, "particles")
 			setPass(ctx.pipeline, "PARTICLES")
 			disableDepthWrite(ctx.pipeline)
 			applyCamera(ctx.pipeline, camera_slot)
+			bindFramebufferTexture(ctx.pipeline, "g_buffer", 3, ctx.depth_buffer_uniform)
 			renderParticles(ctx.pipeline)
 	end	
 end

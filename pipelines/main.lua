@@ -2,7 +2,7 @@ common = require "pipelines/common"
 ctx = { pipeline = this, main_framebuffer = "forward" }
 do_gamma_mapping = true
 
-local deferred_enabled = false
+local deferred_enabled = true
 local render_debug_deferred = { false, false, false, false }
 local render_debug_deferred_fullsize = { false, false, false, false }
 
@@ -10,7 +10,8 @@ addFramebuffer(this, "default", {
 	width = 1024,
 	height = 1024,
 	renderbuffers = {
-		{ format = "rgba8" }
+		{ format = "rgba8" },
+		{ format = "depth24" }
 	}
 })
 
@@ -205,10 +206,8 @@ function render()
 		pointLight(this)		
 	end
 	fur(this)
-	common.renderEditorIcons(ctx)
 
 	postprocessCallback(this, "editor")
-
 	
 	if do_gamma_mapping then
 		newView(this, "SRGB")
@@ -219,6 +218,7 @@ function render()
 			drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
 	end
 	
+	common.renderEditorIcons(ctx)
 	common.renderGizmo(ctx)
 	renderDebug(ctx)
 end

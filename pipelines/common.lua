@@ -9,17 +9,15 @@ module.render_shadowmap_debug_fullsize = false
 
 function module.renderEditorIcons(ctx)
 	if render_gizmos then
+		newView(ctx.pipeline, "copy_depth_editor")
+			copyRenderbuffer(ctx.pipeline, ctx.main_framebuffer, 1, "default", 1)
+		
 		newView(ctx.pipeline, "editor")
-			setStencil(ctx.pipeline, STENCIL_OP_PASS_Z_REPLACE 
-			| STENCIL_OP_FAIL_Z_KEEP 
-			| STENCIL_OP_FAIL_S_KEEP 
-			| STENCIL_TEST_ALWAYS)
-			setStencilRMask(ctx.pipeline, 0xff)
-			setStencilRef(ctx.pipeline, 1)
+			bindFramebufferTexture(ctx.pipeline, ctx.main_framebuffer, 1, ctx.depth_buffer_uniform)
 			setPass(ctx.pipeline, "EDITOR")
-			setFramebuffer(ctx.pipeline, ctx.main_framebuffer)
+			setFramebuffer(ctx.pipeline, "default")
 			enableDepthWrite(ctx.pipeline)
-			--disableBlending(ctx.pipeline)
+			enableBlending(ctx.pipeline, "alpha")
 			applyCamera(ctx.pipeline, "editor")
 			renderIcons(ctx.pipeline)
 	end

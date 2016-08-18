@@ -1,3 +1,5 @@
+depth_test (false)
+
 pass "EDITOR"
 	fs { "DIFFUSE_TEXTURE" }
   

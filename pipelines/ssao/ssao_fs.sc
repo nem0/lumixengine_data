@@ -72,6 +72,6 @@ void main()
 	}
 	
 	occlusion /= max(1.0, occlusion_count);
-	gl_FragColor.rgb = vec3_splat(1 - occlusion * u_intensity.x);
+	gl_FragColor.rgb = vec3_splat(1 - occlusion);
 	gl_FragColor.w = 1;
 }

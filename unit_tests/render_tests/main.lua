@@ -37,9 +37,10 @@ for key, value in pairs(tests) do
 	App.frame(App.instance)
 	App.frame(App.instance)
 	App.frame(App.instance)
+	--if value == "ssao" then while true do App.frame(App.instance) end end
 	dif = Renderer.compareTGA(g_scene_renderer, out_tga, template_tga, 10)
 	local log_msg = "Universe unit_tests/render_tests/" .. value .. ".unv => difference " .. tostring(dif)
-	if dif > 5000 then
+	if dif > 6000 then
 		different_files = different_files + 1
 		Engine.logError(log_msg)
 	else

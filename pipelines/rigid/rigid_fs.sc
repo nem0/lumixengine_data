@@ -35,39 +35,39 @@ uniform vec4 u_parallaxScale;
 
 
 #ifdef BUMP_TEXTURE
-vec2 parallaxMapping(sampler2D bump_map, vec2 texCoords, vec3 viewDir)
+vec2 parallaxMapping(sampler2D bump_map, vec2 tex_coords, vec3 view_dir)
 { 
 	float height_scale = u_parallaxScale.x;
-    const float minLayers = 10;
-    const float maxLayers = 20;
-    float numLayers = mix(maxLayers, minLayers, abs(viewDir.y));  
-    float layerDepth = 1.0 / numLayers;
-    float currentLayerDepth = 0.0;
-    vec2 P = viewDir.xz * height_scale; 
-    vec2 deltaTexCoords = P / numLayers;
+    const float MIN_LAYERS = 10;
+    const float MAX_LAYERS = 20;
+    float num_layers = mix(MAX_LAYERS, MIN_LAYERS, abs(view_dir.y));  
+    float layer_depth = 1.0 / num_layers;
+    float current_layer_depth = 0.0;
+    vec2 P = view_dir.xz * height_scale; 
+    vec2 delta_tex_coords = P / num_layers;
   
-    vec2  currentTexCoords     = texCoords;
-    float currentDepthMapValue = texture2D(bump_map, currentTexCoords).r;
+    vec2  current_tex_coords     = tex_coords;
+    float current_depthmap_value = texture2D(bump_map, current_tex_coords).r;
       
 	#if BGFX_SHADER_LANGUAGE_HLSL
 	[unroll(20)]
 	#endif
-    while(currentLayerDepth < currentDepthMapValue)
+    while(current_layer_depth < current_depthmap_value)
     {
-        currentTexCoords += deltaTexCoords;
-        currentDepthMapValue = texture2D(bump_map, currentTexCoords).r;  
-        currentLayerDepth += layerDepth;  
+        current_tex_coords += delta_tex_coords;
+        current_depthmap_value = texture2D(bump_map, current_tex_coords).r;  
+        current_layer_depth += layer_depth;  
     }
-    
-    vec2 prevTexCoords = currentTexCoords - deltaTexCoords;
 
-    float afterDepth  = currentDepthMapValue - currentLayerDepth;
-    float beforeDepth = texture2D(bump_map, prevTexCoords).r - currentLayerDepth + layerDepth;
+    vec2 prev_tex_coords = current_tex_coords - delta_tex_coords;
+
+    float after_depth  = current_depthmap_value - current_layer_depth;
+    float before_depth = texture2D(bump_map, prev_tex_coords).r - current_layer_depth + layer_depth;
+	float depth_diff = after_depth - before_depth;
+	if(abs(depth_diff) < 0.0001) depth_diff = 0.0001;
  
-    float weight = afterDepth / (afterDepth - beforeDepth);
-    vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
-
-    return finalTexCoords;
+    float weight = clamp(after_depth / depth_diff, 0, 1);
+    return prev_tex_coords * weight + current_tex_coords * (1.0 - weight);
 }
 
 #endif

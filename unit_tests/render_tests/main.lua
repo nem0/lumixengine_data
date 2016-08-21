@@ -1,6 +1,7 @@
 local tests = {
 	{"decals", 10},
 	{"fog", 10}, 
+	{"godrays", 10}, 
 	{"height_fog", 10}, 
 	{"hidden_mesh", 10}, 
 	{"light_color", 10}, 

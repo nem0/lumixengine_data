@@ -1,5 +1,5 @@
 pass "POSTPROCESS"
-	fs { "DOF", "FILM_GRAIN" }
+	fs { "DOF", "FILM_GRAIN", "VIGNETTE" }
 
 depth_test(false)
 

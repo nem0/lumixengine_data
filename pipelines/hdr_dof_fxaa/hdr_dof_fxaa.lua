@@ -12,6 +12,7 @@ dof_near_multiplier = 100
 fxaa_enabled = true
 vignette_radius = 0.5
 vignette_softness = 0.35
+vignette_enabled = true
 
 local pipeline_env = nil
 
@@ -198,7 +199,8 @@ function hdr(ctx, camera_slot)
 		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
 
 	setMaterialDefine(ctx.pipeline, ctx.hdr_material, "FILM_GRAIN", film_grain_enabled)
-	setMaterialDefine(ctx.pipeline, ctx.hdr_material, "DOF", dof_enabled)
+	setMaterialDefine(ctx.pipeline, ctx.hdr_material, "DOF", dof_enabled)	
+	setMaterialDefine(ctx.pipeline, ctx.hdr_material, "VIGNETTE", vignette_enabled)	
 	if dof_enabled then
 		newView(ctx.pipeline, "dof")
 			disableDepthWrite(ctx.pipeline)
@@ -246,7 +248,6 @@ function hdr(ctx, camera_slot)
 			setUniform(ctx.pipeline, ctx.max_dof_blur_uniform, {{max_dof_blur, 0, 0, 0}})
 			setUniform(ctx.pipeline, ctx.dof_clear_range_uniform, {{dof_clear_range, 0, 0, 0}})
 			setUniform(ctx.pipeline, ctx.dof_near_multiplier_uniform, {{dof_near_multiplier, 0, 0, 0}})
-			setUniform(ctx.pipeline, ctx.vignette_uniform, {{vignette_radius, vignette_softness, 0, 0}})
 	else
 		newView(ctx.pipeline, "hdr")
 			setPass(ctx.pipeline, "POSTPROCESS")
@@ -261,6 +262,9 @@ function hdr(ctx, camera_slot)
 			clear(ctx.pipeline, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
 			bindFramebufferTexture(ctx.pipeline, "hdr", 0, ctx.hdr_buffer_uniform)
 			bindFramebufferTexture(ctx.pipeline, ctx.current_lum1, 0, ctx.avg_luminance_uniform)
+	end
+	if vignette_enabled then 
+		setUniform(ctx.pipeline, ctx.vignette_uniform, {{vignette_radius, vignette_softness, 0, 0}})
 	end
 	if film_grain_enabled then
 		setUniform(ctx.pipeline, ctx.grain_amount_uniform, {{grain_amount, 0, 0, 0}})

@@ -36,13 +36,9 @@ uniform vec4 dof_near_multiplier;
 #define grainamount u_grainAmount.x
 #define grainsize u_grainSize.x
 
-const float permTexUnit = 1.0/256.0;
-const float permTexUnitHalf = 0.5/256.0;
-const float lumamount = 0.1;
-
 float reinhard2(float x, float whiteSqr)
 {
-	return (x * (1.0 + x/whiteSqr) ) / (1.0 + x);
+	return (x * (1.0 + x / whiteSqr) ) / (1.0 + x);
 }
 
 // Unchared2 tone mapping (See http://filmicgames.com)
@@ -54,7 +50,7 @@ float Uncharted2Tonemap(float x)
 	const float D = 0.20;
 	const float E = 0.02;
 	const float F = 0.30;
-	return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;
+	return ((x * (A * x + C * B) + D * E) / (x * (A * x + B) + D * F)) - E / F;
 }
 
     
@@ -70,37 +66,40 @@ vec4 rnm(in vec2 tc)
 	return vec4(noiseR,noiseG,noiseB,noiseA);
 }
 
-float fade(in float t) {
+float fade(float t) {
 	return t*t*t*(t*(t*6.0-15.0)+10.0);
 }
 
-float pnoise3D(in vec3 p)
+float pnoise3D(vec3 p)
 {
-	vec3 pi = permTexUnit*floor(p)+permTexUnitHalf; // Integer part, scaled so +1 moves permTexUnit texel
-	vec3 pf = fract(p);     // Fractional part for interpolation
+	const float permTexUnit = 1.0 / 256.0;
+	const float permTexUnitHalf = 0.5 / 256.0;
 
-	float perm00 = rnm(pi.xy).a ;
-	vec3  grad000 = rnm(vec2(perm00, pi.z)).rgb * 4.0 - 1.0;
+	vec3 pi = permTexUnit * floor(p) + permTexUnitHalf; // Integer part, scaled so +1 moves permTexUnit texel
+	vec3 pf = fract(p);									// Fractional part for interpolation
+
+	float perm00 = rnm(pi.xy).a;
+	vec3 grad000 = rnm(vec2(perm00, pi.z)).rgb * 4.0 - 1.0;
 	float n000 = dot(grad000, pf);
-	vec3  grad001 = rnm(vec2(perm00, pi.z + permTexUnit)).rgb * 4.0 - 1.0;
+	vec3 grad001 = rnm(vec2(perm00, pi.z + permTexUnit)).rgb * 4.0 - 1.0;
 	float n001 = dot(grad001, pf - vec3(0.0, 0.0, 1.0));
 
-	float perm01 = rnm(pi.xy + vec2(0.0, permTexUnit)).a ;
-	vec3  grad010 = rnm(vec2(perm01, pi.z)).rgb * 4.0 - 1.0;
+	float perm01 = rnm(pi.xy + vec2(0.0, permTexUnit)).a;
+	vec3 grad010 = rnm(vec2(perm01, pi.z)).rgb * 4.0 - 1.0;
 	float n010 = dot(grad010, pf - vec3(0.0, 1.0, 0.0));
-	vec3  grad011 = rnm(vec2(perm01, pi.z + permTexUnit)).rgb * 4.0 - 1.0;
+	vec3 grad011 = rnm(vec2(perm01, pi.z + permTexUnit)).rgb * 4.0 - 1.0;
 	float n011 = dot(grad011, pf - vec3(0.0, 1.0, 1.0));
 
-	float perm10 = rnm(pi.xy + vec2(permTexUnit, 0.0)).a ;
-	vec3  grad100 = rnm(vec2(perm10, pi.z)).rgb * 4.0 - 1.0;
+	float perm10 = rnm(pi.xy + vec2(permTexUnit, 0.0)).a;
+	vec3 grad100 = rnm(vec2(perm10, pi.z)).rgb * 4.0 - 1.0;
 	float n100 = dot(grad100, pf - vec3(1.0, 0.0, 0.0));
-	vec3  grad101 = rnm(vec2(perm10, pi.z + permTexUnit)).rgb * 4.0 - 1.0;
+	vec3 grad101 = rnm(vec2(perm10, pi.z + permTexUnit)).rgb * 4.0 - 1.0;
 	float n101 = dot(grad101, pf - vec3(1.0, 0.0, 1.0));
 
-	float perm11 = rnm(pi.xy + vec2(permTexUnit, permTexUnit)).a ;
-	vec3  grad110 = rnm(vec2(perm11, pi.z)).rgb * 4.0 - 1.0;
+	float perm11 = rnm(pi.xy + vec2(permTexUnit, permTexUnit)).a;
+	vec3 grad110 = rnm(vec2(perm11, pi.z)).rgb * 4.0 - 1.0;
 	float n110 = dot(grad110, pf - vec3(1.0, 1.0, 0.0));
-	vec3  grad111 = rnm(vec2(perm11, pi.z + permTexUnit)).rgb * 4.0 - 1.0;
+	vec3 grad111 = rnm(vec2(perm11, pi.z + permTexUnit)).rgb * 4.0 - 1.0;
 	float n111 = dot(grad111, pf - vec3(1.0, 1.0, 1.0));
 
 	vec4 n_x = mix(vec4(n000, n001, n010, n011), vec4(n100, n101, n110, n111), fade(pf.x));
@@ -112,83 +111,90 @@ float pnoise3D(in vec3 p)
 	return n_xyz;
 }
 
-vec2 coordRot(in vec2 tc, in float angle)
+vec2 coordRot(vec2 tex_coord, float angle)
 {
-	float aspect = u_textureSize.x/u_textureSize.y;
-	float rotX = ((tc.x*2.0-1.0)*aspect*cos(angle)) - ((tc.y*2.0-1.0)*sin(angle));
-	float rotY = ((tc.y*2.0-1.0)*cos(angle)) + ((tc.x*2.0-1.0)*aspect*sin(angle));
-	rotX = ((rotX/aspect)*0.5+0.5);
-	rotY = rotY*0.5+0.5;
-	return vec2(rotX,rotY);
+	float aspect = u_textureSize.x / u_textureSize.y;
+	float s = sin(angle);
+	float c = cos(angle);
+	vec2 tc = tex_coord * 2.0 - 1.0;
+	float rotX = (tc.x * aspect * c) - (tc.y * s);
+	float rotY = (tc.y * c) + (tc.x * aspect * s);
+	rotX = rotX / aspect;
+	rotY = rotY;
+	return vec2(rotX, rotY) * 0.5 + 0.5;
 }
 
-vec3 filmGrain(vec3 in_col, vec2 texCoord) 
+vec3 filmGrain(vec2 tex_coord, vec3 in_color) 
 {
-	vec3 rotOffset = vec3(1.425,3.892,5.835); //rotation offset values	
-	vec2 rotCoordsR = coordRot(texCoord, timer + rotOffset.x);
-	vec3 noise = vec3_splat(pnoise3D(vec3(rotCoordsR*vec2(u_textureSize.x/grainsize,u_textureSize.y/grainsize),0.0)));
-	vec3 col = in_col;
-	vec3 lumcoeff = vec3(0.299,0.587,0.114);
-	float luminance = mix(0.0,dot(col, lumcoeff),lumamount);
-	float lum = smoothstep(0.2,0.0,luminance);
+#ifdef FILM_GRAIN 
+	const float lumamount = 0.1;
+	vec2 rotCoordsR = coordRot(tex_coord, timer);
+	vec3 noise = vec3_splat(pnoise3D(vec3(rotCoordsR * vec2(u_textureSize.xy / grainsize),0.0)));
+	float luminance = mix(0.0, luma(in_color).x, lumamount);
+	float lum = smoothstep(0.2, 0.0, luminance);
 	lum += luminance;
 	
-	noise = mix(vec3_splat(0.0),vec3_splat(pow(lum,4.0)), noise);
-	col = col+noise*grainamount;
-   
-	return col;
+	noise = mix(vec3_splat(0.0), vec3_splat(pow(lum, 4.0)), noise);
+	return in_color + noise * grainamount;
+#else
+	return in_color;
+#endif
+}
+
+
+vec3 vignette(vec2 tex_coord, vec3 in_color)
+{
+#ifdef VIGNETTE
+	float dist = distance(tex_coord, vec2(0.5, 0.5));
+	float vignette = smoothstep(u_vignette.x, u_vignette.x - u_vignette.y, dist);
+	return mix(in_color, in_color * vignette, 0.5);
+#else
+	return in_color;
+#endif
+}
+
+
+vec3 dof(vec2 tex_coord, vec3 in_color)
+{
+	#ifdef DOF
+		float depth = texture2D(u_depthBuffer, tex_coord).x;
+		vec4 linear_depth_v = mul(u_camInvProj, vec4(0, 0, depth, 1));
+		linear_depth_v /= -linear_depth_v.w;
+
+		float depth_dif = abs(linear_depth_v.z - focal_distance.x);	
+		float near_multiplier = linear_depth_v.z < focal_distance.x ? dof_near_multiplier.x : 1;
+		float t = clamp((depth_dif - clear_range.x) / focal_range.x * near_multiplier, 0, 1);
+		
+		t = min(t, max_dof_blur.x);
+		vec3 dof_color = texture2D(u_dofBuffer, tex_coord).xyz;
+		if (linear_depth_v.z > 10000) t = 0;
+		return mix(in_color, dof_color, t);
+	#else
+		return in_color;
+	#endif
+}
+
+vec3 tonemap(vec3 in_color)
+{
+	float avg_loglum = max(0.1, exp(texture2D(u_avgLuminance, vec2(0.5, 0.5)).r));
+	float lum = luma(in_color).x;
+	float map_middle = (midgray.r / (avg_loglum + 0.001)) * lum;
+	float ld = Uncharted2Tonemap(map_middle) / Uncharted2Tonemap(11.0);
+	return (in_color / lum) * ld;
 }
 
 void main()
 {
-	float avg_loglum = max(0.1, exp(texture2D(u_avgLuminance, vec2(0.5, 0.5)).r));
-	vec3 hdr_color = texture2D(u_hdrBuffer, v_texcoord0).xyz;
+	vec3 color = texture2D(u_hdrBuffer, v_texcoord0).xyz;
 	
-	#ifdef DOF
+	color = dof(v_texcoord0, color);
+	color *= exposure.x;
+	color = tonemap(color);
+	color = vignette(v_texcoord0, color);
+	color = toGamma(color);
+	color = filmGrain(v_texcoord0, color);
 	
-		float depth = texture2D(u_depthBuffer, v_texcoord0).x;
-		vec4 linear_depth_v = mul(u_camInvProj, vec4(0, 0, depth, 1));
-		linear_depth_v /= linear_depth_v.w;
-
-		#if 0
-			float depth2 = texture2D(u_depthBuffer, vec2(0.5, 0.5)).x;
-			vec4 linear_depth2_v = mul(u_camInvProj, vec4(0, 0, depth2, 1));
-			linear_depth2_v /= linear_depth2_v.w;
-			float t = clamp(abs(-linear_depth_v.z - -linear_depth2_v.z) / focal_range.x, 0, 1);
-		#else 
-			float depth_dif = abs(-linear_depth_v.z - focal_distance.x);	
-			float near_multiplier = -linear_depth_v.z < focal_distance.x ? dof_near_multiplier.x : 1;
-			float t = clamp((depth_dif - clear_range.x) / focal_range.x * near_multiplier, 0, 1);
-		#endif
-		
-		t = min(t, max_dof_blur.x);
-		vec3 dof_color = texture2D(u_dofBuffer, v_texcoord0).xyz;
-		if (-linear_depth_v.z > 10000) t = 0;
-		hdr_color = mix(hdr_color, dof_color, t);
-	#endif		
-	hdr_color *= exposure.x;
-	float lum = luma(hdr_color).x;
-
-	float map_middle = (midgray.r / (avg_loglum + 0.001)) * lum;
-	
-	//float ld = reinhard2(map_middle, 1.1*1.1);
-	//float ld = map_middle / (map_middle + 1);
-	
-	float ld = Uncharted2Tonemap(map_middle) / Uncharted2Tonemap(11.0);
-	
-	vec3 finalColor = (hdr_color / lum) * ld;
-
-	float dist = distance(v_texcoord0, vec2(0.5, 0.5));
-	float vignette = smoothstep(u_vignette.x, u_vignette.x - u_vignette.y, dist);
-	finalColor = mix(finalColor, finalColor * vignette, 0.5);
-
-	
-	#ifdef FILM_GRAIN
-		vec3 grained = filmGrain(toGamma(finalColor), v_wpos.xy);
-		gl_FragColor =  vec4(grained, 1.0f);
-	#else
-		gl_FragColor =  vec4(toGamma(finalColor), 1.0f);
-	#endif	
+	gl_FragColor =  vec4(color, 1.0f);
 }
 
 

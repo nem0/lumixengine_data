@@ -1,0 +1,13 @@
+{"shader" : "pipelines/rigid/rigid.shd",
+"texture" : {"source" : "/models/utils/cube/default.tga",
+"srgb" : true},
+"defines" : ["DIFFUSE_TEXTURE"],
+"uniforms" : [{"name" : "u_time",
+"time" : 0},
+{"name" : "u_parallaxScale",
+"float_value" : 0.00000000}],
+"shininess" : 4.00000000,
+"alpha_ref" : 0.30000000,
+"color" : [1.00000000,
+0.00000000,
+0.00000000]}

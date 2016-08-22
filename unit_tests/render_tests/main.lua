@@ -1,4 +1,5 @@
 local tests = {
+	{"colored_material", 10},
 	{"decals", 10},
 	{"fog", 10}, 
 	{"godrays", 10}, 

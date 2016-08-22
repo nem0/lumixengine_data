@@ -4,7 +4,7 @@ local tests = {
 	{"fog", 10}, 
 	{"godrays", 10}, 
 	{"height_fog", 10}, 
-	{"hdr_dof", 10}, 
+	{"hdr_dof", 20}, 
 	{"hidden_mesh", 10}, 
 	{"light_color", 10}, 
 	{"parallax", 10}, 
@@ -41,7 +41,6 @@ for key, value in pairs(tests) do
 	App.frame(App.instance)
 	App.frame(App.instance)
 	App.frame(App.instance)
-	--if value[1] == "ssao" then while true do App.frame(App.instance) end end
 	dif = Renderer.compareTGA(g_scene_renderer, out_tga, template_tga, value[2], true)
 	local log_msg = "Universe unit_tests/render_tests/" .. value[1] .. ".unv => difference " .. tostring(dif)
 	if dif > 5000 then

@@ -4,7 +4,7 @@ local tests = {
 	{"fog", 10}, 
 	{"godrays", 10}, 
 	{"height_fog", 10}, 
-	{"hdr_dof", 20}, 
+	{"hdr_dof", 1020}, -- film grain is random noise => higher tolerance 
 	{"hidden_mesh", 10}, 
 	{"light_color", 10}, 
 	{"parallax", 10}, 

@@ -1,10 +1,10 @@
 local tests = {
+	{"hdr_dof", 30}, -- film grain is random noise => higher tolerance 
 	{"colored_material", 10},
 	{"decals", 10},
 	{"fog", 10}, 
 	{"godrays", 10}, 
 	{"height_fog", 10}, 
-	{"hdr_dof", 1020}, -- film grain is random noise => higher tolerance 
 	{"hidden_mesh", 10}, 
 	{"light_color", 10}, 
 	{"parallax", 10}, 

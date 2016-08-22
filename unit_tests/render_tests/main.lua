@@ -11,6 +11,7 @@ local tests = {
 	{"shadow", 10},
 	{"simple", 10},
 	{"simple_terrain", 10},
+	{"skinned", 10},
 	{"spotlight", 10},
 	{"ssao", 20} -- ssao uses random rotation => higher tolerance
 }

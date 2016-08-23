@@ -36,11 +36,6 @@ uniform vec4 dof_near_multiplier;
 #define grainamount u_grainAmount.x
 #define grainsize u_grainSize.x
 
-float reinhard2(float x, float whiteSqr)
-{
-	return (x * (1.0 + x / whiteSqr) ) / (1.0 + x);
-}
-
 // Unchared2 tone mapping (See http://filmicgames.com)
 float Uncharted2Tonemap(float x)
 {
@@ -167,7 +162,6 @@ vec3 dof(vec2 tex_coord, vec3 in_color)
 		
 		t = min(t, max_dof_blur.x);
 		vec3 dof_color = texture2D(u_dofBuffer, tex_coord).xyz;
-		if (linear_depth_v.z > 10000) t = 0;
 		return mix(in_color, dof_color, t);
 	#else
 		return in_color;

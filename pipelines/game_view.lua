@@ -2,7 +2,6 @@ common = require "pipelines/common"
 ctx = { pipeline = this, main_framebuffer = "forward" }
 do_gamma_mapping = true
 
-local deferred_enabled = false
 local render_debug_deferred = { false, false, false, false }
 local render_debug_deferred_fullsize = { false, false, false, false }
 
@@ -124,11 +123,7 @@ function fur()
 		enableBlending(this, "alpha")
 		applyCamera(this, "main")
 		setActiveGlobalLightUniforms(this)
-		if deferred_enabled then
-			renderModels(this, {deferred_view, fur_view})
-		else
-			renderModels(this, {main_view, fur_view})
-		end
+		renderModels(this, {deferred_view, fur_view})
 end
 
 
@@ -152,14 +147,8 @@ end
 
 function render()
 	common.shadowmap(ctx, "main")
-	if deferred_enabled then
-		deferred("main")
-		common.particles(ctx, "main")
-	else
-		main(this)
-		common.particles(ctx, "main")
-		pointLight(this)		
-	end
+	deferred("main")
+	common.particles(ctx, "main")
 	fur(this)
 
 	postprocessCallback(this, "main")

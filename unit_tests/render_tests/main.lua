@@ -29,8 +29,9 @@ for key, value in pairs(tests) do
 	App.frame(App.instance)
 	App.loadUniverse(App.instance, "unit_tests/render_tests/"..value[1]..".unv")
 	waitForLoad()
-	
 	App.frame(App.instance)
+	waitForLoad()
+
 	App.frame(App.instance)
 	App.frame(App.instance)
 	App.frame(App.instance)

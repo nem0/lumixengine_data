@@ -9,9 +9,6 @@ module.render_shadowmap_debug_fullsize = false
 
 function module.renderEditorIcons(ctx)
 	if module.render_gizmos then
-		newView(ctx.pipeline, "copy_depth_editor")
-			copyRenderbuffer(ctx.pipeline, ctx.main_framebuffer, 1, "default", 1)
-		
 		newView(ctx.pipeline, "editor")
 			bindFramebufferTexture(ctx.pipeline, ctx.main_framebuffer, 1, ctx.depth_buffer_uniform)
 			setPass(ctx.pipeline, "EDITOR")
@@ -27,7 +24,6 @@ function module.renderGizmo(ctx)
 	if module.render_gizmos then
 		newView(ctx.pipeline, "gizmo")
 			setPass(ctx.pipeline, "EDITOR")
-			disableDepthWrite(ctx.pipeline)
 			setFramebuffer(ctx.pipeline, "default")
 			applyCamera(ctx.pipeline, "editor")
 			renderGizmos(ctx.pipeline)

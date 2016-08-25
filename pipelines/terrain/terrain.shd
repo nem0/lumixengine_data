@@ -15,7 +15,6 @@ texture_slot("Splatmap", "u_texSplatmap")
 texture_slot("Satellite map", "u_texSatellitemap")
 texture_slot("Colormap", "u_texColormap")
 texture_slot("Diffuse", "u_texColor")
-	atlas()
 texture_slot("Normal", "u_texNormal")
 	texture_define "NORMAL_MAPPING"
 

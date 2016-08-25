@@ -6,8 +6,8 @@ SAMPLER2D(u_texHeightmap, 0);
 SAMPLER2D(u_texSplatmap, 1);
 SAMPLER2D(u_texSatellitemap, 2);
 SAMPLER2D(u_texColormap, 3);
-SAMPLER2D(u_texColor, 4);
-SAMPLER2D(u_texNormal, 5);
+SAMPLER2DARRAY(u_texColor, 4);
+SAMPLER2DARRAY(u_texNormal, 5);
 #ifndef SHADOW
 	SAMPLER2D(u_texShadowmap, 15);
 #endif
@@ -29,52 +29,6 @@ uniform vec4 u_fogParams;
 uniform vec4 u_terrainScale;
 uniform mat4 u_terrainMatrix;
 
-
-vec2 getSubtextureUV4(vec2 uv, float z)
-{
-	const float o = 1.0/(2.0*2*2);
-	BEGIN_CONST_ARRAY(vec2, 4, origin)
-		vec2(0.0 + o, 0.0 + o),
-		vec2(0.5 + o, 0.0 + o),
-		vec2(0.0 + o, 0.5 + o),
-		vec2(0.5 + o, 0.5 + o)
-	END_CONST_ARRAY;
-
-	return origin[int(z)] + uv / 4.0;
-}
-
-
-vec2 getSubtextureUV9(vec2 uv, float z)
-{
-	const float o = 1.0/(3.0*2*2);
-	BEGIN_CONST_ARRAY(vec2, 9, origin)
-		vec2(0.0 + o, 0.0 + o),			vec2(1/3.0 + o, 0.0 + o),		vec2(2/3.0 + o, 0.0 + o),
-		vec2(0.0 + o, 1/3.0 + o),		vec2(1/3.0 + o, 1/3.0 + o),		vec2(2/3.0 + o, 1/3.0 + o),
-		vec2(0.0 + o, 2/3.0 + o),		vec2(1/3.0 + o, 2/3.0 + o),		vec2(2/3.0 + o, 2/3.0 + o)
-	END_CONST_ARRAY;
-	return origin[int(z)] + uv / 6.0;
-}
-
-
-vec2 getSubtextureUV16(vec2 uv, float z)
-{
-	const float o = 1.0/(4.0*2*2);
-	BEGIN_CONST_ARRAY(vec2, 16, origin)
-		vec2(0.0, 0.0 + o),			vec2(1/4.0, 0.0 + o),		vec2(2/4.0, 0.0 + o),		vec2(3/4.0, 0.0 + o),
-		vec2(0.0, 1/4.0 + o),		vec2(1/4.0, 1/4.0 + o),		vec2(2/4.0, 1/4.0 + o),		vec2(3/4.0, 1/4.0 + o),
-		vec2(0.0, 2/4.0 + o),		vec2(1/4.0, 2/4.0 + o),		vec2(2/4.0, 2/4.0 + o),		vec2(3/4.0, 2/4.0 + o),
-		vec2(0.0, 3/4.0 + o),		vec2(1/4.0, 3/4.0 + o),		vec2(2/4.0, 3/4.0 + o),		vec2(3/4.0, 3/4.0 + o)
-	END_CONST_ARRAY;
-	return origin[int(z)] + uv / 8.0;
-}
-
-float mipmapLevel(vec2 uv, vec2 textureSize)
-{
-    vec2 dx = dFdx(uv * textureSize.x);
-    vec2 dy = dFdy(uv * textureSize.y);
-    float d = max(dot(dx, dx), dot(dy, dy));
-    return 0.5 * log2(d);
-}
 
 void main()
 {
@@ -110,13 +64,9 @@ void main()
 			);
 		tbn = transpose(tbn);
 
-		float splatmap_size = u_terrainParams.w;
+		float splatmap_size = u_terrainParams.z;
 		float half_texel = 0.5 / splatmap_size;
-		int texture_count = int(u_terrainParams.z * u_terrainParams.z);
-		int detail_size = int(u_terrainParams.y / (2.0 * u_terrainParams.z));
 					
-		vec2 ff = fract(detail_uv);
-
 		float u = v_texcoord1.x * splatmap_size - 1.0;
 		float v = v_texcoord1.y * splatmap_size - 1.0;
 		float x = floor(u);
@@ -130,37 +80,10 @@ void main()
 		vec4 splat10 = texture2D(u_texSplatmap, vec2((x+1.0)/splatmap_size, y/splatmap_size)).rgba;
 		vec4 splat11 = texture2D(u_texSplatmap, vec2((x+1.0)/splatmap_size, (y+1.0)/splatmap_size)).rgba;
 	
-		vec2 duv00, duv01, duv10, duv11;
-		if(texture_count < 5)
-		{
-			duv00 = getSubtextureUV4(ff, splat00.x * 256.0);
-			duv01 = getSubtextureUV4(ff, splat01.x * 256.0);
-			duv10 = getSubtextureUV4(ff, splat10.x * 256.0);
-			duv11 = getSubtextureUV4(ff, splat11.x * 256.0);
-		}
-		else if(texture_count < 10)
-		{
-			duv00 = getSubtextureUV9(ff, splat00.x * 256.0);
-			duv01 = getSubtextureUV9(ff, splat01.x * 256.0);
-			duv10 = getSubtextureUV9(ff, splat10.x * 256.0);
-			duv11 = getSubtextureUV9(ff, splat11.x * 256.0);
-		}
-		else
-		{
-			duv00 = getSubtextureUV16(ff, splat00.x * 256.0);
-			duv01 = getSubtextureUV16(ff, splat01.x * 256.0);
-			duv10 = getSubtextureUV16(ff, splat10.x * 256.0);
-			duv11 = getSubtextureUV16(ff, splat11.x * 256.0);
-		}
-		
-		float mipmap_level = mipmapLevel(v_texcoord0 * texture_scale.x, vec2(detail_size, detail_size));
-	
-		mipmap_level = min(mipmap_level, log2(detail_size) - 1);
-		
-		vec4 c00 = texture2DLod(u_texColor, duv00, mipmap_level);
-		vec4 c01 = texture2DLod(u_texColor, duv01, mipmap_level);
-		vec4 c10 = texture2DLod(u_texColor, duv10, mipmap_level);
-		vec4 c11 = texture2DLod(u_texColor, duv11, mipmap_level);
+		vec4 c00 = texture2DArray(u_texColor, vec3(detail_uv, splat00.x * 256.0));
+		vec4 c01 = texture2DArray(u_texColor, vec3(detail_uv, splat01.x * 256.0));
+		vec4 c10 = texture2DArray(u_texColor, vec3(detail_uv, splat10.x * 256.0));
+		vec4 c11 = texture2DArray(u_texColor, vec3(detail_uv, splat11.x * 256.0));
 
 		vec4 bicoef = vec4(
 			u_opposite * v_opposite,
@@ -191,10 +114,10 @@ void main()
 			
 		vec3 wnormal;
 		#ifdef NORMAL_MAPPING
-			vec4 n00 = texture2DLod(u_texNormal, duv00, mipmap_level);
-			vec4 n01 = texture2DLod(u_texNormal, duv01, mipmap_level);
-			vec4 n10 = texture2DLod(u_texNormal, duv10, mipmap_level);
-			vec4 n11 = texture2DLod(u_texNormal, duv11, mipmap_level);
+			vec4 n00 = texture2DArray(u_texNormal, vec3(detail_uv, splat00.x * 256.0));
+			vec4 n01 = texture2DArray(u_texNormal, vec3(detail_uv, splat01.x * 256.0));
+			vec4 n10 = texture2DArray(u_texNormal, vec3(detail_uv, splat10.x * 256.0));
+			vec4 n11 = texture2DArray(u_texNormal, vec3(detail_uv, splat11.x * 256.0));
 			wnormal.xzy = (n00.xyz * b1 + n01.xyz * b2 + n10.xyz * b3 + n11.xyz * b4) / (b1 + b2 + b3 + b4);
 			wnormal = wnormal * 2.0 - 1.0;
 			wnormal = normalize(mul(tbn, wnormal));

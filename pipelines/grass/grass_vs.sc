@@ -1,5 +1,5 @@
-$input a_position, a_normal, a_tangent, a_texcoord0, i_data0, i_data1, i_data2, i_data3
-$output v_wpos, v_common, v_texcoord0, v_view
+$input a_position, a_normal, a_tangent, a_texcoord0, i_data0, i_data1, i_data2, i_data3, i_data4
+$output v_wpos, v_normal, v_common, v_texcoord0, v_view
 
 #include "common.sh"
 
@@ -25,6 +25,8 @@ void main()
 	model[1] = i_data1;
 	model[2] = i_data2;
 	model[3] = i_data3;
+	
+	v_normal = i_data4;
 	
 	const float min_dist = 60;
 	const float scale_dist = 10;

@@ -1,4 +1,4 @@
-$input v_wpos, v_common, v_texcoord0, v_view
+$input v_wpos, v_normal, v_common, v_texcoord0, v_view
 
 #include "common.sh"
 
@@ -49,9 +49,12 @@ void main()
 		if(color.a < u_alphaRef) discard;
 	#endif
 	color.rgb *= u_materialColorShininess.rgb;
+	#if 1 // darkening
+		color.rgb *= min(1.0, 2 * v_common.y + 0.5);
+	#endif
 	#ifdef DEFERRED
 		gl_FragData[0] = color;
-		vec3 normal = vec3(0, 1, 0);
+		vec3 normal = v_normal;
 		gl_FragData[1].xyz = (normal + 1) * 0.5; // todo: store only xz 
 		gl_FragData[1].w = 1;
 		float spec = u_materialColorShininess.g / 64.0;
@@ -59,7 +62,7 @@ void main()
 		gl_FragData[2] = vec4(spec, shininess, 0, 1);
 
 	#else
-		vec3 wnormal = vec3(0, 1, 0);
+		vec3 wnormal = v_normal;
 		vec3 view = normalize(v_view);
 					 
 		vec3 texture_specular = vec3(1, 1, 1);

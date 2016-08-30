@@ -152,13 +152,14 @@ vec3 shadeDirectionalLight(vec3 light_dir
 	float ndotl = dot(normal, light_dir);
 	vec3 reflected = light_dir - 2.0 * ndotl * normal;
 	float rdotv = max(0.0, dot(reflected, view_dir));
-	float spec = pow(max(0.0, rdotv), material_specular_shininess.w);
+	float shininess = max(0.0001, material_specular_shininess.w);
+	float spec = pow(max(0.0, rdotv), shininess);
 	vec3 col = step(0.0, -ndotl) * 
 		(-ndotl * light_color
 			+ light_specular 
 				* material_specular_shininess.rgb 
 				* texture_specular 
-				* step(1.0, material_specular_shininess.w) * spec);
+				* step(1.0, shininess) * spec);
 	return col;	
 }
 

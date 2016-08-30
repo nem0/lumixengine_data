@@ -1,11 +1,32 @@
 local module = {}
-
+local lua_script_type = Engine.getComponentType("lua_script")
 
 module.particles_enabled = true
 module.render_gizmos = true
 module.blur_shadowmap = true
 module.render_shadowmap_debug = false
 module.render_shadowmap_debug_fullsize = false
+
+function doPostprocess(pipeline, this_env, slot)
+	local camera_cmp = Renderer.getCameraInSlot(g_scene_renderer, slot)
+	if camera_cmp < 0 then return end
+	local camera_entity = Renderer.getCameraEntity(g_scene_renderer, camera_cmp)
+	local script_cmp = Engine.getComponent(g_universe, camera_entity, lua_script_type)
+	if script_cmp < 0 then return end
+	local script_count = LuaScript.getScriptCount(g_scene_lua_script, script_cmp)
+	for i = 1, script_count do
+		local env = LuaScript.getEnvironment(g_scene_lua_script, script_cmp, i - 1)
+		if env ~= nil then 
+			if env._IS_POSTPROCESS_INITIALIZED == nil and env.initPostprocess ~= nil then
+				env.initPostprocess(pipeline, this_env)
+				env._IS_POSTPROCESS_INITIALIZED = true
+			end
+			if env.postprocess ~= nil then
+				env.postprocess(pipeline, this_env)
+			end
+		end
+	end
+end
 
 function module.renderEditorIcons(ctx)
 	if module.render_gizmos then

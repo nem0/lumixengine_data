@@ -174,7 +174,7 @@ vec3 tonemap(vec3 in_color)
 	float lum = luma(in_color).x;
 	float map_middle = (midgray.r / (avg_loglum + 0.001)) * lum;
 	float ld = Uncharted2Tonemap(map_middle) / Uncharted2Tonemap(11.0);
-	return (in_color / lum) * ld;
+	return (in_color / max(0.00001, lum)) * ld;
 }
 
 void main()

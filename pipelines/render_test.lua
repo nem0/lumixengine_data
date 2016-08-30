@@ -134,7 +134,7 @@ function render()
 	common.particles(ctx, "editor")
 	fur(this)
 
-	postprocessCallback(this, "editor")
+	doPostprocess(this, _ENV, "editor")
 	
 	if do_gamma_mapping then
 		newView(this, "SRGB")

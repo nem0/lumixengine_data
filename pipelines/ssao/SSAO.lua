@@ -32,7 +32,10 @@ function renderSSAODDebug(pipeline, env)
 end
 
 
+local pipeline_env = nil
+
 function initPostprocess(pipeline, env)
+	pipeline_env = env
 	env.ctx.ssao_material = Engine.loadResource(g_engine, "pipelines/ssao/ssao.mat", "material")
 	env.ctx.normal_buffer_uniform = createUniform(pipeline, "u_normal_buffer")
 	env.ctx.ssao_intensity_uniform = createUniform(pipeline, "u_intensity");
@@ -56,7 +59,14 @@ function initPostprocess(pipeline, env)
 			{ format = "rgba8" }
 		}
 	})
-	
+end
+
+
+function onDestroy()
+	if pipeline_env then
+		removeFramebuffer(pipeline_env.ctx.pipeline, "SSAO")
+		removeFramebuffer(pipeline_env.ctx.pipeline, "blur_rgba8")
+	end
 end
 
 

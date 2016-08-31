@@ -205,9 +205,12 @@ function render()
 		common.particles(ctx, "editor")
 		pointLight(this)		
 	end
+
+	doPostprocess(this, _ENV, "pre_transparent", "editor")
+
 	fur(this)
 
-	doPostprocess(this, _ENV, "editor")
+	doPostprocess(this, _ENV, "main", "editor")
 	
 	if do_gamma_mapping then
 		newView(this, "SRGB")

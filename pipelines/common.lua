@@ -7,8 +7,8 @@ module.blur_shadowmap = true
 module.render_shadowmap_debug = false
 module.render_shadowmap_debug_fullsize = false
 
-function doPostprocess(pipeline, this_env, slot)
-	local camera_cmp = Renderer.getCameraInSlot(g_scene_renderer, slot)
+function doPostprocess(pipeline, this_env, slot, camera_slot)
+	local camera_cmp = Renderer.getCameraInSlot(g_scene_renderer, camera_slot)
 	if camera_cmp < 0 then return end
 	local camera_entity = Renderer.getCameraEntity(g_scene_renderer, camera_cmp)
 	local script_cmp = Engine.getComponent(g_universe, camera_entity, lua_script_type)
@@ -21,8 +21,8 @@ function doPostprocess(pipeline, this_env, slot)
 				env.initPostprocess(pipeline, this_env)
 				env._IS_POSTPROCESS_INITIALIZED = true
 			end
-			if env.postprocess ~= nil then
-				env.postprocess(pipeline, this_env)
+			if env.postprocess ~= nil and (env.postprocess_slot == slot or (env.postprocess_slot == nil and slot == "main"))  then
+				env.postprocess(pipeline, this_env, slot)
 			end
 		end
 	end

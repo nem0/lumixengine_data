@@ -2,6 +2,9 @@ sky_material = -1
 Editor.setPropertyType("sky_material", Editor.RESOURCE_PROPERTY, "material")
 
 
+postprocess_slot = "pre_transparent"
+
+
 function postprocess(pipeline, env)
 	if sky_material < 0 then return end
 	newView(pipeline, "sky")

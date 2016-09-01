@@ -132,9 +132,13 @@ function render()
 	common.shadowmap(ctx, "editor")
 	deferred("editor")
 	common.particles(ctx, "editor")
+
+	doPostprocess(this, _ENV, "pre_transparent", "editor")
+
 	fur(this)
 
-	doPostprocess(this, _ENV, "editor")
+	doPostprocess(this, _ENV, "main", "editor")
+
 	
 	if do_gamma_mapping then
 		newView(this, "SRGB")

@@ -21,7 +21,7 @@ function doPostprocess(pipeline, this_env, slot, camera_slot)
 				env.initPostprocess(pipeline, this_env)
 				env._IS_POSTPROCESS_INITIALIZED = true
 			end
-			if env.postprocess ~= nil and (env.postprocess_slot == slot or (env.postprocess_slot == nil and slot == "main"))  then
+			if env.postprocess ~= nil and (env._postprocess_slot == slot or (env._postprocess_slot == nil and slot == "main"))  then
 				env.postprocess(pipeline, this_env, slot)
 			end
 		end

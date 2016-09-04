@@ -168,6 +168,7 @@ function module.particles(ctx, camera_slot)
 			disableDepthWrite(ctx.pipeline)
 			applyCamera(ctx.pipeline, camera_slot)
 			bindFramebufferTexture(ctx.pipeline, "g_buffer", 3, ctx.depth_buffer_uniform)
+			setActiveGlobalLightUniforms(ctx.pipeline)
 			renderParticles(ctx.pipeline)
 	end	
 end

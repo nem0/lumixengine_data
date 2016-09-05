@@ -65,8 +65,13 @@ void main()
 		vec3 normal = (a_normal * 2.0 - 1.0).xyz;
 		vec3 tangent = (a_tangent * 2.0 - 1.0).xyz;
 
-		v_normal = instMul(model, vec4(normal, 0.0) ).xyz;
-		v_tangent = instMul(model, vec4(tangent, 0.0) ).xyz;
+		#ifdef SKINNED	
+			v_normal = mul(model, vec4(normal, 0.0) ).xyz;
+			v_tangent = mul(model, vec4(tangent, 0.0) ).xyz;
+		#else
+			v_normal = instMul(model, vec4(normal, 0.0) ).xyz;
+			v_tangent = instMul(model, vec4(tangent, 0.0) ).xyz;
+		#endif
 		v_bitangent = cross(v_tangent, v_normal);
 		v_view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - v_wpos;
 		

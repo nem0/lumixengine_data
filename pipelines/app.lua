@@ -142,6 +142,9 @@ function render()
 	common.shadowmap(ctx, "main")
 	deferred("main")
 	common.particles(ctx, "main")
+	
+	doPostprocess(this, _ENV, "pre_transparent", "main")
+	
 	fur(this)
 
 	doPostprocess(this, _ENV, "main", "main")

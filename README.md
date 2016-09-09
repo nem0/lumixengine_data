@@ -3,8 +3,8 @@ LumixEngine Data
 
 Installation
 ------------
-Download and install x86/x64 version of Visual C++ Redistributable Packages for Visual Studio 2013 from
-http://www.microsoft.com/en-us/download/details.aspx?id=40784
+Download and install x64 version of Visual C++ Redistributable Packages for Visual Studio 2015 from
+https://www.microsoft.com/en-us/download/details.aspx?id=48145
 
 Source Code
 -----------

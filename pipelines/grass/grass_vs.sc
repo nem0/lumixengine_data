@@ -4,7 +4,7 @@ $output v_wpos, v_normal, v_common, v_texcoord0, v_view
 #include "common.sh"
 
 uniform vec4 u_time;
-
+uniform vec4 u_grassMaxDist;
 
 SAMPLER2D(u_texNoise, 1);
 
@@ -28,10 +28,10 @@ void main()
 	
 	v_normal = i_data4;
 	
-	const float min_dist = 60;
+	const float min_dist = u_grassMaxDist.x;
 	const float scale_dist = 10;
 	vec3 view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - instMul(model, vec4(a_position, 1.0) ).xyz;
-	float scale = clamp(1 - (length(view) - min_dist)/scale_dist, 0, 1);
+	float scale = clamp(1 - (length(view) - (min_dist - scale_dist))/scale_dist, 0, 1);
 	
 	vec3 displaced_vertex = scale*a_position;
 	if(a_position.y>=0.1)

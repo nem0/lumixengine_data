@@ -24,6 +24,18 @@ local CONTROLLER_MOVE_Y = 10
 local yaw = 0
 local pitch = 0
 
+function makeQuat(axis, angle)
+	local half_angle = angle * 0.5
+	local s = math.sin(half_angle)
+	return {
+		axis[1] * s,
+		axis[2] * s,
+		axis[3] * s,
+		math.cos(half_angle)
+	}
+end
+
+
 function init()
 	cmp = Engine.createComponent(g_scene_physics, "physical_controller", this)
 
@@ -61,7 +73,7 @@ function update(dt)
 		speed = speed * 3
 	end
 	
-	Engine.setEntityLocalRotation(g_scene_hierarchy, camera_entity, {1, 0, 0}, pitch)
+	Engine.setEntityLocalRotation(g_scene_hierarchy, camera_entity, makeQuat({1, 0, 0}, pitch))
 	
 	Engine.setEntityRotation(g_universe, this, {0, 1, 0}, yaw);
 

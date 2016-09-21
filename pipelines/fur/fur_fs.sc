@@ -129,7 +129,7 @@ void main()
 			#endif
 			#ifdef FUR
 				gl_FragColor.rgb *= mix(u_darkening.x, 1, u_layer.x);
-				float alpha = clamp(0, 1, color.a * u_alphaMultiplier.x - u_layer.x);
+				float alpha = clamp(color.a * u_alphaMultiplier.x - u_layer.x, 0, 1);
 				#ifdef ALPHA_CUTOUT
 					if(alpha < u_alphaRef) discard;
 				#endif

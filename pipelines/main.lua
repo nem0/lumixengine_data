@@ -2,6 +2,7 @@ common = require "pipelines/common"
 ctx = { pipeline = this, main_framebuffer = "forward" }
 do_gamma_mapping = true
 
+local render_fur = true
 local deferred_enabled = true
 local render_debug_deferred = { false, false, false, false }
 local render_debug_deferred_fullsize = { false, false, false, false }
@@ -137,6 +138,14 @@ end
 
 
 function fur()
+	if not render_fur then 
+		if deferred_enabled then
+			renderModels(this, {deferred_view})
+		else
+			renderModels(this, {main_view})
+		end
+		return 
+	end
 	fur_view = newView(this, "FUR")
 		setPass(this, "FUR")
 		setFramebuffer(this, ctx.main_framebuffer)
@@ -264,6 +273,7 @@ function onGUI()
 		changed, common.blur_shadowmap = ImGui.Checkbox("Blur shadowmap", common.blur_shadowmap)
 		changed, deferred_enabled = ImGui.Checkbox("Deferred", deferred_enabled)
 		changed, common.render_gizmos = ImGui.Checkbox("Render gizmos", common.render_gizmos)
+		changed, render_fur = ImGui.Checkbox("Render fur", render_fur)
 		
 		ImGui.EndPopup()
 	end

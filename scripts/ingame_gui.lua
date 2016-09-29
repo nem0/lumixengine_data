@@ -4,109 +4,110 @@ camera_entity = -1
 Editor.setPropertyType("player_entity", Editor.ENTITY_PROPERTY)
 Editor.setPropertyType("camera_entity", Editor.ENTITY_PROPERTY)
 
+local Pages = {
+	MAIN = 0,
+	SETTINGS = 1
+}
+
+local gui = { shown = false, page = Pages.MAIN }
+if _G["gui"] == nil then _G["gui"] = gui else gui = _G["gui"] end
+
+function exitGame()
+	if Editor.editor then
+		gui.shown = false
+		Editor.exitGameMode(Editor.editor)
+	else
+		App.exit(App.instance, 0)
+	end
+end
+
 function toggleGUI()
-	local is_gui = Gui.isGUIShown(Gui.instance)
+	gui.shown = not gui.shown
+	Gui.enableCursor(Gui.instance, gui.shown)
 	local player_env = LuaScript.getEnvironment(g_scene_lua_script, player_entity, 0)
 	if player_env then
-		player_env.input_enabled = is_gui
+		player_env.input_enabled = not gui.shown
 	end
-	Gui.showGUI(Gui.instance, not is_gui)
+end
+	
+function main()
+	if ImGui.Button("Continue", 200, 0) then toggleGUI() end
+	if ImGui.Button("Settings", 200, 0) then gui.page = Pages.SETTINGS end
+	if ImGui.Button("Exit", 200, 0) then exitGame() end
+end
+
+function settings()
+	ImGui.Text("SETTINGS")	
+	ImGui.BeginChildFrame("Settings", 500, 280)
+	local camera_env = LuaScript.getEnvironment(g_scene_lua_script, camera_entity, 1)
+	local changed
+	local v
+	if _G["game_pipeline_env"] then
+		changed, v = ImGui.Checkbox("Fur", _G["game_pipeline_env"].fur_enabled)
+		_G["game_pipeline_env"].fur_enabled = v
+	end
+	if camera_env then
+		changed, v = ImGui.Checkbox("DOF", camera_env.dof_enabled)
+		camera_env.dof_enabled = v
+		
+		changed, v = ImGui.Checkbox("Film Grain", camera_env.film_grain_enabled)
+		camera_env.film_grain_enabled = v
+		
+		changed, v = ImGui.Checkbox("FXAA", camera_env.fxaa_enabled)
+		camera_env.fxaa_enabled = v
+		
+		changed, v = ImGui.Checkbox("Vignette", camera_env.vignette_enabled)
+		camera_env.vignette_enabled = v
+		
+		changed, v = ImGui.SliderFloat("Exposure", camera_env.hdr_exposure, 0.1, 20)
+		camera_env.hdr_exposure = v
+	end
+	local player_env = LuaScript.getEnvironment(g_scene_lua_script, player_entity, 0)
+	if player_env then
+		changed, v = ImGui.SliderFloat("Mouse Sensitivity", player_env.MOUSE_SENSITIVITY, 0.1, 20)
+		player_env.MOUSE_SENSITIVITY = v
+	end
+	
+	changed, v = ImGui.SliderFloat("LOD", Renderer.getGlobalLODMultiplier(g_scene_renderer), 0.01, 5)
+	Renderer.setGlobalLODMultiplier(g_scene_renderer, v)
+	
+	if ImGui.Button("Back") then gui.page = Pages.MAIN end
+	ImGui.EndChildFrame()
 end
 
 function update()
-	if Engine.getInputActionValue(g_engine, MENU_ACTION) > 0 then
+	if not gui.shown and Engine.getInputActionValue(g_engine, MENU_ACTION) > 0 then
 		toggleGUI()
 	end
-end
+	
+	if not gui.shown then return end
 
-function onContinue()
-	toggleGUI()
-end
-
-function onExit()
-	if Editor.editor then
-		Gui.showGUI(Gui.instance, false)
-		Editor.exitGameMode(Editor.editor)
+	Gui.beginGUI(Gui.instance)
+	local flags = ImGui.WindowFlags_NoMove
+		| ImGui.WindowFlags_NoCollapse
+		| ImGui.WindowFlags_NoResize
+		| ImGui.WindowFlags_NoTitleBar
+		| ImGui.WindowFlags_NoScrollbar
+		| ImGui.WindowFlags_AlwaysAutoResize
+	ImGui.SetNextWindowPosCenter();
+	if ImGui.Begin("Menu", flags) then
+		if gui.page == Pages.MAIN then main() 
+		elseif gui.page == Pages.SETTINGS then settings() end
 	end
+	ImGui.End()
+	Gui.endGUI(Gui.instance)
 end
 
-function onOptions()
-	Gui.loadFile(Gui.instance, "gui/options.tb.txt")
+function init()
+	Gui.beginGUI(Gui.instance)
+	ImGui.SetStyleColor(ImGui.Col_WindowBg, 0, 0, 0, 0.0)
+	ImGui.SetStyleColor(ImGui.Col_FrameBg, 0, 0, 0, 0.8)
+	ImGui.SetStyleColor(ImGui.Col_Button, 0, 0, 0, 0.8)
+	ImGui.SetStyleColor(ImGui.Col_ButtonActive, 0, 0, 0, 0.6)
+	ImGui.SetStyleColor(ImGui.Col_ButtonHovered, 0, 0, 0, 0.6)
+	Gui.endGUI(Gui.instance)
 end
-
-function onOptionFXAA()
-	local camera_env = LuaScript.getEnvironment(g_scene_lua_script, camera_entity, 1)
-	if camera_env then
-		camera_env.fxaa_enabled = not camera_env.fxaa_enabled
-	end
-
-end
-
-function onOptionDOF()
-	local camera_env = LuaScript.getEnvironment(g_scene_lua_script, camera_entity, 1)
-	if camera_env then
-		camera_env.dof_enabled = not camera_env.dof_enabled
-	end
-end
-
-function onOptionFilmGrain()
-	local camera_env = LuaScript.getEnvironment(g_scene_lua_script, camera_entity, 1)
-	if camera_env then
-		camera_env.film_grain_enabled = not camera_env.film_grain_enabled
-	end
-end
-
-function onOptionVignette()
-	local camera_env = LuaScript.getEnvironment(g_scene_lua_script, camera_entity, 1)
-	if camera_env then
-		camera_env.vignette_enabled = not camera_env.vignette_enabled
-	end
-end
-
-function onGUI()
-	if ImGui.Button("Toggle") then
-		Gui.showGUI(Gui.instance, not Gui.isGUIShown(Gui.instance))
-	end
-	if ImGui.Button("Reload") then
-		Gui.loadFile(Gui.instance, "gui/ingame_menu.tb.txt")
-	end
-end
-
-function onOptionExposure()
-	local val = Gui.getSliderValue(Gui.instance, "option_exposure")
-	local camera_env = LuaScript.getEnvironment(g_scene_lua_script, camera_entity, 1)
-	if camera_env then
-		camera_env.hdr_exposure = val / 10.0
-	end
-end
-
-function onDestroy()
-	if Gui.isGUIShown(Gui.instance) then toggleGUI() end
-	Gui.unregisterEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "continue")
-	Gui.unregisterEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "exit")
-	Gui.unregisterEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "options")
-	Gui.unregisterEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "options_back")
-	Gui.unregisterEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "option_dof")
-	Gui.unregisterEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "option_fxaa")
-	Gui.unregisterEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "option_vignette")
-	Gui.unregisterEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "option_film_grain")
-	Gui.unregisterEvent(Gui.instance, Gui.EVENT_TYPE_CHANGED, "option_exposure")
-end
-
-Gui.loadFile(Gui.instance, "gui/ingame_menu.tb.txt")
-Gui.showGUI(Gui.instance, false)
 
 Engine.addInputAction(g_engine, MENU_ACTION, Engine.INPUT_TYPE_DOWN, string.byte("M"), -1)
 
-Gui.registerEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "continue", onContinue)
-Gui.registerEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "exit", onExit)
-Gui.registerEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "options", onOptions)
-Gui.registerEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "option_dof", onOptionDOF)
-Gui.registerEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "option_fxaa", onOptionFXAA)
-Gui.registerEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "option_vignette", onOptionVignette)
-Gui.registerEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "option_film_grain", onOptionFilmGrain)
-Gui.registerEvent(Gui.instance, Gui.EVENT_TYPE_CHANGED, "option_exposure", onOptionExposure)
-Gui.registerEvent(Gui.instance, Gui.EVENT_TYPE_CLICK, "options_back", function () 
-	Gui.loadFile(Gui.instance, "gui/ingame_menu.tb.txt")
-end)
 

@@ -1,6 +1,8 @@
+_G["game_pipeline_env"] = _ENV
 common = require "pipelines/common"
 ctx = { pipeline = this, main_framebuffer = "forward" }
 do_gamma_mapping = true
+fur_enabled = true
 
 local render_debug_deferred = { false, false, false, false }
 local render_debug_deferred_fullsize = { false, false, false, false }
@@ -120,14 +122,18 @@ end
 
 
 function fur()
-	fur_view = newView(this, "FUR")
-		setPass(this, "FUR")
-		setFramebuffer(this, ctx.main_framebuffer)
-		disableDepthWrite(this)
-		enableBlending(this, "alpha")
-		applyCamera(this, "main")
-		setActiveGlobalLightUniforms(this)
-		renderModels(this, {deferred_view, fur_view})
+	if fur_enabled then
+		fur_view = newView(this, "FUR")
+			setPass(this, "FUR")
+			setFramebuffer(this, ctx.main_framebuffer)
+			disableDepthWrite(this)
+			enableBlending(this, "alpha")
+			applyCamera(this, "main")
+			setActiveGlobalLightUniforms(this)
+			renderModels(this, {deferred_view, fur_view})
+	else
+		renderModels(this, {deferred_view})
+	end
 end
 
 

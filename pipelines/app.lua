@@ -1,3 +1,5 @@
+_G["game_pipeline_env"] = _ENV
+
 common = require "pipelines/common"
 ctx = { pipeline = this, main_framebuffer = "forward" }
 do_gamma_mapping = true

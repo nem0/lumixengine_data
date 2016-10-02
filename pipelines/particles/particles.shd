@@ -1,4 +1,6 @@
 pass "PARTICLES"
+   vs { "SUBIMAGE" }
+   fs { "SUBIMAGE" }
    
 alpha_blending "alpha"
    

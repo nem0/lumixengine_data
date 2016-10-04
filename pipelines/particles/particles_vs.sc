@@ -8,6 +8,10 @@
 
 #include "common.sh"
 
+#ifdef LOCAL_SPACE
+	uniform mat4 u_emitterMatrix;
+#endif
+
 void main()
 {
 	vec4 up2 = vec4(u_invView[0][1], u_invView[1][1], u_invView[2][1], u_invView[3][1]);
@@ -20,7 +24,11 @@ void main()
 	vec4 up = c * up2 + s * right2;
 	vec4 right = -s * up2 + c * right2;
 	
-	vec3 wpos = i_data0.xyz + (up * a_position.y + right * a_position.x).xyz * i_data0.w;
+	#ifdef LOCAL_SPACE
+		vec3 wpos = mul(u_emitterMatrix, vec4(i_data0.xyz, 1)).xyz + (up * a_position.y + right * a_position.x).xyz * i_data0.w;
+	#else
+		vec3 wpos = i_data0.xyz + (up * a_position.y + right * a_position.x).xyz * i_data0.w;
+	#endif
 	v_wpos = wpos;
 	#ifdef SUBIMAGE
 		v_texcoord0 = a_texcoord0 * i_data2.zw + i_data2.xy;

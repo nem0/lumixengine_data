@@ -37,7 +37,7 @@ end
 
 
 function init()
-	cmp = Engine.createComponent(g_scene_physics, "physical_controller", this)
+	cmp = Engine.createComponent(g_universe, this, "physical_controller")
 
 	Engine.addInputAction(g_engine, LEFT_ACTION, Engine.INPUT_TYPE_PRESSED, string.byte("A"), -1)
 	Engine.addInputAction(g_engine, RIGHT_ACTION, Engine.INPUT_TYPE_PRESSED, string.byte("D"), -1)

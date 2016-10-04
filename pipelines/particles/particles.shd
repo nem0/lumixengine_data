@@ -1,5 +1,5 @@
 pass "PARTICLES"
-   vs { "SUBIMAGE" }
+   vs { "SUBIMAGE", "LOCAL_SPACE" }
    fs { "SUBIMAGE" }
    
 alpha_blending "alpha"

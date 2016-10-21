@@ -13,6 +13,7 @@ fxaa_enabled = true
 vignette_radius = 0.5
 vignette_softness = 0.35
 vignette_enabled = true
+bloom_enabled = false
 
 local pipeline_env = nil
 
@@ -42,6 +43,7 @@ function computeLumUniforms()
 		end
 	end
 end
+computeLumUniforms()
 
 function initHDR(ctx)
 	addFramebuffer(ctx.pipeline, "lum128", {
@@ -148,10 +150,11 @@ function initHDR(ctx)
 	ctx.dof_clear_range_uniform = createUniform(ctx.pipeline, "clear_range", 0)
 	ctx.lum_size_uniform = createVec4ArrayUniform(ctx.pipeline, "u_offset", 16)
 	ctx.vignette_uniform = createUniform(ctx.pipeline, "u_vignette")
-	computeLumUniforms()
 end
 
 function hdr(ctx, camera_slot)
+	bloom(ctx, ctx.pipeline)
+
 	newView(ctx.pipeline, "hdr_luminance")
 		setPass(ctx.pipeline, "HDR_LUMINANCE")
 		setFramebuffer(ctx.pipeline, "lum128")
@@ -276,6 +279,61 @@ function hdr(ctx, camera_slot)
 	fxaa(ctx, camera_slot)
 end
 
+
+function initBloom(pipeline, env)
+	env.ctx.extract_material = Engine.loadResource(g_engine, "pipelines/hdr_dof_fxaa/bloomextract.mat", "material")
+	env.ctx.bloom_material = Engine.loadResource(g_engine, "pipelines/hdr_dof_fxaa/bloom.mat", "material")
+	addFramebuffer(env.ctx.pipeline, "bloom_extract", {
+		size_ratio = { 0.5, 0.5},
+		renderbuffers = {
+			{ format = "rgba16f" }
+		}
+	})
+
+	addFramebuffer(env.ctx.pipeline, "bloom_blur", {
+		size_ratio = { 0.5, 0.5},
+		renderbuffers = {
+			{ format = "rgba16f" }
+		}
+	})
+end
+
+
+function bloom(ctx, pipeline)
+	if not bloom_enabled then return end
+	newView(pipeline, "bloom_extract")
+		setPass(pipeline, "MAIN")
+		disableBlending(pipeline)
+		disableDepthWrite(pipeline)
+		setFramebuffer(pipeline, "bloom_extract")
+		bindFramebufferTexture(pipeline, "hdr", 0, ctx.texture_uniform)
+		drawQuad(pipeline, 0, 0, 1, 1, ctx.extract_material)
+	
+	newView(ctx.pipeline, "blur_bloom_h")
+		setPass(ctx.pipeline, "BLUR_H")
+		setFramebuffer(ctx.pipeline, "bloom_blur")
+		disableDepthWrite(ctx.pipeline)
+		bindFramebufferTexture(ctx.pipeline, "bloom_extract", 0, ctx.shadowmap_uniform)
+		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material)
+		enableDepthWrite(ctx.pipeline)
+
+	newView(ctx.pipeline, "blur_bloom_v")
+		setPass(ctx.pipeline, "BLUR_V")
+		setFramebuffer(ctx.pipeline, "bloom_extract")
+		disableDepthWrite(ctx.pipeline)
+		bindFramebufferTexture(ctx.pipeline, "bloom_blur", 0, ctx.shadowmap_uniform)
+		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material);
+		enableDepthWrite(ctx.pipeline)
+		
+	newView(pipeline, "bloom")
+		setPass(pipeline, "MAIN")
+		enableBlending(pipeline, "add")
+		disableDepthWrite(pipeline)
+		setFramebuffer(pipeline, "hdr")
+		bindFramebufferTexture(pipeline, "bloom_extract", 0, ctx.texture_uniform)
+		drawQuad(pipeline, 0, 0, 1, 1, ctx.bloom_material)
+end
+
 function fxaa(ctx, camera_slot)
 		if not fxaa_enabled then return end
 		
@@ -308,6 +366,7 @@ end
 
 function initPostprocess(pipeline, env)
 	pipeline_env = env
+	initBloom(pipeline, env)
 	initHDR(env.ctx)
 	original_framebuffer = env.ctx.main_framebuffer
 	env.ctx.main_framebuffer = "hdr"

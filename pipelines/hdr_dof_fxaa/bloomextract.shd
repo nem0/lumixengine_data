@@ -1,0 +1,3 @@
+pass "MAIN"
+
+uniform("u_time", "time")

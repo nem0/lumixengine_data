@@ -279,6 +279,41 @@ float directionalLightShadow(sampler2D shadowmap, mat4 shadowmap_matrices[4], ve
 }
 
 
+
+// simple == no smooth transition between cascades
+float directionalLightShadowSimple(sampler2D shadowmap, mat4 shadowmap_matrices[4], vec4 position, float ndotl)
+{
+	vec3 shadow_coord[4];
+	shadow_coord[0] = mul(shadowmap_matrices[0], position).xyz;
+	shadow_coord[1] = mul(shadowmap_matrices[1], position).xyz;
+	shadow_coord[2] = mul(shadowmap_matrices[2], position).xyz;
+	shadow_coord[3] = mul(shadowmap_matrices[3], position).xyz;
+
+	vec2 shadow_subcoords[2];
+
+	int split_index = 3;
+	float weight = 0.0;
+	if(all(lessThan(shadow_coord[0].xy, vec2_splat(1.0))) && all(greaterThan(shadow_coord[0].xy, vec2_splat(0.0))))
+	{
+		return noCheckESM(shadowmap, vec2(shadow_coord[0].x * 0.5, shadow_coord[0].y * 0.5), shadow_coord[0].z, 15000.0);
+	}
+	else if(all(lessThan(shadow_coord[1].xy, vec2_splat(1.0))) && all(greaterThan(shadow_coord[1].xy, vec2_splat(0.0))))
+	{
+		return noCheckESM(shadowmap, vec2(0.5 + shadow_coord[1].x * 0.5, shadow_coord[1].y * 0.5), shadow_coord[1].z, 15000.0);
+	}
+	else if(all(lessThan(shadow_coord[2].xy, vec2_splat(1.0))) && all(greaterThan(shadow_coord[2].xy, vec2_splat(0.0))))
+	{
+		return noCheckESM(shadowmap, vec2(shadow_coord[2].x * 0.5, 0.5 + shadow_coord[2].y * 0.5), shadow_coord[2].z, 15000.0);
+	}
+	else if(all(lessThan(shadow_coord[3].xy, vec2_splat(1.0))) && all(greaterThan(shadow_coord[3].xy, vec2_splat(0.0))))
+	{
+		return noCheckESM(shadowmap, vec2(0.5 + shadow_coord[3].x * 0.5, 0.5 + shadow_coord[3].y * 0.5), shadow_coord[3].z, 15000.0);
+	}
+	else
+		return 1.0;
+}
+
+
 vec3 getScreenCoord(vec3 world_pos)
 {
 	vec4 prj = mul(u_viewProj, vec4(world_pos, 1.0) );

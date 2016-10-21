@@ -1,9 +1,13 @@
 enabled = true
 local camera_cmp_type = Engine.getComponentType("camera")
+exposure = 0.01
+decay = 0.99
+weight = 0.1
 
 function initPostprocess(pipeline, env)
 	env.ctx.godrays_material = Engine.loadResource(g_engine, "pipelines/godrays/godrays.mat", "material")
 	env.ctx.global_light_screen_pos_uniform = createUniform(pipeline, "u_light_screen_pos")
+	env.ctx.godrays_params = createUniform(pipeline, "u_godrays_params")
 end
 
 function vecAdd(a, b)
@@ -33,15 +37,18 @@ function computeLightScreenPos()
 end
 
 function onGUI()
+
 end
 
 
 function postprocess(pipeline, env)
 	if not enabled then return end
-	
 	newView(pipeline, "godrays")
 		local light_screen_pos = computeLightScreenPos()
+		local godrays_params = {exposure, decay, weight, 0}
+		setActiveGlobalLightUniforms(pipeline)
 		setUniform(pipeline, env.ctx.global_light_screen_pos_uniform, {light_screen_pos})
+		setUniform(pipeline, env.ctx.godrays_params, {godrays_params})
 		setPass(pipeline, "MAIN")
 		enableBlending(pipeline, "add")
 		--disableBlending(pipeline)

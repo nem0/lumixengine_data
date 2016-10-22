@@ -30,7 +30,7 @@ end
 
 function module.renderEditorIcons(ctx)
 	if module.render_gizmos then
-		newView(ctx.pipeline, "editor")
+		newView(ctx.pipeline, "editor", 0xFFFFffffFFFFffff)
 			bindFramebufferTexture(ctx.pipeline, ctx.main_framebuffer, 1, ctx.depth_buffer_uniform)
 			setPass(ctx.pipeline, "EDITOR")
 			setFramebuffer(ctx.pipeline, "default")
@@ -115,26 +115,26 @@ function module.init(ctx)
 end
 
 
-function module.shadowmap(ctx, camera_slot)
-	newView(ctx.pipeline, "shadow0")
-		setPass(ctx.pipeline, "SHADOW")         
+function module.shadowmap(ctx, camera_slot, layer_mask)
+	newView(ctx.pipeline, "shadow0", layer_mask)
+		setPass(ctx.pipeline, "SHADOW")
 		applyCamera(ctx.pipeline, camera_slot)
 		setFramebuffer(ctx.pipeline, "shadowmap")
 		renderShadowmap(ctx.pipeline, 0) 
 
-	newView(ctx.pipeline, "shadow1")
+	newView(ctx.pipeline, "shadow1", layer_mask)
 		setPass(ctx.pipeline, "SHADOW")         
 		applyCamera(ctx.pipeline, camera_slot)
 		setFramebuffer(ctx.pipeline, "shadowmap")
 		renderShadowmap(ctx.pipeline, 1) 
 
-	newView(ctx.pipeline, "shadow2")
+	newView(ctx.pipeline, "shadow2", layer_mask)
 		setPass(ctx.pipeline, "SHADOW")         
 		applyCamera(ctx.pipeline, camera_slot)
 		setFramebuffer(ctx.pipeline, "shadowmap")
 		renderShadowmap(ctx.pipeline, 2) 
 
-	newView(ctx.pipeline, "shadow3")
+	newView(ctx.pipeline, "shadow3", layer_mask)
 		setPass(ctx.pipeline, "SHADOW")         
 		applyCamera(ctx.pipeline, camera_slot)
 		setFramebuffer(ctx.pipeline, "shadowmap")

@@ -2,6 +2,11 @@ common = require "pipelines/common"
 ctx = { pipeline = this, main_framebuffer = "forward" }
 do_gamma_mapping = true
 
+local DEFAULT_RENDER_MASK = 1
+local TRANSPARENT_RENDER_MASK = 2
+local WATER_RENDER_MASK = 4
+local FUR_RENDER_MASK = 8
+local ALL_RENDER_MASK = DEFAULT_RENDER_MASK + TRANSPARENT_RENDER_MASK + WATER_RENDER_MASK + FUR_RENDER_MASK
 local render_fur = true
 local deferred_enabled = true
 local render_debug_deferred = { false, false, false, false }
@@ -54,7 +59,7 @@ local gamma_mapping_material = Engine.loadResource(g_engine, "pipelines/common/g
 
 
 function deferred(camera_slot)
-	deferred_view = newView(this, "deferred")
+	deferred_view = newView(this, "deferred", DEFAULT_RENDER_MASK)
 		setPass(this, "DEFERRED")
 		setFramebuffer(this, "g_buffer")
 		applyCamera(this, camera_slot)
@@ -119,7 +124,7 @@ function deferred(camera_slot)
 end
 
 function main()
-	main_view = newView(this, "MAIN")
+	main_view = newView(this, "MAIN", DEFAULT_RENDER_MASK)
 		setStencil(this, STENCIL_OP_PASS_Z_REPLACE 
 			| STENCIL_OP_FAIL_Z_KEEP 
 			| STENCIL_OP_FAIL_S_KEEP 
@@ -136,28 +141,24 @@ function main()
 		renderDebugShapes(this)
 end
 
+function water()
+	water_view = newView(this, "WATER", WATER_RENDER_MASK)
+		setPass(this, "WATER")
+		setFramebuffer(this, ctx.main_framebuffer)
+		disableDepthWrite(this)
+		applyCamera(this, "editor")
+		setActiveGlobalLightUniforms(this)
+end
 
 function fur()
-	if not render_fur then 
-		if deferred_enabled then
-			renderModels(this, {deferred_view})
-		else
-			renderModels(this, {main_view})
-		end
-		return 
-	end
-	fur_view = newView(this, "FUR")
+	if not render_fur then return end
+	fur_view = newView(this, "FUR", FUR_RENDER_MASK)
 		setPass(this, "FUR")
 		setFramebuffer(this, ctx.main_framebuffer)
 		disableDepthWrite(this)
 		enableBlending(this, "alpha")
 		applyCamera(this, "editor")
 		setActiveGlobalLightUniforms(this)
-		if deferred_enabled then
-			renderModels(this, {deferred_view, fur_view})
-		else
-			renderModels(this, {main_view, fur_view})
-		end
 end
 
 
@@ -205,7 +206,7 @@ end
 
 
 function render()
-	common.shadowmap(ctx, "editor")
+	common.shadowmap(ctx, "editor", DEFAULT_RENDER_MASK)
 	if deferred_enabled then
 		deferred("editor")
 		common.particles(ctx, "editor")
@@ -215,10 +216,14 @@ function render()
 		pointLight(this)		
 	end
 
+
 	doPostprocess(this, _ENV, "pre_transparent", "editor")
 
-	fur(this)
+	water()
+	fur()
 
+	renderModels(this, ALL_RENDER_MASK)
+	
 	doPostprocess(this, _ENV, "main", "editor")
 	
 	if do_gamma_mapping then

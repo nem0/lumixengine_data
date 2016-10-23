@@ -1,0 +1,14 @@
+texture_slot("Normal", "u_texNormal")
+texture_slot("Reflection", "u_texReflection")
+
+pass "WATER"
+	
+uniform("u_normalStrength", "float")
+uniform("u_fresnelPower", "float")
+uniform("u_eta", "float")
+uniform("u_specPower", "float")
+uniform("u_textureScale", "float")
+uniform("u_waterColor", "color")
+uniform("u_specColor", "color")
+uniform("u_flowDir", "vec2")
+uniform("u_time", "time")

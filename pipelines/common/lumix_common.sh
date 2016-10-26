@@ -329,6 +329,7 @@ float toLinearDepth(float ndc_depth)
 	return linear_depth_v.z / linear_depth_v.w;
 }
 
+
 vec3 getViewPosition(sampler2D depth_buffer, mat4 inv_view_proj, vec2 tex_coord)
 {
 	float z = texture2D(depth_buffer, tex_coord).r;

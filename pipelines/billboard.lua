@@ -10,6 +10,7 @@ addFramebuffer(this, "g_buffer", {
 })
 
 
+local DEFAULT_RENDER_MASK = 1
 function render()
 	main_view = newView(this, "MAIN")
 		setPass(this, "DEFERRED")
@@ -19,6 +20,6 @@ function render()
 		setFramebuffer(this, "g_buffer")
 		applyCamera(this, "main")
 		setActiveGlobalLightUniforms(this)
-		renderModels(this, {main_view})
+		renderModels(this, DEFAULT_RENDER_MASK)
 end
 

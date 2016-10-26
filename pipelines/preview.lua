@@ -7,8 +7,9 @@ addFramebuffer(this, "default", {
 	}
 })
 
+local DEFAULT_RENDER_MASK = 1
 function render()
-	main_view = newView(this, "MAIN")
+	main_view = newView(this, "MAIN", DEFAULT_RENDER_MASK)
 		setPass(this, "MAIN")
 		enableDepthWrite(this)
 		enableRGBWrite(this)
@@ -16,6 +17,6 @@ function render()
 		setFramebuffer(this, "default")
 		applyCamera(this, "main")
 		setActiveGlobalLightUniforms(this)
-		renderModels(this, {main_view})
+		renderModels(this, DEFAULT_RENDER_MASK)
 end
 

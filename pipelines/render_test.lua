@@ -2,6 +2,12 @@ common = require "pipelines/common"
 ctx = { pipeline = this, main_framebuffer = "forward" }
 do_gamma_mapping = true
 
+local DEFAULT_RENDER_MASK = 1
+local TRANSPARENT_RENDER_MASK = 2
+local WATER_RENDER_MASK = 4
+local FUR_RENDER_MASK = 8
+local ALL_RENDER_MASK = DEFAULT_RENDER_MASK + TRANSPARENT_RENDER_MASK + WATER_RENDER_MASK + FUR_RENDER_MASK
+
 addFramebuffer(this, "forward", {
 	width = 1024,
 	height = 1024,
@@ -40,7 +46,7 @@ local gamma_mapping_material = Engine.loadResource(g_engine, "pipelines/common/g
 
 
 function deferred(camera_slot)
-	deferred_view = newView(this, "deferred")
+	deferred_view = newView(this, "deferred", DEFAULT_RENDER_MASK)
 		setPass(this, "DEFERRED")
 		setFramebuffer(this, "g_buffer")
 		applyCamera(this, camera_slot)
@@ -113,7 +119,7 @@ function fur()
 		enableBlending(this, "alpha")
 		applyCamera(this, "editor")
 		setActiveGlobalLightUniforms(this)
-		renderModels(this, {deferred_view, fur_view})
+		renderModels(this, ALL_RENDER_MASK)
 end
 
 
@@ -129,7 +135,7 @@ end
 
 
 function render()
-	common.shadowmap(ctx, "editor")
+	common.shadowmap(ctx, "editor", DEFAULT_RENDER_MASK)
 	deferred("editor")
 	common.particles(ctx, "editor")
 

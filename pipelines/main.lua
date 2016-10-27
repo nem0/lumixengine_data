@@ -150,6 +150,7 @@ function water()
 		setActiveGlobalLightUniforms(this)
 		bindFramebufferTexture(this, "g_buffer", 0, gbuffer0_uniform) -- refraction
 		bindFramebufferTexture(this, "g_buffer", 1, gbuffer1_uniform) 
+		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform) 
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform) -- depth
 end
 

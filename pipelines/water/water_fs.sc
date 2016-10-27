@@ -7,10 +7,16 @@ SAMPLERCUBE(u_texReflection, 1);
 SAMPLER2D(u_texFoam, 2);
 SAMPLER2D(u_texNoise, 3);
 
-SAMPLER2D(u_gbuffer_depth, 13);
+SAMPLER2D(u_texShadowmap, 11);
+SAMPLER2D(u_gbuffer_depth, 12);
+SAMPLER2D(u_gbuffer2, 13);
 SAMPLER2D(u_gbuffer1, 14);
 SAMPLER2D(u_gbuffer0, 15);
 
+uniform vec4 u_fogColorDensity; 
+uniform vec4 u_fogParams;
+uniform vec4 u_ambientColor;
+uniform mat4 u_shadowmapMatrices[4];
 uniform vec4 u_normalStrength;
 uniform vec4 u_fresnelPower;
 uniform vec4 u_eta;
@@ -22,6 +28,8 @@ uniform vec3 u_specColor;
 uniform vec4 u_lightDirFov; 
 uniform vec4 u_flowDir; 
 uniform vec4 u_fullColorDepth; 
+uniform vec4 u_lightRgbAttenuation;
+uniform vec4 u_lightSpecular;
 
 #define normal_strength u_normalStrength.x
 #define fresnel_power u_fresnelPower.x
@@ -38,6 +46,39 @@ vec3 getReflectionColor(vec3 view, vec3 normal)
 	return textureCube(u_texReflection, reflection).rgb;
 }
 
+
+vec3 deferred(vec2 screen_uv)
+{
+	vec3 normal = texture2D(u_gbuffer1, screen_uv).xyz * 2 - 1;
+	vec4 color = texture2D(u_gbuffer0, screen_uv);
+	vec4 value2 = texture2D(u_gbuffer2, screen_uv) * 64.0;
+	
+	vec3 wpos = getViewPosition(u_gbuffer_depth, u_camInvViewProj, screen_uv);
+
+	vec4 camera_wpos = mul(u_camInvView, vec4(0, 0, 0, 1));
+	vec3 view = normalize(camera_wpos.xyz - wpos);
+	
+	vec4 mat_specular_shininess = vec4(value2.x, value2.x, value2.x, value2.y);
+	
+	
+	vec3 diffuse = shadeDirectionalLight(u_lightDirFov.xyz
+					, view
+					, u_lightRgbAttenuation.rgb
+					, u_lightSpecular.rgb
+					, normal
+					, mat_specular_shininess
+					, vec3(1, 1, 1));
+	diffuse = diffuse * color.rgb;
+					
+	float ndotl = -dot(normal, u_lightDirFov.xyz);
+	//diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(wpos, 1), ndotl); 
+
+	vec3 ambient = u_ambientColor.rgb * color.rgb;
+	float fog_factor = getFogFactor(camera_wpos.xyz / camera_wpos.w, u_fogColorDensity.w, wpos.xyz, u_fogParams);
+	return mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
+}
+
+
 vec3 getRefractionColor(vec3 wpos, vec3 view, vec3 normal, float wave)
 {
 	vec3 screen_uv = getScreenCoord(wpos);
@@ -46,7 +87,8 @@ vec3 getRefractionColor(vec3 wpos, vec3 view, vec3 normal, float wave)
 	vec3 refraction = refract(-view, normal, eta);
 	vec2 refr_uv = screen_uv.xy * 0.5 + 0.5;
 	refr_uv += refraction.xz * saturate(depth_diff * 0.1);
-	vec3 refr_color = toLinear(texture2D(u_gbuffer0, refr_uv).rgb);
+	
+	vec3 refr_color = deferred(refr_uv);
 	return mix(u_waterColor.rgb, refr_color, saturate(1 - depth_diff / fullColorDepth));
 }
 
@@ -55,9 +97,9 @@ vec3 getSurfaceNormal(vec2 uv)
 	float noise_t = texture2D(u_texNoise, 1 - uv);
 	vec2 tc0 = uv * texture_scale + flow_dir * time;
 	#if 0
-	vec2 tc1 = uv * texture_scale + flow_dir * (time * (1 + noise_t * 0.2));
+		vec2 tc1 = uv * texture_scale + flow_dir * (time * (1 + noise_t * 0.2));
 	#else
-	vec2 tc1 = uv * texture_scale + flow_dir * (time + noise_t * 0.1);
+		vec2 tc1 = uv * texture_scale + flow_dir * (time + noise_t * 0.1);
 	#endif
 	
 	vec3 wnormal0 = (texture2D(u_texNormal, tc0).xzy + texture2D(u_texNormal, tc1*2.7).xzy) - 1.0;
@@ -70,8 +112,11 @@ vec3 getSurfaceNormal(vec2 uv)
 	return mix(vec3(0, 1, 0), wnormal, normal_strength);
 }
 
+
 void main()
 {   
+	const float FOAM_DEPTH = 0.2;
+	const float WAVE_HEIGHT = 0.1;
 	mat3 tbn = mat3(
 		normalize(v_tangent),
 		normalize(v_normal),
@@ -81,12 +126,13 @@ void main()
 	vec3 wnormal = getSurfaceNormal(v_texcoord0.xy);
 	wnormal = normalize(mul(tbn, wnormal));
 
-	float wave = (cos(time + length(v_wpos)*0.5)) * 0.2 - 0.2;
+	float noise = texture2D(u_texNoise, v_texcoord0*10).x;
+	float wave = cos(time + length(v_wpos)*0.5) * WAVE_HEIGHT - WAVE_HEIGHT - WAVE_HEIGHT * noise;
 	vec3 screen_uv = getScreenCoord(v_wpos);
 	float depth = texture2D(u_gbuffer_depth, screen_uv.xy * 0.5 + 0.5).x;
 	float depth_diff = toLinearDepth(screen_uv.z) - toLinearDepth(depth) + wave;
 
-	if(depth_diff * 2 < 0.35)
+	if(depth_diff < FOAM_DEPTH)
 	{
 		wnormal = texture2D(u_gbuffer1, screen_uv.xy * 0.5 + 0.5).xyz * 2 - 1;	
 		wnormal = mix(vec3(0, 1, 0), wnormal, normal_strength);
@@ -100,13 +146,13 @@ void main()
 	vec3 spec_color = u_specColor.rgb * spec_strength;
 	
 	float fresnel = eta + (1.0 - eta) * pow(max(0.0, 1.0 - dot(normalize(v_view), wnormal)), fresnel_power);
-	vec3 color = mix(refr_color, refl_color, fresnel);
+
+	vec3 color = mix(refr_color, refl_color, fresnel * saturate(depth_diff*10000));
 	#ifdef FOAM_TEXTURE
 
-		vec3 foam0 = texture2D(u_texFoam, v_texcoord0 * texture_scale).rgb;
-		vec3 foam1 = texture2D(u_texFoam, (1-v_texcoord0) * texture_scale).rgb;
+		vec3 foam = texture2D(u_texFoam, v_texcoord0 * texture_scale * 5).rgb;
 		
-		color = color + mix(foam0, foam1, 0.5) * saturate(0.35-abs(0.35 - depth_diff * 2));
+		color = color + foam * saturate(FOAM_DEPTH-abs(FOAM_DEPTH - depth_diff)) * (1/FOAM_DEPTH);
 	#endif
 	gl_FragColor = vec4(color + spec_color, 1);
 }

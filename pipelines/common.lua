@@ -8,14 +8,17 @@ module.render_shadowmap_debug = false
 module.render_shadowmap_debug_fullsize = false
 
 function doPostprocess(pipeline, this_env, slot, camera_slot)
-	local camera_cmp = Renderer.getCameraInSlot(g_scene_renderer, camera_slot)
+	local scene_renderer = Renderer.getPipelineScene(pipeline)
+	local universe = Engine.getSceneUniverse(scene_renderer)
+	local scene_lua_script = Engine.getScene(universe, "lua_script")
+	local camera_cmp = Renderer.getCameraInSlot(scene_renderer, camera_slot)
 	if camera_cmp < 0 then return end
-	local camera_entity = Renderer.getCameraEntity(g_scene_renderer, camera_cmp)
-	local script_cmp = Engine.getComponent(g_universe, camera_entity, lua_script_type)
+	local camera_entity = Renderer.getCameraEntity(scene_renderer, camera_cmp)
+	local script_cmp = Engine.getComponent(universe, camera_entity, lua_script_type)
 	if script_cmp < 0 then return end
-	local script_count = LuaScript.getScriptCount(g_scene_lua_script, script_cmp)
+	local script_count = LuaScript.getScriptCount(scene_lua_script, script_cmp)
 	for i = 1, script_count do
-		local env = LuaScript.getEnvironment(g_scene_lua_script, script_cmp, i - 1)
+		local env = LuaScript.getEnvironment(scene_lua_script, script_cmp, i - 1)
 		if env ~= nil then 
 			if env._IS_POSTPROCESS_INITIALIZED == nil and env.initPostprocess ~= nil then
 				env.initPostprocess(pipeline, this_env)

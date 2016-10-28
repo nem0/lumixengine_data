@@ -115,8 +115,13 @@ vec3 getSurfaceNormal(vec2 uv)
 
 void main()
 {   
-	const float FOAM_DEPTH = 0.2;
 	const float WAVE_HEIGHT = 0.1;
+	const float WAVE_FREQUENCY = 1;
+
+	const float FOAM_DEPTH = 0.2;
+	const float FOAM_TEXTURE_SCALE = 5;
+	const float FOAM_WIDTH = 1;
+	
 	mat3 tbn = mat3(
 		normalize(v_tangent),
 		normalize(v_normal),
@@ -127,7 +132,7 @@ void main()
 	wnormal = normalize(mul(tbn, wnormal));
 
 	float noise = texture2D(u_texNoise, v_texcoord0*10).x;
-	float wave = cos(time + length(v_wpos)*0.5) * WAVE_HEIGHT - WAVE_HEIGHT - WAVE_HEIGHT * noise;
+	float wave = cos(time * WAVE_FREQUENCY + length(v_wpos)*0.5) * WAVE_HEIGHT - WAVE_HEIGHT - WAVE_HEIGHT * noise;
 	vec3 screen_uv = getScreenCoord(v_wpos);
 	float depth = texture2D(u_gbuffer_depth, screen_uv.xy * 0.5 + 0.5).x;
 	float depth_diff = toLinearDepth(screen_uv.z) - toLinearDepth(depth) + wave;
@@ -147,12 +152,14 @@ void main()
 	
 	float fresnel = eta + (1.0 - eta) * pow(max(0.0, 1.0 - dot(normalize(v_view), wnormal)), fresnel_power);
 
-	vec3 color = mix(refr_color, refl_color, fresnel * saturate(depth_diff*10000));
+	fresnel *= saturate((depth_diff - wave)*10); 
+	
+	vec3 color = mix(refr_color, refl_color, fresnel);
 	#ifdef FOAM_TEXTURE
-
-		vec3 foam = texture2D(u_texFoam, v_texcoord0 * texture_scale * 5).rgb;
-		
-		color = color + foam * saturate(FOAM_DEPTH-abs(FOAM_DEPTH - depth_diff)) * (1/FOAM_DEPTH);
+		vec3 foam = texture2D(u_texFoam, v_texcoord0 * texture_scale * FOAM_TEXTURE_SCALE).rgb;
+		color = color + foam * saturate(FOAM_DEPTH-abs(FOAM_DEPTH - depth_diff * FOAM_WIDTH)) * (1/FOAM_DEPTH);
 	#endif
 	gl_FragColor = vec4(color + spec_color, 1);
+	//gl_FragColor = vec4(depth_diff, 0, 0, 1);
 }
+

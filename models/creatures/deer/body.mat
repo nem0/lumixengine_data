@@ -1,6 +1,5 @@
 {"shader" : "pipelines/fur/fur.shd",
-"layer" : {"pass" : "FUR",
-"count" : 25},
+"layers_count" : 25,
 "texture" : {"source" : "/models/creatures/deer/deer-body.dds"},
 "texture" : {"source" : "/models/creatures/deer/deer-body-normal.dds"},
 "defines" : ["NORMAL_MAPPING",

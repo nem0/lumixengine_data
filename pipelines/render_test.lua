@@ -149,7 +149,7 @@ function render()
 	if do_gamma_mapping then
 		newView(this, "SRGB")
 			clear(this, CLEAR_ALL, 0x00000000)
-			setPass(this, "GAMMA_MAPPING")
+			setPass(this, "MAIN")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "forward", 0, texture_uniform)
 			drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)

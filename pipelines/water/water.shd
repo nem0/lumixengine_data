@@ -4,7 +4,7 @@ texture_slot("Foam", "u_texFoam")
 	texture_define "FOAM_TEXTURE"
 texture_slot("Noise", "u_texNoise")
 	
-pass "WATER"
+pass "MAIN"
 	fs { "FOAM_TEXTURE" }
 	
 uniform("u_normalStrength", "float")

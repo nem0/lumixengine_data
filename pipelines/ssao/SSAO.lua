@@ -18,7 +18,7 @@ end
 function renderSSAODDebug(pipeline, env)
 	if SSAO_debug then
 		newView(pipeline, "ssao_debug")
-			setPass(pipeline, "SCREEN_SPACE")
+			setPass(pipeline, "MAIN")
 			disableBlending(pipeline)
 			disableDepthWrite(pipeline)
 			setFramebuffer(pipeline, env.ctx.main_framebuffer)
@@ -74,7 +74,7 @@ function postprocess(pipeline, env)
 	if not enabled then return end
 	
 	newView(pipeline, "ssao")
-		setPass(pipeline, "SSAO")
+		setPass(pipeline, "MAIN")
 		disableBlending(pipeline)
 		disableDepthWrite(pipeline)
 		setFramebuffer(pipeline, "SSAO")
@@ -102,7 +102,7 @@ function postprocess(pipeline, env)
 			enableDepthWrite(pipeline)		
 			
 		newView(pipeline, "ssao_postprocess")
-			setPass(pipeline, "SCREEN_SPACE")
+			setPass(pipeline, "MAIN")
 			enableBlending(pipeline, "multiply")
 			disableDepthWrite(pipeline)
 			setFramebuffer(pipeline, env.ctx.main_framebuffer)

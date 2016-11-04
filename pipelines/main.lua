@@ -143,7 +143,7 @@ end
 
 function water()
 	water_view = newView(this, "WATER", WATER_RENDER_MASK)
-		setPass(this, "WATER")
+		setPass(this, "MAIN")
 		setFramebuffer(this, ctx.main_framebuffer)
 		disableDepthWrite(this)
 		applyCamera(this, "editor")
@@ -184,7 +184,7 @@ function renderDebug(ctx)
 	for i = 1, 4 do
 		if render_debug_deferred[i] then
 			newView(ctx.pipeline, "deferred_debug_"..tostring(i))
-				setPass(ctx.pipeline, "SCREEN_SPACE")
+				setPass(ctx.pipeline, "MAIN")
 				setFramebuffer(ctx.pipeline, "default")
 				bindFramebufferTexture(ctx.pipeline, "g_buffer", i - 1, ctx.texture_uniform)
 				drawQuad(ctx.pipeline, 0.01 + offset_x, 0.01 + offset_y, 0.23, 0.23, ctx.screen_space_material)
@@ -200,7 +200,7 @@ function renderDebug(ctx)
 	for i = 1, 4 do
 		if render_debug_deferred_fullsize[i] and render_debug_deferred[i] then
 			newView(ctx.pipeline, "deferred_debug_fullsize")
-				setPass(ctx.pipeline, "SCREEN_SPACE")
+				setPass(ctx.pipeline, "MAIN")
 				setFramebuffer(ctx.pipeline, "default")
 				bindFramebufferTexture(ctx.pipeline, "g_buffer", i - 1, ctx.texture_uniform)
 				drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.screen_space_material)
@@ -233,7 +233,7 @@ function render()
 	if do_gamma_mapping then
 		newView(this, "SRGB")
 			clear(this, CLEAR_ALL, 0x00000000)
-			setPass(this, "GAMMA_MAPPING")
+			setPass(this, "MAIN")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "forward", 0, texture_uniform)
 			drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)

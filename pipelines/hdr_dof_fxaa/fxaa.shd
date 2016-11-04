@@ -1,4 +1,4 @@
-pass "POSTPROCESS"
+pass "MAIN"
 
 depth_test(false)
 

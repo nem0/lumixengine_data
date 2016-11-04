@@ -57,14 +57,14 @@ end
 function module.shadowmapDebug(ctx, x, y)
 	if module.render_shadowmap_debug then
 		newView(ctx.pipeline, "shadowmap_debug")
-			setPass(ctx.pipeline, "SCREEN_SPACE")
+			setPass(ctx.pipeline, "MAIN")
 			setFramebuffer(ctx.pipeline, "default")
 			bindFramebufferTexture(ctx.pipeline, "shadowmap", 0, ctx.texture_uniform)
 			drawQuad(ctx.pipeline, 0.01 + x, 0.01 + y, 0.23, 0.23, ctx.screen_space_material)
 	end
 	if module.render_shadowmap_debug_fullsize then
 		newView(ctx.pipeline, "shadowmap_debug_fullsize")
-			setPass(ctx.pipeline, "SCREEN_SPACE")
+			setPass(ctx.pipeline, "MAIN")
 			setFramebuffer(ctx.pipeline, "default")
 			bindFramebufferTexture(ctx.pipeline, "shadowmap", 0, ctx.texture_uniform)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.screen_space_material)

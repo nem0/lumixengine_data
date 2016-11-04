@@ -1,4 +1,4 @@
-pass "GAMMA_MAPPING"
+pass "MAIN"
  
 depth_test(false)
  

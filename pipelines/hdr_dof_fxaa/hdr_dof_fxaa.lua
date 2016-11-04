@@ -207,7 +207,7 @@ function hdr(ctx, camera_slot)
 	if dof_enabled then
 		newView(ctx.pipeline, "dof")
 			disableDepthWrite(ctx.pipeline)
-			setPass(ctx.pipeline, "SCREEN_SPACE")
+			setPass(ctx.pipeline, "MAIN")
 			setFramebuffer(ctx.pipeline, "dof")
 			bindFramebufferTexture(ctx.pipeline, "hdr", 0, ctx.texture_uniform)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.screen_space_material)
@@ -230,7 +230,7 @@ function hdr(ctx, camera_slot)
 			enableDepthWrite(ctx.pipeline)
 
 		newView(ctx.pipeline, "hdr_dof")
-			setPass(ctx.pipeline, "POSTPROCESS")
+			setPass(ctx.pipeline, "MAIN")
 			if fxaa_enabled then
 				setFramebuffer(ctx.pipeline, "fxaa")
 			else
@@ -253,7 +253,7 @@ function hdr(ctx, camera_slot)
 			setUniform(ctx.pipeline, ctx.dof_near_multiplier_uniform, {{dof_near_multiplier, 0, 0, 0}})
 	else
 		newView(ctx.pipeline, "hdr")
-			setPass(ctx.pipeline, "POSTPROCESS")
+			setPass(ctx.pipeline, "MAIN")
 			if fxaa_enabled then
 				setFramebuffer(ctx.pipeline, "fxaa")
 			else
@@ -338,7 +338,7 @@ function fxaa(ctx, camera_slot)
 		if not fxaa_enabled then return end
 		
 		newView(ctx.pipeline, "fxaa")
-			setPass(ctx.pipeline, "POSTPROCESS")
+			setPass(ctx.pipeline, "MAIN")
 			setFramebuffer(ctx.pipeline, "default")
 			disableBlending(ctx.pipeline)
 			applyCamera(ctx.pipeline, camera_slot)

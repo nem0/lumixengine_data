@@ -1,4 +1,4 @@
-pass "IMGUI"
+pass "MAIN"
    
 
 depth_test(false)

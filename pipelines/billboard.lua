@@ -12,7 +12,7 @@ addFramebuffer(this, "g_buffer", {
 
 local DEFAULT_RENDER_MASK = 1
 function render()
-	main_view = newView(this, "MAIN")
+	main_view = newView(this, "MAIN", DEFAULT_RENDER_MASK)
 		setPass(this, "DEFERRED")
 		enableDepthWrite(this)
 		enableRGBWrite(this)

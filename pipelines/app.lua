@@ -1,5 +1,3 @@
-_G["game_pipeline_env"] = _ENV
-
 common = require "pipelines/common"
 ctx = { pipeline = this, main_framebuffer = "forward" }
 do_gamma_mapping = true
@@ -9,10 +7,7 @@ local TRANSPARENT_RENDER_MASK = 2
 local WATER_RENDER_MASK = 4
 local FUR_RENDER_MASK = 8
 local ALL_RENDER_MASK = DEFAULT_RENDER_MASK + TRANSPARENT_RENDER_MASK + WATER_RENDER_MASK + FUR_RENDER_MASK
-
-local render_debug_deferred = { false, false, false, false }
-local render_debug_deferred_fullsize = { false, false, false, false }
-fur_enabled = true
+local render_fur = true
 
 addFramebuffer(this, "forward", {
 	width = 1024,
@@ -41,14 +36,14 @@ common.initShadowmap(ctx)
 
 
 local texture_uniform = createUniform(this, "u_texture")
-local screen_space_material = Engine.loadResource(g_engine,"pipelines/screenspace/screenspace.mat", "material")
+local screen_space_material = Engine.loadResource(g_engine, "pipelines/screenspace/screenspace.mat", "material")
 local gbuffer0_uniform = createUniform(this, "u_gbuffer0")
 local gbuffer1_uniform = createUniform(this, "u_gbuffer1")
 local gbuffer2_uniform = createUniform(this, "u_gbuffer2")
 local gbuffer_depth_uniform = createUniform(this, "u_gbuffer_depth")
-local deferred_material = Engine.loadResource(g_engine,"pipelines/common/deferred.mat", "material")
-local deferred_point_light_material = Engine.loadResource(g_engine,"pipelines/common/deferredpointlight.mat", "material")
-local gamma_mapping_material = Engine.loadResource(g_engine,"pipelines/common/gamma_mapping.mat", "material")
+local deferred_material = Engine.loadResource(g_engine, "pipelines/common/deferred.mat", "material")
+local deferred_point_light_material = Engine.loadResource(g_engine, "pipelines/common/deferredpointlight.mat", "material")
+local gamma_mapping_material = Engine.loadResource(g_engine, "pipelines/common/gamma_mapping.mat", "material")
 
 
 function deferred(camera_slot)
@@ -68,6 +63,14 @@ function deferred(camera_slot)
 	newView(this, "copyRenderbuffer");
 		copyRenderbuffer(this, "g_buffer", 3, ctx.main_framebuffer, 1)
 		
+	newView(this, "decals")
+		setPass(this, "DEFERRED")
+		disableDepthWrite(this)
+		setFramebuffer(this, "g_buffer")
+		applyCamera(this, camera_slot)
+		bindFramebufferTexture(this, ctx.main_framebuffer, 1, gbuffer_depth_uniform)
+		renderDecalsVolumes(this)
+	
 	newView(this, "main")
 		setPass(this, "MAIN")
 		setFramebuffer(this, ctx.main_framebuffer)
@@ -80,7 +83,7 @@ function deferred(camera_slot)
 		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform)
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
 		drawQuad(this, 0, 0, 1, 1, deferred_material)
-
+		
 	newView(this, "deferred_debug_shapes")
 		setPass(this, "EDITOR")
 		setFramebuffer(this, ctx.main_framebuffer)
@@ -99,36 +102,37 @@ function deferred(camera_slot)
 		disableDepthWrite(this)
 		enableBlending(this, "add")
 		applyCamera(this, camera_slot)
+		bindFramebufferTexture(this, "g_buffer", 0, gbuffer0_uniform)
+		bindFramebufferTexture(this, "g_buffer", 1, gbuffer1_uniform)
+		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform)
+		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
 		renderLightVolumes(this, deferred_point_light_material)
 		disableBlending(this)
+	
 end
 
-function main()
-	main_view = newView(this, "MAIN", DEFAULT_RENDER_MASK)
+function water()
+	water_view = newView(this, "WATER", WATER_RENDER_MASK)
 		setPass(this, "MAIN")
-		enableDepthWrite(this)
-		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
-		enableRGBWrite(this)
 		setFramebuffer(this, ctx.main_framebuffer)
+		disableDepthWrite(this)
 		applyCamera(this, "main")
 		setActiveGlobalLightUniforms(this)
-		renderDebugShapes(this)
+		bindFramebufferTexture(this, "g_buffer", 0, gbuffer0_uniform) -- refraction
+		bindFramebufferTexture(this, "g_buffer", 1, gbuffer1_uniform) 
+		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform) 
+		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform) -- depth
 end
 
-
 function fur()
-	if fur_enabled then
-		fur_view = newView(this, "FUR", FUR_RENDER_MASK)
-			setPass(this, "FUR")
-			setFramebuffer(this, ctx.main_framebuffer)
-			disableDepthWrite(this)
-			enableBlending(this, "alpha")
-			applyCamera(this, "main")
-			setActiveGlobalLightUniforms(this)
-			renderModels(this, ALL_RENDER_MASK)
-	else
-		renderModels(this, ALL_RENDER_MASK)
-	end
+	if not render_fur then return end
+	fur_view = newView(this, "FUR", FUR_RENDER_MASK)
+		setPass(this, "FUR")
+		setFramebuffer(this, ctx.main_framebuffer)
+		disableDepthWrite(this)
+		enableBlending(this, "alpha")
+		applyCamera(this, "main")
+		setActiveGlobalLightUniforms(this)
 end
 
 
@@ -142,32 +146,32 @@ function pointLight()
 		renderPointLightLitGeometry(this)
 end
 
-function ingameGUI()
-	newView(this, "ingame_gui")
-		setPass(this, "MAIN")
-		setFramebuffer(this, "default")
-		clear(this, CLEAR_DEPTH, 0x303030ff)
-		renderIngameGUI(this)
-end
+
 
 function render()
-	common.shadowmap(ctx, "main", ALL_RENDER_MASK)
+	common.shadowmap(ctx, "main", DEFAULT_RENDER_MASK)
 	deferred("main")
 	common.particles(ctx, "main")
-	
+
 	doPostprocess(this, _ENV, "pre_transparent", "main")
+
+	water()
+	fur()
+
+	renderModels(this, ALL_RENDER_MASK)
 	
-	fur(this)
-
 	doPostprocess(this, _ENV, "main", "main")
-
+	
 	if do_gamma_mapping then
 		newView(this, "SRGB")
+			clear(this, CLEAR_ALL, 0x00000000)
 			setPass(this, "MAIN")
 			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "forward", 0, texture_uniform)
 			drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
 	end
 	
-	ingameGUI(ctx)
+	common.renderEditorIcons(ctx)
+	common.renderGizmo(ctx)
+	renderDebug(ctx)
 end

@@ -2,7 +2,7 @@
 "texture" : {"source" : "/models/buildings/catherdral_ruins/3td_wooddebris_17.dds",
 "srgb" : true},
 "texture" : {"source" : "/models/buildings/catherdral_ruins/3td_wooddebris_17_nrm.dds"},
-"shininess" : 4.00000000,
+
 "color" : [1.00000000,
 1.00000000,
 1.00000000]}

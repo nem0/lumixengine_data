@@ -2,7 +2,7 @@
 "texture" : {"source" : "texture1.dds"},
 "texture" : {"source" : "texture0.dds"},
 "uniforms" : [],
-"shininess" : 4.00000000,
+
 "color" : [1.00000000,
 1.00000000,
 1.00000000]}

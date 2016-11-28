@@ -4,7 +4,7 @@
 "texture" : {"source" : "/models/plants/trees/oldstump/stumpy01_nrm.dds"},
 "defines" : [],
 "uniforms" : [],
-"shininess" : 4.00000000,
+
 "color" : [1.00000000,
 1.00000000,
 1.00000000]}

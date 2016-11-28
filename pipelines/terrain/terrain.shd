@@ -1,11 +1,5 @@
-pass "MAIN"
-	fs { "NORMAL_MAPPING" }
-
 pass "SHADOW"
 	fs { }
-
-pass "POINT_LIGHT"
-	fs { "NORMAL_MAPPING", "HAS_SHADOWMAP" }
 
 pass "DEFERRED"
 	fs { "NORMAL_MAPPING" }

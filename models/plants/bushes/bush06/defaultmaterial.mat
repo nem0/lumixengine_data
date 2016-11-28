@@ -3,7 +3,7 @@
 "srgb" : true},
 "defines" : ["ALPHA_CUTOUT"],
 "uniforms" : [],
-"shininess" : 4.00000000,
+
 "alpha_ref" : 0.64000006,
 "color" : [1.00000000,
 1.00000000,

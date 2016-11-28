@@ -4,7 +4,7 @@
 "texture" : {"source" : "/models/rocks/rock_02/normal.dds"},
 "texture" : {"source" : "/models/rocks/rock_02/specular.dds"},
 "uniforms" : [],
-"shininess" : 4.00000000,
+
 "color" : [1.00000000,
 1.00000000,
 1.00000000]}

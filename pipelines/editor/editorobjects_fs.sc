@@ -12,7 +12,7 @@ $input v_wpos, v_texcoord0, v_normal
 #endif
 SAMPLER2D(u_depthBuffer, 15);
 	
-uniform vec4 u_materialColorShininess;
+uniform vec4 u_materialColor;
 
 	
 void main()
@@ -28,7 +28,7 @@ void main()
 		vec3 diffuse = vec3_splat(0.9);
 		vec3 color = ndotl * diffuse + ambient;
 	#endif
-	color *= u_materialColorShininess.rgb;
+	color *= u_materialColor.rgb;
 	float depth = texture2D(u_depthBuffer, screen_coord.xy * 0.5 + 0.5).x;
 	gl_FragColor = vec4(toGamma(color.rgb), screen_coord.z < depth ? 1 : 0.1);
 }

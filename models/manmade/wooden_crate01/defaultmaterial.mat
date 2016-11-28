@@ -2,7 +2,7 @@
 "texture" : {"source" : "/models/manmade/wooden_crate01/diffuse.dds",
 "srgb" : true},
 "texture" : {"source" : "/models/manmade/wooden_crate01/normal.dds"},
-"shininess" : 4.00000000,
+
 "color" : [1.00000000,
 1.00000000,
 1.00000000]}

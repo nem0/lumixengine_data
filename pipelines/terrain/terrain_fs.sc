@@ -8,26 +8,15 @@ SAMPLER2D(u_texSatellitemap, 2);
 SAMPLER2D(u_texColormap, 3);
 SAMPLER2DARRAY(u_texColor, 4);
 SAMPLER2DARRAY(u_texNormal, 5);
-#ifndef SHADOW
-	SAMPLER2D(u_texShadowmap, 15);
-#endif
 
 
-uniform vec4 u_lightPosRadius;
-uniform vec4 u_lightRgbAttenuation;
-uniform vec4 u_ambientColor;
-uniform vec4 u_lightDirFov; 
-uniform mat4 u_shadowmapMatrices[4];
-uniform vec4 u_fogColorDensity; 
 uniform vec4 u_terrainParams;
-uniform vec4 u_lightSpecular;
-uniform vec4 u_materialColorShininess;
+uniform vec4 u_materialColor;
 uniform vec4 detail_texture_distance;
 uniform vec4 texture_scale;
-uniform vec4 u_attenuationParams;
-uniform vec4 u_fogParams;
 uniform vec4 u_terrainScale;
 uniform mat4 u_terrainMatrix;
+uniform vec4 u_roughnessMetallic;
 
 
 void main()
@@ -110,7 +99,7 @@ void main()
 		vec4 color = 
 			texture2D(u_texColormap, v_texcoord1) * 
 			vec4((c00.rgb * b1 + c01.rgb * b2 + c10.rgb * b3 + c11.rgb * b4) / (b1 + b2 + b3 + b4), 1.0);
-		color.rgb *= u_materialColorShininess.rgb;
+		color.rgb *= u_materialColor.rgb;
 			
 		vec3 wnormal;
 		#ifdef NORMAL_MAPPING
@@ -128,79 +117,17 @@ void main()
 		// http://www.gamasutra.com/blogs/AndreyMishkinis/20130716/196339/Advanced_Terrain_Texture_Splatting.php
 		// without height blend
 		//color = (c00 * u_opposite  + c10  * u_ratio) * v_opposite + (c01 * u_opposite  + c11 * u_ratio) * v_ratio;
-
 		
 		float dist = length(v_view);
 		float t = (dist - detail_texture_distance.x) / detail_texture_distance.x;
 		color = mix(color, texture2D(u_texSatellitemap, v_texcoord1), clamp(t, 0.0, 1.0));
 		wnormal = mix(wnormal, terrain_normal, clamp(t, 0.0, 1.0));
 
-		#ifdef DEFERRED
-				gl_FragData[0] = color;
-				gl_FragData[1].xyz = (wnormal + vec3_splat(1.0)) * 0.5;
-				gl_FragData[1].w = 1.0;
-				float spec = u_materialColorShininess.g / 64.0;
-				float shininess = u_materialColorShininess.a / 64.0;
-				#ifdef SPECULAR_TEXTURE
-					spec *= texture2D(u_texSpecular, v_texcoord0).g;
-				#endif
-				gl_FragData[2] = vec4(spec, shininess, 0.0, 1.0);
-		#else
-			vec3 view = normalize(v_view);
-			vec3 diffuse;
-			vec3 texture_specular = 
-			#ifdef SPECULAR_TEXTURE
-				texture2D(u_texSpecular, v_texcoord0).rgb;
-			#else
-				vec3_splat(1.0);
-			#endif
-			#ifdef POINT_LIGHT
-				diffuse = 
-				shadePointLight(u_lightDirFov
-				, v_wpos
-				, wnormal
-				, view
-				, detail_uv.xy
-				, u_lightPosRadius
-				, u_lightRgbAttenuation
-				, u_materialColorShininess
-				, u_lightSpecular.rgb
-				, texture_specular
-				);
-				
-				diffuse = diffuse.xyz * color.rgb;
-				#ifdef HAS_SHADOWMAP
-					diffuse = diffuse * pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), u_lightDirFov.w); 
-				#endif
-			#else
-				diffuse = shadeDirectionalLight(u_lightDirFov.xyz
-					, view
-					, u_lightRgbAttenuation.rgb
-					, u_lightSpecular.rgb
-					, wnormal
-					, u_materialColorShininess
-					, texture_specular);
-				diffuse = diffuse.xyz * color.rgb;
-				float ndotl = -dot(terrain_normal, u_lightDirFov.xyz);
-				diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 	
-			#endif
-
-			
-			#ifdef MAIN
-				vec3 ambient = u_ambientColor.rgb * color.rgb;
-			#else
-				vec3 ambient = vec3_splat(0.0);
-			#endif  
-
-			vec4 camera_wpos = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0));
-			float fog_factor = getFogFactor(camera_wpos.xyz / camera_wpos.w, u_fogColorDensity.w, v_wpos.xyz, u_fogParams);
-
-			#ifdef POINT_LIGHT
-				gl_FragColor.xyz = (1.0 - fog_factor) * (diffuse + ambient);
-			#else
-				gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
-			#endif
-			gl_FragColor.w = 1.0;
-		#endif
+		gl_FragData[0].rgb = color.rgb;
+		gl_FragData[0].w = u_roughnessMetallic.x;
+		gl_FragData[1].xyz = (wnormal + vec3_splat(1.0)) * 0.5;
+		gl_FragData[1].w = u_roughnessMetallic.y;
+		gl_FragData[2] = vec4(0, 0, 0.0, 1.0);
+		
 	#endif // else SHADOW
 }

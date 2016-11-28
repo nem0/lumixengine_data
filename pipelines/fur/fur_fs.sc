@@ -6,9 +6,6 @@ SAMPLER2D(u_texColor, 0);
 #ifdef NORMAL_MAPPING
 	SAMPLER2D(u_texNormal, 1);
 #endif
-#ifdef SPECULAR_TEXTURE
-	SAMPLER2D(u_texSpecular, 2);
-#endif
 #ifndef SHADOW
 	SAMPLER2D(u_texShadowmap, 15);
 #endif
@@ -20,20 +17,22 @@ uniform vec4 u_lightDirFov;
 uniform mat4 u_shadowmapMatrices[4];
 uniform vec4 u_fogColorDensity; 
 uniform vec4 u_lightSpecular;
-uniform vec4 u_materialColorShininess;
+uniform vec4 u_materialColor;
 uniform vec4 u_attenuationParams;
 uniform vec4 u_fogParams;
 uniform vec4 u_layer;
 uniform vec4 u_alphaMultiplier;
 uniform vec4 u_darkening;
+uniform vec4 u_roughnessMetallic;
 
 
 void main()
 {     
 	vec4 color = texture2D(u_texColor, v_texcoord0);
-	color.xyz *= u_materialColorShininess.rgb;
+	color.xyz *= u_materialColor.rgb;
 	#ifdef DEFERRED
-		gl_FragData[0] = color;
+		gl_FragData[0].rgb = color.rgb;
+		gl_FragData[0].w = u_roughnessMetallic.x;
 		mat3 tbn = mat3(
 			normalize(v_tangent),
 			normalize(v_normal),
@@ -48,13 +47,8 @@ void main()
 			normal = normalize(v_normal.xyz);
 		#endif
 		gl_FragData[1].xyz = (normal + 1) * 0.5; // todo: store only xz 
-		gl_FragData[1].w = 1;
-		float spec = u_materialColorShininess.g / 64.0;
-		float shininess = u_materialColorShininess.a / 64.0;
-		#ifdef SPECULAR_TEXTURE
-			spec *= texture2D(u_texSpecular, v_texcoord0).g;
-		#endif
-		gl_FragData[2] = vec4(spec, shininess, 0, 1);
+		gl_FragData[1].w = u_roughnessMetallic.y;
+		gl_FragData[2] = vec4(0, 0, 0, 1);
 	#else
 		#ifdef SHADOW
 			float depth = v_common2.z/v_common2.w;
@@ -78,41 +72,17 @@ void main()
 			
 			vec3 view = normalize(v_view);
 
-			vec3 texture_specular = 
-			#ifdef SPECULAR_TEXTURE
-				texture2D(u_texSpecular, v_texcoord0).rgb;
-			#else
-				vec3(1, 1, 1);
-			#endif
 			vec3 diffuse;
-			#ifdef POINT_LIGHT
-				diffuse = shadePointLight(u_lightDirFov
-				, v_wpos
-				, wnormal
+			diffuse = shadeDirectionalLight(u_lightDirFov.xyz
 				, view
-				, v_texcoord0
-				, u_lightPosRadius
-				, u_lightRgbAttenuation
-				, u_materialColorShininess
+				, u_lightRgbAttenuation.rgb
 				, u_lightSpecular.rgb
-				, texture_specular
-				);
-				diffuse = diffuse.xyz * color.rgb;
-				#ifdef HAS_SHADOWMAP
-					diffuse = diffuse * pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), u_lightDirFov.w); 
-				#endif
-			#else
-				diffuse = shadeDirectionalLight(u_lightDirFov.xyz
-					, view
-					, u_lightRgbAttenuation.rgb
-					, u_lightSpecular.rgb
-					, wnormal
-					, u_materialColorShininess
-					, texture_specular);
-				diffuse = diffuse.xyz * color.rgb;
-				float ndotl = -dot(wnormal, u_lightDirFov.xyz);
-				//diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 
-			#endif
+				, wnormal
+				, u_materialColor
+				, vec3(0, 0, 0));
+			diffuse = diffuse.xyz * color.rgb;
+			float ndotl = -dot(wnormal, u_lightDirFov.xyz);
+			//diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 
 
 			#if defined MAIN || defined FUR
 				vec3 ambient = u_ambientColor.rgb * color.rgb;
@@ -122,23 +92,14 @@ void main()
 
 			vec4 camera_wpos = mul(u_invView, vec4(0, 0, 0, 1.0));
 			float fog_factor = getFogFactor(camera_wpos.xyz / camera_wpos.w, u_fogColorDensity.w, v_wpos.xyz, u_fogParams);
-			#ifdef POINT_LIGHT
-				gl_FragColor.xyz = (1 - fog_factor) * (diffuse + ambient);
-			#else
-				gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
+			gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
+			gl_FragColor.rgb *= mix(u_darkening.x, 1, u_layer.x);
+			float alpha = clamp(color.a * u_alphaMultiplier.x - u_layer.x, 0, 1);
+			#ifdef ALPHA_CUTOUT
+				if(alpha < u_alphaRef) discard;
 			#endif
-			#ifdef FUR
-				gl_FragColor.rgb *= mix(u_darkening.x, 1, u_layer.x);
-				float alpha = clamp(color.a * u_alphaMultiplier.x - u_layer.x, 0, 1);
-				#ifdef ALPHA_CUTOUT
-					if(alpha < u_alphaRef) discard;
-				#endif
 
-				gl_FragColor.a = alpha;
-			#else
-				gl_FragColor.rgb *= u_darkening.x;
-				gl_FragColor.a = 1.0;
-			#endif
+			gl_FragColor.a = alpha;
 		#endif       
 	#endif		
 }

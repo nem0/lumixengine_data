@@ -2,7 +2,7 @@
 "texture" : {"source" : "/models/buildings/catherdral_ruins/3td_concretedirty_01.dds",
 "srgb" : true},
 "texture" : {"source" : "/models/buildings/catherdral_ruins/3td_concretedirty_01_nrm.dds"},
-"shininess" : 4.00000000,
+
 "color" : [1.00000000,
 1.00000000,
 1.00000000]}

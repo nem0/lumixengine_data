@@ -2,27 +2,21 @@ texture_slot("Diffuse", "u_texColor")
 	texture_define "DIFFUSE_TEXTURE"
 texture_slot("Normal","u_texNormal")
 	texture_define "NORMAL_MAPPING"
-texture_slot("Specular", "u_texSpecular")
-	texture_define "SPECULAR_TEXTURE"
+texture_slot("Roughness", "u_texRoughness")
+	texture_define "ROUGHNESS_TEXTURE"
+texture_slot("Metallic", "u_texMetallic")
+	texture_define "METALLIC_TEXTURE"
 texture_slot("Bump", "u_texBump")
 	texture_define "BUMP_TEXTURE"
 texture_slot("Wind", "u_noise")
 	texture_define "WIND_ANIMATION"
 
-pass "MAIN"
-	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT", "DIFFUSE_TEXTURE", "BUMP_TEXTURE"}
-	vs { "SKINNED", "WIND_ANIMATION", "BUMP_TEXTURE" }
-	
 pass "SHADOW"
 	fs { "ALPHA_CUTOUT", "DIFFUSE_TEXTURE" }
 	vs { "SKINNED", "WIND_ANIMATION", "BUMP_TEXTURE" }
 	
-pass "POINT_LIGHT"
-	fs { "NORMAL_MAPPING", "SPECULAR_TEXTURE", "HAS_SHADOWMAP", "ALPHA_CUTOUT", "DIFFUSE_TEXTURE", "BUMP_TEXTURE" }
-	vs { "SKINNED", "WIND_ANIMATION", "BUMP_TEXTURE" }
-	
 pass "DEFERRED"
-	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT", "DIFFUSE_TEXTURE", "BUMP_TEXTURE" }
+	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT", "DIFFUSE_TEXTURE", "BUMP_TEXTURE", "ROUGHNESS_TEXTURE", "METALLIC_TEXTURE" }
 	vs { "SKINNED", "WIND_ANIMATION", "BUMP_TEXTURE" }
 	
 uniform("u_time", "time")

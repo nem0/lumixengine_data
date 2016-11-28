@@ -2,7 +2,7 @@
 "texture" : {"source" : "/models/buildings/catherdral_ruins/2td_floorbrick_color_02a.dds",
 "srgb" : true},
 "texture" : {"source" : "/models/buildings/catherdral_ruins/2td_floorbrick_color_02_nrm.dds"},
-"shininess" : 4.00000000,
+
 "color" : [1.00000000,
 1.00000000,
 1.00000000]}

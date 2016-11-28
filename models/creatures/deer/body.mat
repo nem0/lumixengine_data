@@ -13,7 +13,7 @@
 "float_value" : -1.00000000},
 {"name" : "u_darkening",
 "float_value" : 0.80000000}],
-"shininess" : 4.00000000,
+
 "alpha_ref" : 0.30000000,
 "color" : [1.00000000,
 1.00000000,

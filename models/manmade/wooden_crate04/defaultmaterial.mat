@@ -3,7 +3,7 @@
 "srgb" : true},
 "texture" : {"source" : "/models/manmade/wooden_crate04/normal.dds"},
 "uniforms" : [],
-"shininess" : 4.00000000,
+
 "color" : [1.00000000,
 1.00000000,
 1.00000000]}

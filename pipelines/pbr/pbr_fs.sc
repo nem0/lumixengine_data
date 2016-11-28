@@ -109,7 +109,9 @@ void main()
 					, normal
 					, mat_specular_shininess
 					, vec3(1, 1, 1));*/
-	gl_FragColor.rgb = direct_diffuse * diffuseColor.rgb + direct_specular * specularColor.rgb + u_ambientColor.rgb * albedo.rgb;
+	float ndotl = -dot(normal, u_lightDirFov.xyz);
+	float shadow = directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(wpos, 1), ndotl);
+	gl_FragColor.rgb = direct_diffuse * diffuseColor.rgb * shadow + direct_specular * specularColor.rgb * shadow + u_ambientColor.rgb * albedo.rgb;
 	/*				
 	float ndotl = -dot(normal, u_lightDirFov.xyz);
 	diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(wpos, 1), ndotl); 

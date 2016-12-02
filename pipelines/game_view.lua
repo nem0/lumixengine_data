@@ -140,6 +140,7 @@ function fur()
 			enableBlending(this, "alpha")
 			applyCamera(this, "main")
 			setActiveGlobalLightUniforms(this)
+			bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
 			renderModels(this, ALL_RENDER_MASK)
 	else
 		renderModels(this, ALL_RENDER_MASK)

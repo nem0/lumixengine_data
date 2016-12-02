@@ -17,7 +17,7 @@ pass "SHADOW"
 	
 pass "DEFERRED"
 	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT", "DIFFUSE_TEXTURE", "BUMP_TEXTURE", "ROUGHNESS_TEXTURE", "METALLIC_TEXTURE" }
-	vs { "SKINNED", "WIND_ANIMATION", "BUMP_TEXTURE" }
+	vs { "SKINNED", "WIND_ANIMATION", "BUMP_TEXTURE", "VEGETATION" }
 	
 uniform("u_time", "time")
 uniform("u_parallaxScale", "float")

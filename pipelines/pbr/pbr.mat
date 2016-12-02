@@ -1,0 +1,9 @@
+{"shader" : "pipelines/pbr/pbr.shd",
+"backface_culling" : false,
+"defines" : [],
+"uniforms" : [],
+
+"alpha_ref" : 0.30000000,
+"color" : [1.00000000,
+1.00000000,
+1.00000000]}

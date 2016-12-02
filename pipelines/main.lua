@@ -8,9 +8,15 @@ local WATER_RENDER_MASK = 4
 local FUR_RENDER_MASK = 8
 local ALL_RENDER_MASK = DEFAULT_RENDER_MASK + TRANSPARENT_RENDER_MASK + WATER_RENDER_MASK + FUR_RENDER_MASK
 local render_fur = true
-local deferred_enabled = true
-local render_debug_deferred = { false, false, false, false }
-local render_debug_deferred_fullsize = { false, false, false, false }
+local render_debug_deferred = 
+{ 
+ { label = "Albedo", enabled = false, fullscreen = false, mask = {1, 1, 1, 0}, g_buffer_idx = 0},
+ { label = "Normal", enabled = false, fullscreen = false, mask = {1, 1, 1, 0}, g_buffer_idx = 1},
+ { label = "Roughness", enabled = false, fullscreen = false, mask = {0, 0, 0, 1}, g_buffer_idx = 0},
+ { label = "Metallic", enabled = false, fullscreen = false, mask = {0, 0, 0, 1}, g_buffer_idx = 1},
+
+}
+
 
 addFramebuffer(this, "default", {
 	width = 1024,
@@ -37,7 +43,7 @@ addFramebuffer(this, "g_buffer", {
 	screen_size = true,
 	renderbuffers = {
 		{ format = "rgba8" },
-		{ format = "rgba8" },
+		{ format = "rgba16f" },
 		{ format = "rgba8" },
 		{ format = "depth24stencil8" }
 	}
@@ -57,7 +63,7 @@ local irradiance_map_uniform = createUniform(this, "u_irradiance_map")
 local radiance_map_uniform = createUniform(this, "u_radiance_map")
 local lut_uniform = createUniform(this, "u_LUT")
 local lut_texture = Engine.loadResource(g_engine, "pipelines/pbr/lut.tga", "texture")
-local deferred_material = Engine.loadResource(g_engine, "pipelines/common/deferred.mat", "material")
+local deferred_material = Engine.loadResource(g_engine, "pipelines/pbr/pbr.mat", "material")
 local deferred_point_light_material = Engine.loadResource(g_engine, "pipelines/common/deferredpointlight.mat", "material")
 local gamma_mapping_material = Engine.loadResource(g_engine, "pipelines/common/gamma_mapping.mat", "material")
 
@@ -190,13 +196,14 @@ end
 function renderDebug(ctx)
 	local offset_x = 0
 	local offset_y = 0
-	for i = 1, 4 do
-		if render_debug_deferred[i] then
+	for i, _ in ipairs(render_debug_deferred) do
+		if render_debug_deferred[i].enabled then
 			newView(ctx.pipeline, "deferred_debug_"..tostring(i))
 				setPass(ctx.pipeline, "MAIN")
 				setFramebuffer(ctx.pipeline, "default")
-				bindFramebufferTexture(ctx.pipeline, "g_buffer", i - 1, ctx.texture_uniform)
-				drawQuad(ctx.pipeline, 0.01 + offset_x, 0.01 + offset_y, 0.23, 0.23, ctx.screen_space_material)
+				bindFramebufferTexture(ctx.pipeline, "g_buffer", render_debug_deferred[i].g_buffer_idx, ctx.texture_uniform)
+				setUniform(ctx.pipeline, ctx.multiplier_uniform, {render_debug_deferred[i].mask})
+				drawQuad(ctx.pipeline, 0.01 + offset_x, 0.01 + offset_y, 0.23, 0.23, ctx.screen_space_debug_material)
 				
 			offset_x = offset_x + 0.25
 			if offset_x > 0.76 then
@@ -206,13 +213,14 @@ function renderDebug(ctx)
 		end
 	end
 	common.shadowmapDebug(ctx, offset_x, offset_y)
-	for i = 1, 4 do
-		if render_debug_deferred_fullsize[i] and render_debug_deferred[i] then
+	for i, _ in ipairs(render_debug_deferred) do
+		if render_debug_deferred[i].enabled and render_debug_deferred[i].fullscreen then
 			newView(ctx.pipeline, "deferred_debug_fullsize")
 				setPass(ctx.pipeline, "MAIN")
 				setFramebuffer(ctx.pipeline, "default")
-				bindFramebufferTexture(ctx.pipeline, "g_buffer", i - 1, ctx.texture_uniform)
-				drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.screen_space_material)
+				bindFramebufferTexture(ctx.pipeline, "g_buffer", render_debug_deferred[i].g_buffer_idx, ctx.texture_uniform)
+				setUniform(ctx.pipeline, ctx.multiplier_uniform, {render_debug_deferred[i].mask})
+				drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.screen_space_debug_material)
 		end
 	end
 end
@@ -220,15 +228,8 @@ end
 
 function render()
 	common.shadowmap(ctx, "editor", DEFAULT_RENDER_MASK)
-	if deferred_enabled then
-		deferred("editor")
-		common.particles(ctx, "editor")
-	else
-		main(this)
-		common.particles(ctx, "editor")
-		pointLight(this)		
-	end
-
+	deferred("editor")
+	common.particles(ctx, "editor")
 
 	doPostprocess(this, _ENV, "pre_transparent", "editor")
 
@@ -260,17 +261,17 @@ function onGUI()
 		ImGui.OpenPopup("debug_popup")
 	end
 	if ImGui.BeginPopup("debug_popup") then
-		for i = 1, 4 do
-			changed, render_debug_deferred[i] = ImGui.Checkbox("GBuffer " .. tostring(i), render_debug_deferred[i])
-			if render_debug_deferred[i] then
+		for i, _ in ipairs(render_debug_deferred) do
+			changed, render_debug_deferred[i].enabled = ImGui.Checkbox(render_debug_deferred[i].label, render_debug_deferred[i].enabled)
+			if render_debug_deferred[i].enabled then
 				ImGui.SameLine()
-				changed, render_debug_deferred_fullsize[i] = ImGui.Checkbox("Fullsize###gbf" .. tostring(i), render_debug_deferred_fullsize[i])
+				changed, render_debug_deferred[i].fullscreen = ImGui.Checkbox("Fullsize###gbf" .. tostring(i), render_debug_deferred[i].fullscreen)
 				
-				if changed and render_debug_deferred_fullsize[i] then
-					for j = 1, 4 do
-						render_debug_deferred_fullsize[j] = false
+				if changed and render_debug_deferred[i].fullscreen then
+					for j, _ in ipairs(render_debug_deferred) do
+						render_debug_deferred[j].fullscreen = false
 					end
-					render_debug_deferred_fullsize[i] = true
+					render_debug_deferred[i].fullscreen = true
 				end
 			end
 		end
@@ -281,15 +282,14 @@ function onGUI()
 			changed, common.render_shadowmap_debug_fullsize = ImGui.Checkbox("Fullsize###gbfsm", common.render_shadowmap_debug_fullsize)
 		end
 		if ImGui.Button("Toggle") then
-			local v = not render_debug_deferred[1]
+			local v = not render_debug_deferred[1].enabled
 			common.render_shadowmap_debug = v 
-			render_debug_deferred[1] = v
-			render_debug_deferred[2] = v
-			render_debug_deferred[3] = v
-			render_debug_deferred[4] = v
+			render_debug_deferred[1].enabled = v
+			render_debug_deferred[2].enabled = v
+			render_debug_deferred[3].enabled = v
+			render_debug_deferred[4].enabled = v
 		end
 		changed, common.blur_shadowmap = ImGui.Checkbox("Blur shadowmap", common.blur_shadowmap)
-		changed, deferred_enabled = ImGui.Checkbox("Deferred", deferred_enabled)
 		changed, common.render_gizmos = ImGui.Checkbox("Render gizmos", common.render_gizmos)
 		changed, render_fur = ImGui.Checkbox("Render fur", render_fur)
 		

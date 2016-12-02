@@ -63,6 +63,10 @@ void main()
 	
 	#ifndef SHADOW
 		vec3 normal = (a_normal * 2.0 - 1.0).xyz;
+		#ifdef VEGETATION
+			float normal_t = saturate(length(a_position.xz) * 5);
+			normal = normalize(mix(normal, normalize(vec3(a_position.x, 0, a_position.z)), normal_t));
+		#endif
 		vec3 tangent = (a_tangent * 2.0 - 1.0).xyz;
 
 		#ifdef SKINNED	

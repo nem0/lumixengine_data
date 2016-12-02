@@ -37,7 +37,7 @@ addFramebuffer(this, "g_buffer", {
 	screen_size = true,
 	renderbuffers = {
 		{ format = "rgba8" },
-		{ format = "rgba8" },
+		{ format = "rgba16f" },
 		{ format = "rgba8" },
 		{ format = "depth24stencil8" }
 	}
@@ -57,7 +57,7 @@ local irradiance_map_uniform = createUniform(this, "u_irradiance_map")
 local radiance_map_uniform = createUniform(this, "u_radiance_map")
 local lut_uniform = createUniform(this, "u_LUT")
 local lut_texture = Engine.loadResource(g_engine, "pipelines/pbr/lut.tga", "texture")
-local deferred_material = Engine.loadResource(g_engine,"pipelines/common/deferred.mat", "material")
+local deferred_material = Engine.loadResource(g_engine,"pipelines/pbr/pbr.mat", "material")
 local deferred_point_light_material = Engine.loadResource(g_engine,"pipelines/common/deferredpointlight.mat", "material")
 local gamma_mapping_material = Engine.loadResource(g_engine,"pipelines/common/gamma_mapping.mat", "material")
 

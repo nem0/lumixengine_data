@@ -40,7 +40,7 @@ local gbuffer0_uniform = createUniform(this, "u_gbuffer0")
 local gbuffer1_uniform = createUniform(this, "u_gbuffer1")
 local gbuffer2_uniform = createUniform(this, "u_gbuffer2")
 local gbuffer_depth_uniform = createUniform(this, "u_gbuffer_depth")
-local deferred_material = Engine.loadResource(g_engine, "pipelines/common/deferred.mat", "material")
+local deferred_material = Engine.loadResource(g_engine, "pipelines/pbr/pbr.mat", "material")
 local deferred_point_light_material = Engine.loadResource(g_engine, "pipelines/common/deferredpointlight.mat", "material")
 local gamma_mapping_material = Engine.loadResource(g_engine, "pipelines/common/gamma_mapping.mat", "material")
 

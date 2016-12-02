@@ -106,7 +106,9 @@ void main()
 				normalize(v_bitangent)
 				);
 			tbn = transpose(tbn);
-			normal.xzy = texture2D(u_texNormal, tex_coords).xyz * 2.0 - 1.0;
+			
+			normal.xz = texture2D(u_texNormal, tex_coords).xy * 2.0 - 1.0;
+			normal.y = sqrt(1 - normal.x * normal.x - normal.z * normal.z); 
 			normal = normalize(mul(tbn, normal));
 		#else
 			normal = normalize(v_normal);

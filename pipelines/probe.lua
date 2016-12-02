@@ -58,8 +58,6 @@ local deferred_point_light_material = Engine.loadResource(g_engine,"pipelines/co
 local gamma_mapping_material = Engine.loadResource(g_engine,"pipelines/common/gamma_mapping.mat", "material")
 local irradiance_map_uniform = createUniform(this, "u_irradiance_map")
 local radiance_map_uniform = createUniform(this, "u_radiance_map")
-local lut_uniform = createUniform(this, "u_LUT")
-local lut_texture = Engine.loadResource(g_engine, "pipelines/pbr/lut.tga", "texture")
 local default_cube_texture = Engine.loadResource(g_engine, "pipelines/pbr/default_probe.dds", "texture")
 
 
@@ -93,7 +91,6 @@ function deferred(camera_slot)
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
 		bindTexture(this, irradiance_map_uniform, default_cube_texture)
 		bindTexture(this, irradiance_map_uniform, default_cube_texture)
-		bindTexture(this, lut_uniform, lut_texture)
 		drawQuad(this, 0, 0, 1, 1, deferred_material)
 
 	newView(this, "deferred_debug_shapes")
@@ -120,7 +117,6 @@ function deferred(camera_slot)
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
 		bindTexture(this, irradiance_map_uniform, default_cube_texture)
 		bindTexture(this, irradiance_map_uniform, default_cube_texture)
-		bindTexture(this, lut_uniform, lut_texture)
 		renderLightVolumes(this, deferred_point_light_material)
 		disableBlending(this)
 end

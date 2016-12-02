@@ -46,8 +46,6 @@ local deferred_point_light_material = Engine.loadResource(g_engine, "pipelines/c
 local gamma_mapping_material = Engine.loadResource(g_engine, "pipelines/common/gamma_mapping.mat", "material")
 local irradiance_map_uniform = createUniform(this, "u_irradiance_map")
 local radiance_map_uniform = createUniform(this, "u_radiance_map")
-local lut_uniform = createUniform(this, "u_LUT")
-local lut_texture = Engine.loadResource(g_engine, "pipelines/pbr/lut.tga", "texture")
 
 function ingameGUI()
 	newView(this, "ingame_gui")
@@ -95,7 +93,6 @@ function deferred(camera_slot)
 		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform)
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
 		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
-		bindTexture(this, lut_uniform, lut_texture)
 		drawQuad(this, 0, 0, 1, 1, deferred_material)
 		
 	newView(this, "deferred_debug_shapes")
@@ -137,7 +134,6 @@ function water()
 		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform) 
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform) -- depth
 		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
-		bindTexture(this, lut_uniform, lut_texture)
 end
 
 function fur()

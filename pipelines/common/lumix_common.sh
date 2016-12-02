@@ -314,6 +314,60 @@ float directionalLightShadowSimple(sampler2D shadowmap, mat4 shadowmap_matrices[
 }
 
 
+
+void PBR_ComputeDirectLight(vec3 normal, vec3 lightDir, vec3 viewDir,
+                            vec3 lightColor, float fZero, float roughness,
+                            out vec3 outDiffuse, out vec3 outSpecular)
+{
+    vec3 halfVec = normalize(lightDir + viewDir);
+    float ndotl = saturate(dot(normal,   lightDir));
+    float hdotv = saturate(dot(viewDir,  halfVec));
+    float ndoth = saturate(dot(normal,   halfVec));       
+
+    outDiffuse = vec3_splat(ndotl) * lightColor;
+
+    float alpha = roughness * roughness;
+    float alpha2 = alpha * alpha;
+    float sum  = ((ndoth * ndoth) * (alpha2 - 1.0) + 1.0);
+    float denom = M_PI * sum * sum;
+    float D = alpha2 / denom;  
+
+	float F_b = pow(1 - hdotv, 5);
+	float k = alpha2 * 0.25;
+	float inv_k = 1 - k;
+	float vis = 1/(hdotv * hdotv * inv_k + k);
+    float specular = ndotl * D * (fZero * vis + (1-fZero) * F_b * vis); 
+	
+    outSpecular = vec3_splat(specular) * lightColor;
+}
+
+
+vec3 PBR_ComputeIndirectDiffuse(samplerCube irradiance_map, vec3 normal, vec3 diffuseColor)
+{
+	return textureCube(irradiance_map, normal.xyz).rgb * diffuseColor.rgb;
+}
+
+
+// from urho
+vec3 EnvBRDFApprox (vec3 SpecularColor, float Roughness, float NoV)
+{
+	vec4 c0 = vec4(-1, -0.0275, -0.572, 0.022 );
+	vec4 c1 = vec4(1, 0.0425, 1.0, -0.04 );
+	vec4 r = Roughness * c0 + c1;
+	float a004 = min( r.x * r.x, exp2( -9.28 * NoV ) ) * r.x + r.y;
+	vec2 AB = vec2( -1.04, 1.04 ) * a004 + r.zw;
+	return SpecularColor * AB.x + AB.y;
+}
+
+
+vec3 PBR_ComputeIndirectSpecular(samplerCube radiance_map, vec3 spec_color , float roughness, float ndotv, vec3 reflected_vec)
+{
+    float Lod = roughness * 8;
+    vec3 PrefilteredColor =  textureCubeLod(radiance_map, reflected_vec.xyz, Lod).rgb;    
+    return PrefilteredColor * EnvBRDFApprox(spec_color, roughness, ndotv);
+}
+
+
 vec3 getScreenCoord(vec3 world_pos)
 {
 	vec4 prj = mul(u_viewProj, vec4(world_pos, 1.0) );

@@ -6,8 +6,13 @@ SAMPLER2D(u_texColor, 0);
 #ifdef NORMAL_MAPPING
 	SAMPLER2D(u_texNormal, 1);
 #endif
-#ifndef SHADOW
+#ifdef MAIN
 	SAMPLER2D(u_texShadowmap, 15);
+#endif
+#ifdef FUR
+	SAMPLERCUBE(u_irradiance_map, 15);
+	SAMPLERCUBE(u_radiance_map, 14);
+	SAMPLER2D(u_texShadowmap, 13);
 #endif
 
 uniform vec4 u_lightPosRadius;
@@ -16,7 +21,6 @@ uniform vec4 u_ambientColor;
 uniform vec4 u_lightDirFov; 
 uniform mat4 u_shadowmapMatrices[4];
 uniform vec4 u_fogColorDensity; 
-uniform vec4 u_lightSpecular;
 uniform vec4 u_materialColor;
 uniform vec4 u_attenuationParams;
 uniform vec4 u_fogParams;
@@ -70,36 +74,45 @@ void main()
 				wnormal = normalize(v_normal.xyz);
 			#endif
 			
-			vec3 view = normalize(v_view);
+			float f0 = 0.04;
+			
+			vec3 normal = wnormal;
+			vec4 albedo = color;
+			float roughness = u_roughnessMetallic.x;
+			float metallic = u_roughnessMetallic.y;
+			
+			vec4 camera_wpos = mul(u_camInvView, vec4(0, 0, 0, 1));
+			vec3 view = normalize(camera_wpos.xyz - v_wpos.xyz);
+			
+			vec4 specularColor = (f0 - f0 * metallic) + albedo * metallic;
+			vec4 diffuseColor = albedo - albedo * metallic;
+			
+			float ndotv = saturate(dot(normal, view));
+			vec3 direct_diffuse;
+			vec3 direct_specular;
+			PBR_ComputeDirectLight(normal, -u_lightDirFov.xyz, view, u_lightRgbAttenuation.rgb, f0, roughness, direct_diffuse, direct_specular);
 
-			vec3 diffuse;
-			diffuse = shadeDirectionalLight(u_lightDirFov.xyz
-				, view
-				, u_lightRgbAttenuation.rgb
-				, u_lightSpecular.rgb
-				, wnormal
-				, u_materialColor
-				, vec3(0, 0, 0));
-			diffuse = diffuse.xyz * color.rgb;
-			float ndotl = -dot(wnormal, u_lightDirFov.xyz);
-			//diffuse = diffuse * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), ndotl); 
-
-			#if defined MAIN || defined FUR
-				vec3 ambient = u_ambientColor.rgb * color.rgb;
-			#else
-				vec3 ambient = vec3(0, 0, 0);
-			#endif  
-
-			vec4 camera_wpos = mul(u_invView, vec4(0, 0, 0, 1.0));
+			vec3 indirect_diffuse = PBR_ComputeIndirectDiffuse(u_irradiance_map, normal, diffuseColor.rgb);
+			vec3 rv = reflect(-view.xyz, normal.xyz);
+			vec3 indirect_specular = PBR_ComputeIndirectSpecular(u_radiance_map, specularColor, roughness, ndotv, rv);
+			
+			float ndotl = -dot(normal, u_lightDirFov.xyz);
+			float shadow = 1; //directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1), ndotl);
 			float fog_factor = getFogFactor(camera_wpos.xyz / camera_wpos.w, u_fogColorDensity.w, v_wpos.xyz, u_fogParams);
-			gl_FragColor.xyz = mix(diffuse + ambient, u_fogColorDensity.rgb, fog_factor);
-			gl_FragColor.rgb *= mix(u_darkening.x, 1, u_layer.x);
+			vec3 lighting = 
+				direct_diffuse * diffuseColor.rgb * shadow + 
+				direct_specular * specularColor.rgb * shadow + 
+				indirect_diffuse + 
+				indirect_specular +
+				0
+				;
 			float alpha = clamp(color.a * u_alphaMultiplier.x - u_layer.x, 0, 1);
 			#ifdef ALPHA_CUTOUT
 				if(alpha < u_alphaRef) discard;
 			#endif
-
-			gl_FragColor.a = alpha;
+				
+			gl_FragColor.rgb = mix(lighting, u_fogColorDensity.rgb, fog_factor);
+			gl_FragColor.w = alpha;
 		#endif       
 	#endif		
 }

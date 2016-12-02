@@ -61,8 +61,6 @@ local gbuffer2_uniform = createUniform(this, "u_gbuffer2")
 local gbuffer_depth_uniform = createUniform(this, "u_gbuffer_depth")
 local irradiance_map_uniform = createUniform(this, "u_irradiance_map")
 local radiance_map_uniform = createUniform(this, "u_radiance_map")
-local lut_uniform = createUniform(this, "u_LUT")
-local lut_texture = Engine.loadResource(g_engine, "pipelines/pbr/lut.tga", "texture")
 local deferred_material = Engine.loadResource(g_engine, "pipelines/pbr/pbr.mat", "material")
 local deferred_point_light_material = Engine.loadResource(g_engine, "pipelines/common/deferredpointlight.mat", "material")
 local gamma_mapping_material = Engine.loadResource(g_engine, "pipelines/common/gamma_mapping.mat", "material")
@@ -105,7 +103,6 @@ function deferred(camera_slot)
 		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform)
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
 		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
-		bindTexture(this, lut_uniform, lut_texture)
 		drawQuad(this, 0, 0, 1, 1, deferred_material)
 		
 	newView(this, "deferred_debug_shapes")
@@ -131,7 +128,6 @@ function deferred(camera_slot)
 		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform)
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
 		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
-		bindTexture(this, lut_uniform, lut_texture)
 		disableBlending(this)
 	
 end
@@ -166,7 +162,6 @@ function water()
 		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform) 
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform) -- depth
 		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
-		bindTexture(this, lut_uniform, lut_texture)
 end
 
 function fur()
@@ -178,6 +173,7 @@ function fur()
 		enableBlending(this, "alpha")
 		applyCamera(this, "editor")
 		setActiveGlobalLightUniforms(this)
+		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
 end
 
 

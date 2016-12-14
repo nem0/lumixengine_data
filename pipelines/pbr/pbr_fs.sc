@@ -29,6 +29,7 @@ void main()
 	float f0 = 0.04;
 	
 	vec4 gbuffer1_val = texture2D(u_gbuffer1, v_texcoord0);
+	vec4 gbuffer2_val = texture2D(u_gbuffer2, v_texcoord0);
 	vec3 normal = normalize(gbuffer1_val.xyz * 2 - 1);
 	vec4 albedo = texture2D(u_gbuffer0, v_texcoord0);
 	float roughness = albedo.w;
@@ -45,7 +46,7 @@ void main()
 	float ndotv = saturate(dot(normal, view));
 	vec3 direct_diffuse;
 	vec3 direct_specular;
-	PBR_ComputeDirectLight(normal, -u_lightDirFov.xyz, view, u_lightRgbAttenuation.rgb, f0, roughness, direct_diffuse, direct_specular);
+	PBR_ComputeDirectLight(normal, -u_lightDirFov.xyz, view, u_lightRgbAttenuation.rgb, 0.24, roughness, direct_diffuse, direct_specular);
 
 	vec3 indirect_diffuse = PBR_ComputeIndirectDiffuse(u_irradiance_map, normal, diffuseColor.rgb);
 	vec3 rv = reflect(-view.xyz, normal.xyz);
@@ -61,6 +62,7 @@ void main()
 		indirect_specular +
 		0
 		;
-	gl_FragColor.rgb = mix(lighting, u_fogColorDensity.rgb, fog_factor);
+	float prebaked_ao = gbuffer2_val.x;
+	gl_FragColor.rgb = mix(lighting * prebaked_ao, u_fogColorDensity.rgb, fog_factor);
 	gl_FragColor.w = 1;
 }

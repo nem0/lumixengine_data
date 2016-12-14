@@ -127,7 +127,7 @@ void main()
 		gl_FragData[0].w = u_roughnessMetallic.x;
 		gl_FragData[1].xyz = (wnormal + vec3_splat(1.0)) * 0.5;
 		gl_FragData[1].w = u_roughnessMetallic.y;
-		gl_FragData[2] = vec4(0, 0, 0.0, 1.0);
+		gl_FragData[2] = vec4(1, 0, 0.0, 1.0);
 		
 	#endif // else SHADOW
 }

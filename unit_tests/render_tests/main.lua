@@ -1,21 +1,5 @@
 local tests = {
-	{"hdr_dof", 20}, -- film grain is random noise => higher tolerance 
-	{"colored_material", 10},
-	{"decals", 10},
-	{"fog", 10}, 
-	{"godrays", 10}, 
-	{"height_fog", 10}, 
-	{"hidden_mesh", 10}, 
-	{"light_color", 10}, 
-	{"parallax", 10}, 
-	{"pointlight", 10}, 
-	{"pointlight_shadows", 10}, 
-	{"shadow", 10},
-	{"simple", 10},
-	{"simple_terrain", 10},
-	{"skinned", 10},
-	{"spotlight", 10},
-	{"ssao", 20} -- ssao uses random rotation => higher tolerance
+	{"basic", 10}
 }
 
 local function waitForLoad()

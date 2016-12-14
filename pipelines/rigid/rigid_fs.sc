@@ -21,6 +21,9 @@
 #ifdef BUMP_TEXTURE
 	SAMPLER2D(u_texBump, 4);
 #endif
+#ifdef AMBIENT_OCCLUSION
+	SAMPLER2D(u_texAO, 5);
+#endif
 uniform vec4 u_materialColor;
 uniform vec4 u_roughnessMetallic;
 uniform vec4 u_parallaxScale;
@@ -108,13 +111,17 @@ void main()
 			tbn = transpose(tbn);
 			
 			normal.xz = texture2D(u_texNormal, tex_coords).xy * 2.0 - 1.0;
-			normal.y = sqrt(1 - normal.x * normal.x - normal.z * normal.z); 
+			normal.y = sqrt(clamp(1 - dot(normal.xz, normal.xz), 0, 1)); 
 			normal = normalize(mul(tbn, normal));
 		#else
 			normal = normalize(v_normal);
 		#endif
 		gl_FragData[1].xyz = (normal + 1) * 0.5; // todo: store only xz 
 		gl_FragData[1].w = metallic;
-		gl_FragData[2] = vec4(0, 0, 0, 1);
+		#ifdef AMBIENT_OCCLUSION
+			gl_FragData[2] = vec4(texture2D(u_texAO, tex_coords).x, 0, 0, 1);
+		#else
+			gl_FragData[2] = vec4(1, 0, 0, 1);
+		#endif
 	#endif
 }

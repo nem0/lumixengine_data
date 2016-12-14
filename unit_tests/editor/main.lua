@@ -1,8 +1,9 @@
 Engine.logInfo("Commencing editor tests");
 local failed_count = 0
 local tests = { 
-	"unit_tests/editor/joints",
-	"unit_tests/editor/terrain" 
+	"unit_tests/editor/basic",
+	"unit_tests/editor/copy_paste_delete",
+	"unit_tests/editor/terrain"
 }
 
 local success = Editor.runTest(Editor.editor, "unit_tests/editor/mismatch.json", "unit_tests/editor/mismatch.unv")

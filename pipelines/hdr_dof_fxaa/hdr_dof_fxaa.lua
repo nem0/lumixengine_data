@@ -1,4 +1,4 @@
-hdr_exposure = 1
+hdr_exposure = 4
 dof_focal_distance = 0
 dof_focal_range = 10
 dof_enabled = true
@@ -6,8 +6,8 @@ film_grain_enabled = true
 grain_amount = 0.02
 grain_size = 1.6
 enabled = true
-max_dof_blur = 0.5
-dof_clear_range = 0
+max_dof_blur = 1
+dof_clear_range = 75
 dof_near_multiplier = 100
 fxaa_enabled = true
 vignette_radius = 0.5

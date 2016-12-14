@@ -8,6 +8,8 @@ texture_slot("Metallic", "u_texMetallic")
 	texture_define "METALLIC_TEXTURE"
 texture_slot("Bump", "u_texBump")
 	texture_define "BUMP_TEXTURE"
+texture_slot("Ambient occlusion", "u_texAO")
+	texture_define "AMBIENT_OCCLUSION"
 texture_slot("Wind", "u_noise")
 	texture_define "WIND_ANIMATION"
 
@@ -16,7 +18,7 @@ pass "SHADOW"
 	vs { "SKINNED", "WIND_ANIMATION", "BUMP_TEXTURE" }
 	
 pass "DEFERRED"
-	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT", "DIFFUSE_TEXTURE", "BUMP_TEXTURE", "ROUGHNESS_TEXTURE", "METALLIC_TEXTURE" }
+	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT", "DIFFUSE_TEXTURE", "BUMP_TEXTURE", "ROUGHNESS_TEXTURE", "METALLIC_TEXTURE", "AMBIENT_OCCLUSION" }
 	vs { "SKINNED", "WIND_ANIMATION", "BUMP_TEXTURE", "VEGETATION" }
 	
 uniform("u_time", "time")

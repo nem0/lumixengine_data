@@ -7,6 +7,7 @@ local TRANSPARENT_RENDER_MASK = 2
 local WATER_RENDER_MASK = 4
 local FUR_RENDER_MASK = 8
 local ALL_RENDER_MASK = DEFAULT_RENDER_MASK + TRANSPARENT_RENDER_MASK + WATER_RENDER_MASK + FUR_RENDER_MASK
+local render_fur = true
 
 addFramebuffer(this, "forward", {
 	width = 1024,
@@ -24,7 +25,7 @@ addFramebuffer(this, "g_buffer", {
 	screen_size = true,
 	renderbuffers = {
 		{ format = "rgba8" },
-		{ format = "rgba8" },
+		{ format = "rgba16f" },
 		{ format = "rgba8" },
 		{ format = "depth24stencil8" }
 	}
@@ -40,6 +41,8 @@ local gbuffer0_uniform = createUniform(this, "u_gbuffer0")
 local gbuffer1_uniform = createUniform(this, "u_gbuffer1")
 local gbuffer2_uniform = createUniform(this, "u_gbuffer2")
 local gbuffer_depth_uniform = createUniform(this, "u_gbuffer_depth")
+local irradiance_map_uniform = createUniform(this, "u_irradiance_map")
+local radiance_map_uniform = createUniform(this, "u_radiance_map")
 local deferred_material = Engine.loadResource(g_engine, "pipelines/pbr/pbr.mat", "material")
 local deferred_point_light_material = Engine.loadResource(g_engine, "pipelines/common/deferredpointlight.mat", "material")
 local gamma_mapping_material = Engine.loadResource(g_engine, "pipelines/common/gamma_mapping.mat", "material")
@@ -81,19 +84,9 @@ function deferred(camera_slot)
 		bindFramebufferTexture(this, "g_buffer", 1, gbuffer1_uniform)
 		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform)
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
+		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
 		drawQuad(this, 0, 0, 1, 1, deferred_material)
 		
-	newView(this, "deferred_debug_shapes")
-		setPass(this, "EDITOR")
-		setFramebuffer(this, ctx.main_framebuffer)
-		applyCamera(this, camera_slot)
-		setStencil(this, STENCIL_OP_PASS_Z_REPLACE 
-			| STENCIL_OP_FAIL_Z_KEEP 
-			| STENCIL_OP_FAIL_S_KEEP 
-			| STENCIL_TEST_ALWAYS)
-		setStencilRMask(this, 0xff)
-		setStencilRef(this, 1)
-		renderDebugShapes(this)
 		
 	newView(this, "deferred_local_light")
 		setPass(this, "MAIN")
@@ -105,21 +98,52 @@ function deferred(camera_slot)
 		bindFramebufferTexture(this, "g_buffer", 1, gbuffer1_uniform)
 		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform)
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
-		renderLightVolumes(this, deferred_point_light_material)
+		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
 		disableBlending(this)
 	
 end
 
+function main()
+	main_view = newView(this, "MAIN", DEFAULT_RENDER_MASK)
+		setStencil(this, STENCIL_OP_PASS_Z_REPLACE 
+			| STENCIL_OP_FAIL_Z_KEEP 
+			| STENCIL_OP_FAIL_S_KEEP 
+			| STENCIL_TEST_ALWAYS)
+		setStencilRMask(this, 0xff)
+		setStencilRef(this, 1)
+		setPass(this, "MAIN")
+		enableDepthWrite(this)
+		clear(this, CLEAR_ALL, 0xffffFFFF)
+		enableRGBWrite(this)
+		setFramebuffer(this, ctx.main_framebuffer)
+		applyCamera(this, "editor")
+		setActiveGlobalLightUniforms(this)
+end
+
+function water()
+	water_view = newView(this, "WATER", WATER_RENDER_MASK)
+		setPass(this, "MAIN")
+		setFramebuffer(this, ctx.main_framebuffer)
+		disableDepthWrite(this)
+		applyCamera(this, "editor")
+		setActiveGlobalLightUniforms(this)
+		bindFramebufferTexture(this, "g_buffer", 0, gbuffer0_uniform) -- refraction
+		bindFramebufferTexture(this, "g_buffer", 1, gbuffer1_uniform) 
+		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform) 
+		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform) -- depth
+		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
+end
 
 function fur()
-	fur_view = newView(this, "FUR")
+	if not render_fur then return end
+	fur_view = newView(this, "FUR", FUR_RENDER_MASK)
 		setPass(this, "FUR")
 		setFramebuffer(this, ctx.main_framebuffer)
 		disableDepthWrite(this)
 		enableBlending(this, "alpha")
 		applyCamera(this, "editor")
 		setActiveGlobalLightUniforms(this)
-		renderModels(this, ALL_RENDER_MASK)
+		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
 end
 
 
@@ -141,10 +165,12 @@ function render()
 
 	doPostprocess(this, _ENV, "pre_transparent", "editor")
 
-	fur(this)
+	water()
+	fur()
 
+	renderModels(this, ALL_RENDER_MASK)
+	
 	doPostprocess(this, _ENV, "main", "editor")
-
 	
 	if do_gamma_mapping then
 		newView(this, "SRGB")
@@ -154,4 +180,8 @@ function render()
 			bindFramebufferTexture(this, "forward", 0, texture_uniform)
 			drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
 	end
+	
+	common.renderEditorIcons(ctx)
+	common.renderGizmo(ctx)
 end
+

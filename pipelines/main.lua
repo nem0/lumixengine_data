@@ -14,7 +14,7 @@ local render_debug_deferred =
  { label = "Normal", enabled = false, fullscreen = false, mask = {1, 1, 1, 0}, g_buffer_idx = 1},
  { label = "Roughness", enabled = false, fullscreen = false, mask = {0, 0, 0, 1}, g_buffer_idx = 0},
  { label = "Metallic", enabled = false, fullscreen = false, mask = {0, 0, 0, 1}, g_buffer_idx = 1},
-
+ { label = "AO", enabled = false, fullscreen = false, mask = {1, 1, 1, 0}, g_buffer_idx = 2},
 }
 
 

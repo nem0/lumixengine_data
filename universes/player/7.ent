@@ -1,0 +1,40 @@
+#name
+	""
+#transform (-2.933720, 1.981334, 0.038023)  (0.000000, 0.000000, 0.000000, 1.000000)
+	3225141779
+	1073585243
+	1025228384
+	0
+	0
+	0
+	1065353216
+#scale 1.000000
+	1065353216
+#renderable
+	1512583253
+#source
+	"models/fps_hands/fps arms rig 1 test.msh"
+#custom_materials
+	0
+#animable
+	3505036238
+#time_scale 1.000000
+	1065353216
+#start_time 0.000000
+	0
+#animation
+	"models/fps_hands/fps arms rig 1 test.ani"
+#hierarchy
+	4202309806
+#parent
+	6
+#tranform (0.000000, 0.080000, 0.000000)  (0.000000, 0.000000, 0.000000, -1.000000)
+	0
+	1034147600
+	0
+	0
+	0
+	0
+	3212836864
+#cmp_end
+	0

@@ -19,3 +19,4 @@ fulldump.dmp
 imgui.ini
 error.log
 studio.ini
+unit_tests/editor/results/*

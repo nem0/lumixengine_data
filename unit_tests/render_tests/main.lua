@@ -1,5 +1,6 @@
 local tests = {
-	{"basic", 10}
+	{"direct_light", 10},
+	{"indirect_light", 10}
 }
 
 local function waitForLoad()

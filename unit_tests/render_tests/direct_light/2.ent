@@ -10,11 +10,17 @@
 	1065353216
 #scale 1.000000
 	1065353216
-#renderable
-	1512583253
-#source
-	"models/utils/cube/cube.msh"
-#custom_materials
+#terrain
+	3363197873
+#layer_mask
+	1
+#scale (1.000000, 16.000000, 1.000000)
+	1065353216
+	1098907648
+	1065353216
+#material
+	"terrains/desert/desert.mat"
+#grass_count
 	0
 #cmp_end
 	0

@@ -21,7 +21,7 @@
 #prop_name
 	"camera_entity"
 #prop_value
-	"-1"
+	"6"
 #prop_name
 	"dest_entity"
 #prop_value
@@ -29,7 +29,7 @@
 #prop_name
 	"PLAYER_SPEED"
 #prop_value
-	"0.35000000"
+	"0.10000000"
 #prop_name
 	"input_enabled"
 #prop_value

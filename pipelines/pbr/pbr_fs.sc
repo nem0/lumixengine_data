@@ -53,10 +53,10 @@ void main()
 	float shadow = directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(wpos, 1), ndotl);
 	float fog_factor = getFogFactor(camera_wpos.xyz / camera_wpos.w, u_fogColorDensity.w, wpos.xyz, u_fogParams);
 	vec3 lighting = 
-		direct_diffuse * diffuse_color.rgb * shadow + 
-		direct_specular * specular_color.rgb * shadow + 
-		indirect_diffuse + 
-		indirect_specular +
+		//direct_diffuse * diffuse_color.rgb * shadow + 
+		//direct_specular * specular_color.rgb * shadow + 
+		//indirect_diffuse + 
+		//indirect_specular +
 		0
 		;
 	float prebaked_ao = gbuffer2_val.x;

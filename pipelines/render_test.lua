@@ -44,7 +44,6 @@ local gbuffer_depth_uniform = createUniform(this, "u_gbuffer_depth")
 local irradiance_map_uniform = createUniform(this, "u_irradiance_map")
 local radiance_map_uniform = createUniform(this, "u_radiance_map")
 local deferred_material = Engine.loadResource(g_engine, "pipelines/pbr/pbr.mat", "material")
-local deferred_point_light_material = Engine.loadResource(g_engine, "pipelines/common/deferredpointlight.mat", "material")
 local gamma_mapping_material = Engine.loadResource(g_engine, "pipelines/common/gamma_mapping.mat", "material")
 
 

@@ -1,15 +1,5 @@
-*.blend1
-*.blend2
-scripts/*.exp
-scripts/*.ilk
-scripts/*.obj
-scripts/*.lib
-scripts/*.pdb
 /*.dll
 /*.exe
-*_autosave.unv
-*.unv.lst
-*.unv.bkp
 pipelines/compiled/*.*
 pipelines/compiled_gl/*.*
 unit_tests/render_tests/*_res.tga
@@ -19,4 +9,5 @@ fulldump.dmp
 imgui.ini
 error.log
 studio.ini
-unit_tests/editor/results/*
+universes/__test_result__*
+universes/*.unv

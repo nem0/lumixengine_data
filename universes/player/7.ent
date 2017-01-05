@@ -16,14 +16,6 @@
 	"models/fps_hands/fps arms rig 1 test.msh"
 #custom_materials
 	0
-#animable
-	3505036238
-#time_scale 1.000000
-	1065353216
-#start_time 0.000000
-	0
-#animation
-	"models/fps_hands/fps arms rig 1 test.ani"
 #hierarchy
 	4202309806
 #parent
@@ -36,5 +28,13 @@
 	0
 	0
 	3212836864
+#animable
+	3505036238
+#time_scale 1.000000
+	1065353216
+#start_time 0.000000
+	0
+#animation
+	"models/fps_hands/fps arms rig 1 test.ani"
 #cmp_end
 	0

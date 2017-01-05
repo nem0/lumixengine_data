@@ -1,1 +1,3 @@
-universes/*.* eol=lf
+universes/*.ent eol=lf
+universes/*.sys eol=lf
+universes/*.scn eol=lf

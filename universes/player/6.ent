@@ -10,18 +10,6 @@
 	1065353216
 #scale 1.000000
 	1065353216
-#hierarchy
-	4202309806
-#parent
-	5
-#tranform (0.000000, 1.401334, 0.000000)  (0.000000, 0.000000, 0.000000, -1.000000)
-	0
-	1068719852
-	0
-	0
-	0
-	0
-	3212836864
 #camera
 	991751685
 #far 10000.000000
@@ -36,5 +24,29 @@
 	1036831949
 #slot
 	"main"
+#lua_script
+	4143584752
+#count
+	1
+#source
+	"pipelines/cubesky/cubesky.lua"
+#prop_count
+	1
+#prop_name
+	"sky_material"
+#prop_value
+	"models/sky/clouded01/sky.mat"
+#hierarchy
+	4202309806
+#parent
+	5
+#tranform (0.000000, 1.401334, 0.000000)  (0.000000, 0.000000, 0.000000, -1.000000)
+	0
+	1068719852
+	0
+	0
+	0
+	0
+	3212836864
 #cmp_end
 	0

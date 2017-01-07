@@ -179,8 +179,5 @@ function render()
 			bindFramebufferTexture(this, "forward", 0, texture_uniform)
 			drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
 	end
-	
-	common.renderEditorIcons(ctx)
-	common.renderGizmo(ctx)
 end
 

@@ -185,7 +185,5 @@ function render()
 	end
 	ingameGUI()
 	
-	common.renderEditorIcons(ctx)
-	common.renderGizmo(ctx)
 	renderDebug(ctx)
 end

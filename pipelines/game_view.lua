@@ -55,6 +55,14 @@ local radiance_map_uniform = createUniform(this, "u_radiance_map")
 local deferred_material = Engine.loadResource(g_engine, "pipelines/pbr/pbr.mat", "material")
 local gamma_mapping_material = Engine.loadResource(g_engine, "pipelines/common/gamma_mapping.mat", "material")
 
+function ingameGUI()
+	newView(this, "ingame_gui")
+		setPass(this, "MAIN")
+		setFramebuffer(this, "default")
+		clear(this, CLEAR_DEPTH, 0x303030ff)
+		renderIngameGUI(this)
+end
+
 
 function deferred(camera_slot)
 	deferred_view = newView(this, "deferred", DEFAULT_RENDER_MASK)
@@ -189,7 +197,5 @@ function render()
 			drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
 	end
 	
-	common.renderEditorIcons(ctx)
-	common.renderGizmo(ctx)
+	ingameGUI()
 end
-

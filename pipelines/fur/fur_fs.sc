@@ -94,7 +94,7 @@ void main()
 
 			vec3 indirect_diffuse = PBR_ComputeIndirectDiffuse(u_irradiance_map, normal, diffuseColor.rgb);
 			vec3 rv = reflect(-view.xyz, normal.xyz);
-			vec3 indirect_specular = PBR_ComputeIndirectSpecular(u_radiance_map, specularColor, roughness, ndotv, rv);
+			vec3 indirect_specular = PBR_ComputeIndirectSpecular(u_radiance_map, specularColor.rgb, roughness, ndotv, rv);
 			
 			float ndotl = -dot(normal, u_lightDirFov.xyz);
 			float shadow = 1; //directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1), ndotl);

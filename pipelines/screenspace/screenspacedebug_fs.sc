@@ -16,6 +16,6 @@ void main()
 	if (all(lessThan(u_multiplier.xyz, vec3_splat(0.5))))
 		gl_FragColor.rgb = vec3_splat(color.a * u_multiplier.a);
 	else
-	gl_FragColor.rgb = color.rgb * u_multiplier;
+	gl_FragColor.rgb = color.rgb * u_multiplier.rgb;
 	gl_FragColor.w = 1.0;
 }

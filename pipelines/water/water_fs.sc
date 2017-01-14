@@ -94,7 +94,7 @@ vec3 getRefractionColor(vec3 wpos, vec3 view, vec3 normal, float wave)
 
 vec3 getSurfaceNormal(vec2 uv)
 {
-	float noise_t = texture2D(u_texNoise, 1 - uv);
+	float noise_t = texture2D(u_texNoise, 1 - uv).x;
 	vec2 tc0 = uv * texture_scale + flow_dir * time;
 	#if 0
 		vec2 tc1 = uv * texture_scale + flow_dir * (time * (1 + noise_t * 0.2));
@@ -106,7 +106,7 @@ vec3 getSurfaceNormal(vec2 uv)
 	vec3 wnormal1 = (texture2D(u_texNormal, vec2(0.5, 0.5) - tc1).xzy + texture2D(u_texNormal, (vec2(0.5, 0.5) - tc1)*2.3).xzy) - 1.0;
 	
 	float noise = texture2D(u_texNoise, uv).x;
-	float t = (time * 0.3 + noise*2) % 1;
+	float t = mod((time * 0.3 + noise*2), 1);
 	vec3 wnormal = mix(wnormal0, wnormal1, abs( 0.5 - t ) / 0.5);
 	
 	return mix(vec3(0, 1, 0), wnormal, normal_strength);

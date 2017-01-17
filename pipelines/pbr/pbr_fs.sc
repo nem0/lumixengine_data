@@ -2,8 +2,6 @@ $input v_wpos, v_texcoord0 // in...
 
 #include "common.sh"
 
-#define M_PI 3.14159265
-
 
 SAMPLER2D(u_gbuffer0, 15);
 SAMPLER2D(u_gbuffer1, 14);

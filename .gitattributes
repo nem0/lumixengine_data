@@ -1,3 +1,4 @@
 *.ent eol=lf
 *.sys eol=lf
 *.scn eol=lf
+pipelines/* eol=auto

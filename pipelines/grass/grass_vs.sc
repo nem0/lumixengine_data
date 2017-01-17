@@ -28,8 +28,8 @@ void main()
 	
 	v_normal = i_data4;
 	
-	const float min_dist = u_grassMaxDist.x;
-	const float scale_dist = 10;
+	float min_dist = u_grassMaxDist.x;
+	float scale_dist = 10;
 	vec3 view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - instMul(model, vec4(a_position, 1.0) ).xyz;
 	float scale = clamp(1 - (length(view) - (min_dist - scale_dist))/scale_dist, 0, 1);
 	
@@ -39,7 +39,7 @@ void main()
 		float len = length(displaced_vertex);
 		int totalTime = int(u_time.x);
 		int pixelY = int(totalTime/64);
-		int pixelX = int(totalTime / -(pixelY + 1e-5));
+		int pixelX = int(totalTime / -(pixelY + 0.00001));
 		float noiseFactor = texture2DLod(u_texNoise, vec2( pixelX*10, pixelY*10 ), 0).r;
 		vec3 wpos = instMul(model, vec4(displaced_vertex, 1.0) ).xyz;
 		displaced_vertex.x += move_factor * sin(frequency * u_time.x * texture2DLod(u_texNoise, wpos.xz*50.0, 0).r + len) + (wind_strength * noiseFactor * wind_dir.x)/10.0;

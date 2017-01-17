@@ -26,7 +26,7 @@ void main()
 	model[2] = i_data2;
 	model[3] = i_data3;
 	
-	v_normal = i_data4;
+	v_normal.xyz = i_data4.xyz;
 	
 	float min_dist = u_grassMaxDist.x;
 	float scale_dist = 10;

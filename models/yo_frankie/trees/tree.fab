@@ -1,0 +1,22 @@
+#prefab
+	1666980976
+#renderable
+	1512583253
+#source
+	"models/yo_frankie/trees/trees_0.msh"
+#custom_materials
+	0
+#box_rigid_actor
+	894846619
+#layer
+	0
+#is_dynamic
+	0
+#x 1.000000
+	1065353216
+#y 5.000000
+	1084227584
+#z 1.000000
+	1065353216
+#cmp_end
+	0

@@ -1,0 +1,42 @@
+#name
+	"player"
+#transform (83.028282, 10.979141, 100.201492)  (0.000000, 0.000000, 0.000000, 1.000000)
+	1118178939
+	1093642896
+	1120429866
+	0
+	0
+	0
+	1065353216
+#scale 1.000000
+	1065353216
+#lua_script
+	4143584752
+#count
+	1
+#source
+	"scripts/player.lua"
+#prop_count
+	5
+#prop_name
+	"camera_entity"
+#prop_value
+	"4"
+#prop_name
+	"dest_entity"
+#prop_value
+	"-1"
+#prop_name
+	"PLAYER_SPEED"
+#prop_value
+	"0.10000000"
+#prop_name
+	"input_enabled"
+#prop_value
+	"true"
+#prop_name
+	"MOUSE_SENSITIVITY"
+#prop_value
+	"1.00000000"
+#cmp_end
+	0

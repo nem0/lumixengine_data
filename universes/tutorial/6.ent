@@ -1,0 +1,52 @@
+#name
+	"player_camera"
+#transform (83.028282, 12.380476, 100.201492)  (0.000000, 0.000000, 0.000000, -1.000000)
+	1118178939
+	1095112302
+	1120429866
+	0
+	0
+	0
+	3212836864
+#scale 1.000000
+	1065353216
+#camera
+	991751685
+#far 10000.000000
+	1176256512
+#fov 1.047198
+	1065749138
+#is_ortho
+	0
+#ortho_size 10.000000
+	1092616192
+#near 0.100000
+	1036831949
+#slot
+	"main"
+#lua_script
+	4143584752
+#count
+	1
+#source
+	"pipelines/cubesky/cubesky.lua"
+#prop_count
+	1
+#prop_name
+	"sky_material"
+#prop_value
+	"models/sky/clouded01/sky.mat"
+#hierarchy
+	4202309806
+#parent
+	5
+#tranform (0.000000, 1.401335, 0.000000)  (0.000000, 0.000000, 0.000000, 1.000000)
+	0
+	1068719856
+	0
+	0
+	0
+	0
+	1065353216
+#cmp_end
+	0

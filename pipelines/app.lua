@@ -184,6 +184,5 @@ function render()
 			drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
 	end
 	ingameGUI()
-	
-	renderDebug(ctx)
+
 end

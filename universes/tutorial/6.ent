@@ -34,6 +34,8 @@
 	1
 #prop_name
 	"sky_material"
+#prop_type
+	3
 #prop_value
 	"models/sky/clouded01/sky.mat"
 #hierarchy

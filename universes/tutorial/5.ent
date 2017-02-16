@@ -20,22 +20,32 @@
 	5
 #prop_name
 	"camera_entity"
+#prop_type
+	2
 #prop_value
-	"4"
+	"6"
 #prop_name
 	"dest_entity"
+#prop_type
+	2
 #prop_value
-	"-1"
+	"18446744073709551615"
 #prop_name
 	"PLAYER_SPEED"
+#prop_type
+	1
 #prop_value
 	"0.10000000"
 #prop_name
 	"input_enabled"
+#prop_type
+	0
 #prop_value
 	"true"
 #prop_name
 	"MOUSE_SENSITIVITY"
+#prop_type
+	1
 #prop_value
 	"1.00000000"
 #cmp_end

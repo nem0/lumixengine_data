@@ -1,0 +1,4 @@
+{
+	"shader" : "pipelines/rigid/rigid.shd",
+	"texture" : { "source" : "Roach.png", "srgb" : true },
+	"texture" : { "source" : "RoachNormal.png"}}

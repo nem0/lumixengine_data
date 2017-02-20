@@ -12,12 +12,16 @@ void main()
 {
 	vec4 normal = a_normal * 2.0 - 1.0;
 	vec4 tangent = a_tangent * 2.0 - 1.0;
-	mat4 model = 
-		mul(u_model[0], a_weight.x * u_boneMatrices[int(a_indices.x)] + 
-		a_weight.y * u_boneMatrices[int(a_indices.y)] +
-		a_weight.z * u_boneMatrices[int(a_indices.z)] +
-		a_weight.w * u_boneMatrices[int(a_indices.w)]);
-
+	#ifdef SKINNED
+		mat4 model = 
+			mul(u_model[0], a_weight.x * u_boneMatrices[int(a_indices.x)] + 
+			a_weight.y * u_boneMatrices[int(a_indices.y)] +
+			a_weight.z * u_boneMatrices[int(a_indices.z)] +
+			a_weight.w * u_boneMatrices[int(a_indices.w)]);
+	#else
+		mat4 model = u_model[0];
+	#endif	
+	
 
     v_wpos = mul(model, vec4(a_position, 1.0)).xyz;
 	#ifndef SHADOW

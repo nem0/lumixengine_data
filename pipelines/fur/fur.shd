@@ -4,12 +4,15 @@ texture_slot("Normal","u_texNormal")
 
 pass "SHADOW"
 	fs { "ALPHA_CUTOUT" }
+	vs { "SKINNED" }
 	
 pass "DEFERRED"
 	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT" }
+	vs { "SKINNED" }
 
 pass "FUR"
 	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT" }
+	vs { "SKINNED" }
 
 uniform("u_alphaMultiplier", "float")
 uniform("u_furLength", "float")

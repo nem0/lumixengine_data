@@ -32,5 +32,13 @@
 	1097859072
 #layer
 	0
+#lua_script
+	4143584752
+#count
+	1
+#source
+	"scripts/tutorial/load_navmesh.lua"
+#prop_count
+	0
 #cmp_end
 	0

@@ -2,12 +2,16 @@
 	1666980976
 #renderable
 	1512583253
+#scene_version
+	4
 #source
 	"models/yo_frankie/trees/trees_0.msh"
 #custom_materials
 	0
 #box_rigid_actor
 	894846619
+#scene_version
+	-1
 #layer
 	0
 #is_dynamic

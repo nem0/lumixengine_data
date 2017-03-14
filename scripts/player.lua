@@ -1,9 +1,7 @@
 camera_entity = -1
 PLAYER_SPEED = 1
 MOUSE_SENSITIVITY = 1
-dest_entity = -1
 Editor.setPropertyType("camera_entity", Editor.ENTITY_PROPERTY)
-Editor.setPropertyType("dest_entity", Editor.ENTITY_PROPERTY)
 input_enabled = true
 
 local LSHIFT_KEY = 160

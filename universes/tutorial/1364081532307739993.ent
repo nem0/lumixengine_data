@@ -16,6 +16,18 @@
 	"models/creatures/roach/roach.msh"
 #custom_materials
 	0
+#box_rigid_actor
+	894846619
+#layer
+	0
+#dynamic_type
+	2
+#x 1.000000
+	1065353216
+#y 1.000000
+	1065353216
+#z 1.000000
+	1065353216
 #anim_controller
 	284548379
 #source

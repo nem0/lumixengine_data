@@ -6,6 +6,7 @@ local anim_ctrl = -1
 local speed_input_idx = -1
 local attack_input_idx = -1
 local next_follow = 2
+local is_enabled = true
 
 function init()
 	-- cache some stuff
@@ -14,12 +15,19 @@ function init()
 	attack_input_idx = Animation.getControllerInputIndex(g_scene_animation, anim_ctrl, "attack")
 end
 
+function stopFollowing()
+	is_enabled = false
+	Navigation.cancelNavigation(g_scene_navigation, this)
+end
+
 function onPathFinished()
 	-- when the enemy finish walking, play attack animation
 	Animation.setControllerBoolInput(g_scene_animation, anim_ctrl, attack_input_idx, true)
 end
 
 function update(time_delta)
+	if not is_enabled then return end
+
 	-- get agent speed from navigation and set it as input to animation controller
 	-- so it can play the right animation
 	local agent_speed = Navigation.getAgentSpeed(g_scene_navigation, this)

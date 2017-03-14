@@ -13,7 +13,7 @@
 #lua_script
 	4143584752
 #count
-	1
+	2
 #source
 	"scripts/player.lua"
 #prop_count
@@ -25,11 +25,11 @@
 #prop_value
 	"6"
 #prop_name
-	"dest_entity"
+	""
 #prop_type
-	2
+	5
 #prop_value
-	"18446744073709551615"
+	""
 #prop_name
 	"PLAYER_SPEED"
 #prop_type
@@ -48,5 +48,21 @@
 	1
 #prop_value
 	"1.00000000"
+#source
+	"scripts/tutorial/shooting.lua"
+#prop_count
+	2
+#prop_name
+	"muzzle"
+#prop_type
+	2
+#prop_value
+	"16148665572437121714"
+#prop_name
+	"creature"
+#prop_type
+	2
+#prop_value
+	"1364081532307739993"
 #cmp_end
 	0

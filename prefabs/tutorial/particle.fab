@@ -1,0 +1,92 @@
+#prefab
+	558143874
+#particle_emitter
+	2085777965
+#scene_version
+	4
+#autoemit
+	1
+#local_space
+	0
+#spawn_period_from 1.000000
+	1065353216
+#spawn_period_to 2.000000
+	1073741824
+#initial_life_from 1.000000
+	1065353216
+#initial_life_to 2.000000
+	1073741824
+#initial_size_from 0.200000
+	1045220557
+#initial_size_to 0.500000
+	1056964608
+#spawn_count_from
+	10
+#spawn_count_to
+	10
+#material
+	"particles/test.mat"
+#particle_emitter_alpha
+	1578575532
+#scene_version
+	4
+#count
+	9
+# -0.200000
+	3192704205
+# 0.000000
+	0
+# 0.000000
+	0
+# 0.000000
+	0
+# 0.200000
+	1045220557
+# 0.000000
+	0
+# -0.200000
+	3192704205
+# 0.000000
+	0
+# 0.500000
+	1056964608
+# 1.000000
+	1065353216
+# 0.200000
+	1045220557
+# 0.000000
+	0
+# -0.200000
+	3192704205
+# 0.000000
+	0
+# 1.000000
+	1065353216
+# 0.000000
+	0
+# 0.200000
+	1045220557
+# 0.000000
+	0
+#particle_emitter_linear_movement
+	3269129633
+#scene_version
+	4
+#x_from -1.000000
+	3212836864
+#x_to 1.000000
+	1065353216
+#y_from 1.000000
+	1065353216
+#y_to 1.000000
+	1065353216
+#z_from -1.000000
+	3212836864
+#z_to 1.000000
+	1065353216
+#particle_emitter_random_rotation
+	2588269735
+#scene_version
+	4
+#cmp_end
+	0

@@ -17,7 +17,7 @@
 #source
 	"scripts/player.lua"
 #prop_count
-	5
+	4
 #prop_name
 	"camera_entity"
 #prop_type
@@ -25,11 +25,11 @@
 #prop_value
 	"6"
 #prop_name
-	""
+	"MOUSE_SENSITIVITY"
 #prop_type
-	5
+	1
 #prop_value
-	""
+	"1.00000000"
 #prop_name
 	"PLAYER_SPEED"
 #prop_type
@@ -42,12 +42,6 @@
 	0
 #prop_value
 	"true"
-#prop_name
-	"MOUSE_SENSITIVITY"
-#prop_type
-	1
-#prop_value
-	"1.00000000"
 #source
 	"scripts/tutorial/shooting.lua"
 #prop_count

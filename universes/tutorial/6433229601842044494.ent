@@ -35,10 +35,20 @@
 #lua_script
 	4143584752
 #count
-	1
+	2
 #source
 	"scripts/tutorial/load_navmesh.lua"
 #prop_count
 	0
+#source
+	"scripts/tutorial/spawner.lua"
+#prop_count
+	1
+#prop_name
+	"player"
+#prop_type
+	2
+#prop_value
+	"5"
 #cmp_end
 	0

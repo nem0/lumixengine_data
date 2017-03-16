@@ -88,6 +88,8 @@ vec3 getRefractionColor(vec3 wpos, vec3 view, vec3 normal, float wave)
 	vec2 refr_uv = screen_uv.xy * 0.5 + 0.5;
 	refr_uv += refraction.xz * saturate(depth_diff * 0.1);
 	
+	refr_uv = clamp(refr_uv * 0.9 + 0.05, vec2_splat(0), vec2_splat(1));
+	
 	vec3 refr_color = deferred(refr_uv);
 	return mix(u_waterColor.rgb, refr_color, saturate(1 - depth_diff / fullColorDepth));
 }

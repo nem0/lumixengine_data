@@ -2,29 +2,13 @@ local LBUTTON = 1 -- should be exported as a constant from engine, it's not at t
 local SHOOT_ACTION = 1001 -- be careful so that the number does not collide with other actions
 local prefab = -1
 local particles = {}
-local ANIM_CONTROLLER_TYPE = Engine.getComponentType("anim_controller")
-local creature_anim_ctrl = -1
-local dead_input_idx = -1
 
 muzzle = -1
 Editor.setPropertyType("muzzle", Editor.ENTITY_PROPERTY)
-creature = -1
-Editor.setPropertyType("creature", Editor.ENTITY_PROPERTY)
 
 function init()
     Engine.addInputAction(g_engine, SHOOT_ACTION, Engine.INPUT_TYPE_DOWN, LBUTTON, -1)
     prefab = Engine.loadResource(g_engine, "prefabs/tutorial/particle.fab", "prefab") -- clean up in onDestroy
-	creature_anim_ctrl = Engine.getComponent(g_universe, creature, ANIM_CONTROLLER_TYPE)
-	dead_input_idx = Animation.getControllerInputIndex(g_scene_animation, creature_anim_ctrl, "dead")
-end
-
-function kill()
-    Engine.logError("killed")
-    -- play dead animation
-    Animation.setControllerBoolInput(g_scene_animation, creature_anim_ctrl, dead_input_idx, true)
-    -- stop following player
-    local env = LuaScript.getEnvironment(g_scene_lua_script, creature, 0)
-    env.stopFollowing()
 end
 
 function update(time_delta)
@@ -38,15 +22,15 @@ function update(time_delta)
         is_hit, hit_entity, hit_position = Physics.raycast(g_scene_physics, muzzle_pos, muzzle_dir)
         if is_hit then
             -- spawn particle
-            Engine.logError("spawn particle")
             local instance = Engine.instantiatePrefab(g_engine, g_universe, hit_position, prefab)
             -- remember particles so we can destroy them later
             local particle = { entity = instance[1], life = 1 }
             table.insert(particles, particle)
         
-            -- if the creature is hit
-            if hit_entity == creature then
-                kill()
+            -- if a creature is hit
+            local env = LuaScript.getEnvironment(g_scene_lua_script, hit_entity, 0)
+            if env ~= nil and env.kill ~= nil then
+                env.kill()
             end
         end
     end

@@ -1,10 +1,13 @@
 followed_entity = -1
+spawner = -1
 speed = 5.0
+Editor.setPropertyType("spawner", Editor.ENTITY_PROPERTY)
 Editor.setPropertyType("followed_entity", Editor.ENTITY_PROPERTY)
 local ANIM_CONTROLLER_TYPE = Engine.getComponentType("anim_controller")
 local anim_ctrl = -1
 local speed_input_idx = -1
 local attack_input_idx = -1
+local dead_input_idx = -1
 local next_follow = 2
 local is_enabled = true
 
@@ -13,6 +16,17 @@ function init()
 	anim_ctrl = Engine.getComponent(g_universe, this, ANIM_CONTROLLER_TYPE)
 	speed_input_idx = Animation.getControllerInputIndex(g_scene_animation, anim_ctrl, "speed")
 	attack_input_idx = Animation.getControllerInputIndex(g_scene_animation, anim_ctrl, "attack")
+	dead_input_idx = Animation.getControllerInputIndex(g_scene_animation, anim_ctrl, "dead")
+end
+
+function kill()
+    -- play dead animation
+    Animation.setControllerBoolInput(g_scene_animation, anim_ctrl, dead_input_idx, true)
+    -- stop following player
+    stopFollowing()
+	-- despawn
+	local spawner_env = LuaScript.getEnvironment(g_scene_lua_script, spawner, 1)
+	spawner_env.despawn(this)
 end
 
 function stopFollowing()

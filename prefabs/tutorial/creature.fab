@@ -35,15 +35,21 @@
 #count
 	1
 #source
-	"scripts/tutorial/follow.lua"
+	"scripts/tutorial/creature.lua"
 #prop_count
+	3
+#prop_name
+	"spawner"
+#prop_type
 	2
+#prop_value
+	"11"
 #prop_name
 	"followed_entity"
 #prop_type
 	2
 #prop_value
-	"6"
+	"7"
 #prop_name
 	"speed"
 #prop_type

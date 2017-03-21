@@ -28,12 +28,12 @@ void main()
 	
 	v_normal.xyz = i_data4.xyz;
 	
-	float min_dist = u_grassMaxDist.x;
+	float max_dist = u_grassMaxDist.x;
 	float scale_dist = 10;
 	vec3 view = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - instMul(model, vec4(a_position, 1.0) ).xyz;
-	float scale = clamp(1 - (length(view) - (min_dist - scale_dist))/scale_dist, 0, 1);
+	float scale = clamp(1 - (length(view) - (max_dist - scale_dist))/scale_dist, 0, 1);
 	
-	vec3 displaced_vertex = scale*a_position;
+	vec3 displaced_vertex = scale * a_position;
 	if(a_position.y>=0.1)
 	{
 		float len = length(displaced_vertex);

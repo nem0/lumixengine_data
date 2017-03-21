@@ -95,18 +95,6 @@ function deferred(camera_slot)
 		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
 		drawQuad(this, 0, 0, 1, 1, deferred_material)
 		
-	newView(this, "deferred_debug_shapes")
-		setPass(this, "EDITOR")
-		setFramebuffer(this, ctx.main_framebuffer)
-		applyCamera(this, camera_slot)
-		setStencil(this, STENCIL_OP_PASS_Z_REPLACE 
-			| STENCIL_OP_FAIL_Z_KEEP 
-			| STENCIL_OP_FAIL_S_KEEP 
-			| STENCIL_TEST_ALWAYS)
-		setStencilRMask(this, 0xff)
-		setStencilRef(this, 1)
-		renderDebugShapes(this)
-		
 	newView(this, "deferred_local_light")
 		setPass(this, "MAIN")
 		setFramebuffer(this, ctx.main_framebuffer)
@@ -162,7 +150,7 @@ end
 
 
 function render()
-	common.shadowmap(ctx, "main", DEFAULT_RENDER_MASK)
+	common.shadowmap(ctx, "main", DEFAULT_RENDER_MASK + FUR_RENDER_MASK)
 	deferred("main")
 	common.particles(ctx, "main")
 

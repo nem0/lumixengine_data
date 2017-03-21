@@ -175,7 +175,7 @@ end
 
 
 function render()
-	common.shadowmap(ctx, "main", DEFAULT_RENDER_MASK)
+	common.shadowmap(ctx, "main", DEFAULT_RENDER_MASK + FUR_RENDER_MASK)
 	deferred("main")
 	common.particles(ctx, "main")
 

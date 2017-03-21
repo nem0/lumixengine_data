@@ -222,7 +222,7 @@ end
 
 
 function render()
-	common.shadowmap(ctx, "editor", DEFAULT_RENDER_MASK)
+	common.shadowmap(ctx, "editor", DEFAULT_RENDER_MASK + FUR_RENDER_MASK)
 	deferred("editor")
 	common.particles(ctx, "editor")
 
@@ -249,8 +249,15 @@ function render()
 	renderDebug(ctx)
 end
 
+local volume = 1
+
 function onGUI()
 	local changed
+	ImGui.SameLine()
+	changed, volume = ImGui.SliderFloat("Volume", volume, 0, 1)
+	if changed then
+		Audio.setMasterVolume(g_scene_audio, volume)
+	end
 	ImGui.SameLine()
 	if ImGui.Button("Debug") then
 		ImGui.OpenPopup("debug_popup")
@@ -275,6 +282,9 @@ function onGUI()
 		if common.render_shadowmap_debug then
 			ImGui.SameLine()
 			changed, common.render_shadowmap_debug_fullsize = ImGui.Checkbox("Fullsize###gbfsm", common.render_shadowmap_debug_fullsize)
+		end
+		if ImGui.Button("High details") then
+			Renderer.setGlobalLODMultiplier(g_scene_renderer, 0.1)
 		end
 		if ImGui.Button("Toggle") then
 			local v = not render_debug_deferred[1].enabled

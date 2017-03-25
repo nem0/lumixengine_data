@@ -32,14 +32,22 @@
 	284548379
 #source
 	"models/creatures/roach/roach.act"
+#default_set
+	0
 #lua_script
 	4143584752
 #count
 	1
 #source
-	"scripts/tutorial/follow.lua"
+	"scripts/tutorial/creature.lua"
 #prop_count
+	3
+#prop_name
+	"spawner"
+#prop_type
 	2
+#prop_value
+	"6433229601842044494"
 #prop_name
 	"followed_entity"
 #prop_type

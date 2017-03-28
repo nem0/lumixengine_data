@@ -161,7 +161,10 @@ void main()
 		vec3 foam = texture2D(u_texFoam, v_texcoord0 * texture_scale * FOAM_TEXTURE_SCALE).rgb;
 		color = color + foam * saturate(FOAM_DEPTH-abs(FOAM_DEPTH - depth_diff * FOAM_WIDTH)) * (1/FOAM_DEPTH);
 	#endif
-	gl_FragColor = vec4(color + spec_color, 1);
+	vec4 camera_wpos = mul(u_camInvView, vec4(0, 0, 0, 1));
+	vec3 wpos = getViewPosition(u_gbuffer_depth, u_camInvViewProj, screen_uv.xy * 0.5 + 0.5);
+	float fog_factor = getFogFactor(camera_wpos.xyz / camera_wpos.w, u_fogColorDensity.w, wpos.xyz, u_fogParams);
+	gl_FragColor = vec4(mix(color + spec_color, u_fogColorDensity.rgb, fog_factor), 1);
 	//gl_FragColor = vec4(depth_diff, 0, 0, 1);
 }
 

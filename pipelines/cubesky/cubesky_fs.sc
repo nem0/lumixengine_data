@@ -8,15 +8,12 @@ uniform vec4 u_fogColorDensity;
 SAMPLERCUBE(u_texColor, 0);
 
 
-vec3 get_world_normal(vec2 frag_coord)
+vec3 getWorldNormal(vec2 frag_coord)
 {
-	float z = 1;
-	vec4 posProj = vec4(frag_coord * 2 - 1, z, 1.0);
-	vec4 wpos = mul(u_camInvViewProj, posProj);
-	wpos /= wpos.w;
-	vec3 view = mul(u_camInvView, vec4(0.0, 0.0, 0.0, 1.0)).xyz - wpos.xyz;
-
-	return -normalize(view);
+	vec4 posProj = vec4(frag_coord * 2 - 1, 1.0, 1.0);
+	vec4 view_space_dir = mul(u_camInvProj, posProj);
+	vec3 view = mul(u_camInvView, view_space_dir).xyz;
+	return normalize(view);
 }
 
 
@@ -35,7 +32,7 @@ float getFogFactorSky(vec3 camera_wpos, float fog_density, vec3 eye_dir, vec4 fo
 
 void main()
 {
-	vec3 eye_dir = get_world_normal(v_wpos.xy);
+	vec3 eye_dir = getWorldNormal(v_wpos.xy);
 	vec3 camera_wpos = mul(u_camInvView, vec4(0, 0, 0, 1)).xyz;
 	float fog_factor = getFogFactorSky(camera_wpos, u_fogColorDensity.w, eye_dir, u_fogParams);
 	vec4 sky_color = textureCube(u_texColor, eye_dir);

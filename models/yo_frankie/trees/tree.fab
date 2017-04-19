@@ -1,3 +1,7 @@
+#version
+	1
+#entity_count
+	1
 #prefab
 	1666980976
 #renderable

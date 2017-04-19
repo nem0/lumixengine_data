@@ -55,5 +55,5 @@ function update(time_delta)
 	-- get player's position
 	local pos = Engine.getEntityPosition(g_universe, followed_entity)
 	-- move to where player is
-	Navigation.navigate(g_scene_navigation, this, pos, speed)
+	Navigation.navigate(g_scene_navigation, this, pos, speed, 0.1)
 end

@@ -115,6 +115,7 @@ function module.init(ctx)
 	ctx.screen_space_debug_material = Engine.loadResource(g_engine, "pipelines/screenspace/screenspace_debug.mat", "material")
 	ctx.texture_uniform = createUniform(ctx.pipeline, "u_texture")
 	ctx.blur_material = Engine.loadResource(g_engine, "pipelines/common/blur.mat", "material")
+	ctx.downsample_material = Engine.loadResource(g_engine, "pipelines/common/downsample.mat", "material")
 	ctx.depth_buffer_uniform = createUniform(ctx.pipeline, "u_depthBuffer")
 	ctx.multiplier_uniform = createUniform(ctx.pipeline, "u_multiplier")
 end

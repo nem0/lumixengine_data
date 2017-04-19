@@ -14,11 +14,15 @@ vignette_radius = 0.5
 vignette_softness = 0.35
 vignette_enabled = true
 bloom_enabled = false
+bloom_cutoff = 1.0
 
 local pipeline_env = nil
 
 local current_lum1 = "lum1a"
 local lum_uniforms = {}
+local bloom_debug = false
+local bloom_debug_fullscreen = false
+local bloom_blur = true
 
 
 function computeLumUniforms()
@@ -133,6 +137,7 @@ function initHDR(ctx)
 		})
 	end
 	
+	ctx.bloom_cutoff = createUniform(ctx.pipeline, "u_bloomCutoff", 1)
 	ctx.avg_luminance_uniform = createUniform(ctx.pipeline, "u_avgLuminance")
 	ctx.grain_amount_uniform = createUniform(ctx.pipeline, "u_grainAmount")
 	ctx.grain_size_uniform = createUniform(ctx.pipeline, "u_grainSize")
@@ -153,8 +158,6 @@ function initHDR(ctx)
 end
 
 function hdr(ctx, camera_slot)
-	bloom(ctx, ctx.pipeline)
-
 	newView(ctx.pipeline, "hdr_luminance")
 		setPass(ctx.pipeline, "HDR_LUMINANCE")
 		setFramebuffer(ctx.pipeline, "lum128")
@@ -201,6 +204,8 @@ function hdr(ctx, camera_slot)
 		bindFramebufferTexture(ctx.pipeline, old_lum1, 0, ctx.avg_luminance_uniform)
 		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
 
+	bloom(ctx, ctx.pipeline)
+		
 	setMaterialDefine(ctx.pipeline, ctx.hdr_material, "FILM_GRAIN", film_grain_enabled)
 	setMaterialDefine(ctx.pipeline, ctx.hdr_material, "DOF", dof_enabled)	
 	setMaterialDefine(ctx.pipeline, ctx.hdr_material, "VIGNETTE", vignette_enabled)	
@@ -284,14 +289,26 @@ function initBloom(pipeline, env)
 	env.ctx.extract_material = Engine.loadResource(g_engine, "pipelines/hdr_dof_fxaa/bloomextract.mat", "material")
 	env.ctx.bloom_material = Engine.loadResource(g_engine, "pipelines/hdr_dof_fxaa/bloom.mat", "material")
 	addFramebuffer(env.ctx.pipeline, "bloom_extract", {
-		size_ratio = { 0.5, 0.5},
+		size_ratio = { 1, 1},
 		renderbuffers = {
 			{ format = "rgba16f" }
 		}
 	})
 
-	addFramebuffer(env.ctx.pipeline, "bloom_blur", {
-		size_ratio = { 0.5, 0.5},
+	addFramebuffer(env.ctx.pipeline, "bloom_blur2", {
+		size_ratio = { 0.5, 0.5 },
+		renderbuffers = {
+			{ format = "rgba16f" }
+		}
+	})
+	addFramebuffer(env.ctx.pipeline, "bloom_blur4", {
+		size_ratio = { 0.25, 0.25 },
+		renderbuffers = {
+			{ format = "rgba16f" }
+		}
+	})
+	addFramebuffer(env.ctx.pipeline, "bloom_blur8", {
+		size_ratio = { 0.125, 0.125 },
 		renderbuffers = {
 			{ format = "rgba16f" }
 		}
@@ -301,37 +318,79 @@ end
 
 function bloom(ctx, pipeline)
 	if not bloom_enabled then return end
+	
 	newView(pipeline, "bloom_extract")
 		setPass(pipeline, "MAIN")
 		disableBlending(pipeline)
 		disableDepthWrite(pipeline)
+		setUniform(pipeline, ctx.bloom_cutoff, {{bloom_cutoff, 0, 0, 0}})
 		setFramebuffer(pipeline, "bloom_extract")
 		bindFramebufferTexture(pipeline, "hdr", 0, ctx.texture_uniform)
+		bindFramebufferTexture(pipeline, ctx.current_lum1, 0, ctx.avg_luminance_uniform)
 		drawQuad(pipeline, 0, 0, 1, 1, ctx.extract_material)
 	
-	newView(ctx.pipeline, "blur_bloom_h")
-		setPass(ctx.pipeline, "BLUR_H")
-		setFramebuffer(ctx.pipeline, "bloom_blur")
-		disableDepthWrite(ctx.pipeline)
-		bindFramebufferTexture(ctx.pipeline, "bloom_extract", 0, ctx.shadowmap_uniform)
-		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material)
-		enableDepthWrite(ctx.pipeline)
+	if bloom_blur then
+		newView(ctx.pipeline, "blur_bloom2_downsample")
+			setPass(ctx.pipeline, "MAIN")
+			setFramebuffer(ctx.pipeline, "bloom_blur2")
+			disableDepthWrite(ctx.pipeline)
+			bindFramebufferTexture(ctx.pipeline, "bloom_extract", 0, ctx.shadowmap_uniform)
+			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.downsample_material)
+			enableDepthWrite(ctx.pipeline)
 
-	newView(ctx.pipeline, "blur_bloom_v")
-		setPass(ctx.pipeline, "BLUR_V")
-		setFramebuffer(ctx.pipeline, "bloom_extract")
-		disableDepthWrite(ctx.pipeline)
-		bindFramebufferTexture(ctx.pipeline, "bloom_blur", 0, ctx.shadowmap_uniform)
-		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material);
-		enableDepthWrite(ctx.pipeline)
+		newView(ctx.pipeline, "blur_bloom2_h")
+			setPass(ctx.pipeline, "BLUR_H")
+			setFramebuffer(ctx.pipeline, "bloom_extract")
+			disableDepthWrite(ctx.pipeline)
+			bindFramebufferTexture(ctx.pipeline, "bloom_blur2", 0, ctx.shadowmap_uniform)
+			drawQuad(ctx.pipeline, 0, 0, 0.5, 0.5, ctx.blur_material)
+			enableDepthWrite(ctx.pipeline)
+
+		newView(ctx.pipeline, "blur_bloom2_v")
+			setPass(ctx.pipeline, "BLUR_V")
+			enableBlending(pipeline, "add")
+			setFramebuffer(ctx.pipeline, "hdr")
+			disableDepthWrite(ctx.pipeline)
+			bindFramebufferTexture(ctx.pipeline, "bloom_extract", 0, ctx.shadowmap_uniform)
+			drawQuadEx(ctx.pipeline, 0, 0, 1, 1, 0, 0.5, 0.5, 0, ctx.blur_material);
+			enableDepthWrite(ctx.pipeline)
+			
+		newView(ctx.pipeline, "blur_bloom4_downsample")
+			setPass(ctx.pipeline, "MAIN")
+			setFramebuffer(ctx.pipeline, "bloom_blur4")
+			disableDepthWrite(ctx.pipeline)
+			bindFramebufferTexture(ctx.pipeline, "bloom_blur2", 0, ctx.shadowmap_uniform)
+			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.downsample_material)
+			enableDepthWrite(ctx.pipeline)
+			
+		newView(ctx.pipeline, "blur_bloom4_h")
+			setPass(ctx.pipeline, "BLUR_H")
+			setFramebuffer(ctx.pipeline, "bloom_extract")
+			disableDepthWrite(ctx.pipeline)
+			bindFramebufferTexture(ctx.pipeline, "bloom_blur4", 0, ctx.shadowmap_uniform)
+			drawQuad(ctx.pipeline, 0, 0, 0.25, 0.25, ctx.blur_material)
+			enableDepthWrite(ctx.pipeline)
+
+		newView(ctx.pipeline, "blur_bloom4_v")
+			setPass(ctx.pipeline, "BLUR_V")
+			enableBlending(pipeline, "add")
+			setFramebuffer(ctx.pipeline, "hdr")
+			disableDepthWrite(ctx.pipeline)
+			bindFramebufferTexture(ctx.pipeline, "bloom_extract", 0, ctx.shadowmap_uniform)
+			drawQuadEx(ctx.pipeline, 0, 0, 1, 1, 0, 0, 0.25, 0.25, ctx.blur_material);
+			enableDepthWrite(ctx.pipeline)
+
+	end
 		
-	newView(pipeline, "bloom")
-		setPass(pipeline, "MAIN")
-		enableBlending(pipeline, "add")
-		disableDepthWrite(pipeline)
-		setFramebuffer(pipeline, "hdr")
-		bindFramebufferTexture(pipeline, "bloom_extract", 0, ctx.texture_uniform)
-		drawQuad(pipeline, 0, 0, 1, 1, ctx.bloom_material)
+	--newView(pipeline, "bloom")
+	--	setPass(pipeline, "MAIN")
+	--	enableBlending(pipeline, "add")
+	--	disableDepthWrite(pipeline)
+	--	setFramebuffer(pipeline, "hdr")
+	--	bindFramebufferTexture(pipeline, "bloom_extract", 0, ctx.texture_uniform)
+	--	drawQuad(pipeline, 0, 0, 1, 1, ctx.bloom_material)
+		
+	renderBloomDebug(ctx, pipeline)
 end
 
 function fxaa(ctx, camera_slot)
@@ -373,6 +432,22 @@ function initPostprocess(pipeline, env)
 	env.do_gamma_mapping = false
 end
 
+function renderBloomDebug(ctx, pipeline)
+	if bloom_debug then
+		newView(pipeline, "bloom_debug")
+			setPass(pipeline, "MAIN")
+			disableBlending(pipeline)
+			disableDepthWrite(pipeline)
+			setFramebuffer(pipeline, ctx.main_framebuffer)
+			bindFramebufferTexture(pipeline, "bloom_extract", 0, ctx.texture_uniform)
+			if bloom_debug_fullscreen then
+				drawQuad(pipeline, 0, 0, 1, 1, ctx.screen_space_material)
+			else
+				drawQuad(pipeline, 0.48, 0.48, 0.5, 0.5, ctx.screen_space_material)
+			end
+	end
+end
+
 function postprocess(pipeline, env)
 	
 	if enabled then
@@ -384,5 +459,16 @@ function postprocess(pipeline, env)
 	else
 		env.ctx.main_framebuffer = original_framebuffer
 		env.do_gamma_mapping = true
+	end
+end
+
+
+function onGUI()
+	local changed
+	changed, bloom_debug = ImGui.Checkbox("Bloom debug", bloom_debug)
+	if bloom_debug then
+		changed, bloom_blur = ImGui.Checkbox("Bloom blur", bloom_blur)
+		ImGui.SameLine()
+		changed, bloom_debug_fullscreen = ImGui.Checkbox("Fullscreen", bloom_debug_fullscreen)
 	end
 end

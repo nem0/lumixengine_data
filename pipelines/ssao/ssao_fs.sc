@@ -19,23 +19,23 @@ vec3 getViewNormal(vec2 tex_coord)
 // inspired by https://github.com/tobspr/RenderPipeline/blob/master/rpplugins/ao/shader/ue4ao.kernel.glsl
 void main()
 {
-	const float max_distance = 1.0;
-	
 	vec3 view_pos = getViewPosition(u_texture, u_camInvProj, v_texcoord0);
 	vec3 view_normal = getViewNormal(v_texcoord0);
 	
 	float occlusion = 0;
 	float occlusion_count = 0;
 	
-	const int SAMPLE_COUNT = 16;
+	const int SAMPLE_COUNT = 4;
 	
 	float random_angle = rand(view_pos.xyz) * 6.283285;
 	float s = sin(random_angle);
 	float c = cos(random_angle);
+	float depth_scale = u_radius.x / view_pos.z;
 	for (int i = 0; i < SAMPLE_COUNT; ++i)
 	{
-		vec2 sample = vec2(POISSON_DISK_16[i].x * c + POISSON_DISK_16[i].y * s, POISSON_DISK_16[i].x * -s + POISSON_DISK_16[i].y * c);
-		sample = sample * u_radius.x / view_pos.z;
+		vec2 poisson = POISSON_DISK_16[i];
+		vec2 sample = vec2(poisson.x * c + poisson.y * s, poisson.x * -s + poisson.y * c);
+		sample = sample * depth_scale;
 			
 		vec3 vpos_a = getViewPosition(u_texture, u_camInvProj, v_texcoord0 + sample);
 		vec3 vpos_b = getViewPosition(u_texture, u_camInvProj, v_texcoord0 - sample);
@@ -43,8 +43,8 @@ void main()
 		vec3 sample_vec_a = normalize(vpos_a - view_pos);
 		vec3 sample_vec_b = normalize(vpos_b - view_pos);
 
-		float dist_a = distance(vpos_a, view_pos) / max_distance;
-		float dist_b = distance(vpos_b, view_pos) / max_distance;
+		float dist_a = distance(vpos_a, view_pos);
+		float dist_b = distance(vpos_b, view_pos);
 
 		float valid_a = step(dist_a - 1.0, 0.0);
 		float valid_b = step(dist_b - 1.0, 0.0);

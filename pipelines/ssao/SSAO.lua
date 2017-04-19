@@ -46,8 +46,7 @@ function initPostprocess(pipeline, env)
 		height = 512,
 		size_ratio = {1, 1},
 		renderbuffers = {
-			{format="rgba8"},
-			{format = "depth24"}
+			{format="rgba8"}
 		}
 	})
 		

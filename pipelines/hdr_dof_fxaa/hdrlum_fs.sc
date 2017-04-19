@@ -56,7 +56,7 @@ void main()
 	float avg = sum/16.0;
 	#ifdef LUM1
 		float prev_lum = texture2D(s_texPrevLum, vec2(0.5, 0.5)).r;
-		gl_FragColor.r = mix(avg, prev_lum, 0.9);
+		gl_FragColor.r = mix(avg, prev_lum, 0.95);
 	#else
 		gl_FragColor.r = avg;
 	#endif

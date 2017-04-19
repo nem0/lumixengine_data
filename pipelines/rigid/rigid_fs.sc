@@ -84,11 +84,11 @@ void main()
 	#else
 		vec4 color = vec4(1, 1, 1, 1);
 	#endif
-	color.xyz *= u_materialColor.rgb;
 	#ifdef SHADOW
 		float depth = v_common2.z / v_common2.w;
 		gl_FragColor = vec4_splat(depth);
 	#else
+		color.xyz *= u_materialColor.rgb;
 		#ifdef ROUGHNESS_TEXTURE
 			float roughness = texture2D(u_texRoughness, tex_coords).x * u_roughnessMetallic.x;
 		#else

@@ -252,6 +252,8 @@ end
 local volume = 1
 local paused = false
 
+local timescale = 1
+
 function onGUI()
 	local changed
 	ImGui.SameLine()
@@ -263,16 +265,24 @@ function onGUI()
 	if ImGui.Button("Debug") then
 		ImGui.OpenPopup("debug_popup")
 	end
+
+	ImGui.SameLine()
+	changed, paused = ImGui.Checkbox("paused", paused)
+	if changed then
+		Engine.pause(g_engine, paused)
+	end
+	
+	ImGui.SameLine()
+	if ImGui.Button("Next frame") then Engine.nextFrame(g_engine) end
+	
+	ImGui.SameLine()
+	changed, timescale = ImGui.SliderFloat("Timescale", timescale, 0, 1)
+	if changed then
+		Engine.setTimeMultiplier(g_engine, timescale)
+	end
+	
+	
 	if ImGui.BeginPopup("debug_popup") then
-		changed, paused = ImGui.Checkbox("paused", paused)
-		if changed then
-			Engine.pause(g_engine, paused)
-		end
-	
-		if ImGui.Button("Next frame") then Engine.nextFrame(g_engine) end
-	
-		ImGui.Separator()
-	
 		for i, _ in ipairs(render_debug_deferred) do
 			changed, render_debug_deferred[i].enabled = ImGui.Checkbox(render_debug_deferred[i].label, render_debug_deferred[i].enabled)
 			if render_debug_deferred[i].enabled then

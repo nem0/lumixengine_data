@@ -17,7 +17,7 @@ void main()
 	#endif
 	color.rgb *= u_materialColor.rgb;
 	#if 1 // darkening
-		color.rgb *= min(1.0, 2 * v_common.y + 0.5);
+		color.rgb *= min(1.0, 2 * v_common.y + 0.2);
 	#endif
 	gl_FragData[0].rgb = color.rgb;
 	gl_FragData[0].w = u_roughnessMetallic.x;

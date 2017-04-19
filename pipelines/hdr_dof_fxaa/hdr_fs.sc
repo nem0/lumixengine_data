@@ -170,7 +170,7 @@ vec3 dof(vec2 tex_coord, vec3 in_color)
 
 vec3 tonemap(vec3 in_color)
 {
-	float avg_loglum = max(0.1, exp(texture2D(u_avgLuminance, vec2(0.5, 0.5)).r));
+	float avg_loglum = exp(texture2D(u_avgLuminance, vec2(0.5, 0.5)).r);
 	float lum = luma(in_color).x;
 	float map_middle = (midgray.r / (avg_loglum + 0.001)) * lum;
 	float ld = Uncharted2Tonemap(map_middle) / Uncharted2Tonemap(11.0);

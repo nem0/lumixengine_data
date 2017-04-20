@@ -30,7 +30,8 @@ void main()
 	float roughness = albedo.w;
 	float metallic = gbuffer1_val.w;
 	
-	vec3 wpos = getViewPosition(u_gbuffer_depth, u_camInvViewProj, v_texcoord0);
+	mat4 inv_view_proj = mul(u_camInvView, u_camInvProj); // to improve precision, shadows shimmer if we use u_canInvViewProj instead
+	vec3 wpos = getViewPosition(u_gbuffer_depth, inv_view_proj, v_texcoord0);
 
 	vec4 camera_wpos = mul(u_camInvView, vec4(0, 0, 0, 1));
 	vec3 view = normalize(camera_wpos.xyz - wpos);

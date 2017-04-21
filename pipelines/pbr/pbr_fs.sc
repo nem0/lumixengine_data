@@ -12,7 +12,7 @@ SAMPLERCUBE(u_radiance_map, 10);
 SAMPLER2D(u_texShadowmap, 9);
 
 
-uniform vec4 u_lightRgbAttenuation;
+uniform vec4 u_lightRgbAndIndirectIntensity;
 uniform vec4 u_lightDirFov; 
 uniform mat4 u_shadowmapMatrices[4];
 uniform vec4 u_fogColorDensity; 
@@ -42,7 +42,7 @@ void main()
 	float ndotv = saturate(dot(normal, view));
 	vec3 direct_diffuse;
 	vec3 direct_specular;
-	PBR_ComputeDirectLight(normal, -u_lightDirFov.xyz, view, u_lightRgbAttenuation.rgb, 0.24, roughness, direct_diffuse, direct_specular);
+	PBR_ComputeDirectLight(normal, -u_lightDirFov.xyz, view, u_lightRgbAndIndirectIntensity.rgb, 0.24, roughness, direct_diffuse, direct_specular);
 
 	vec3 indirect_diffuse = PBR_ComputeIndirectDiffuse(u_irradiance_map, normal, diffuse_color.rgb);
 	vec3 rv = reflect(-view.xyz, normal.xyz);
@@ -54,8 +54,8 @@ void main()
 	vec3 lighting = 
 		direct_diffuse * diffuse_color.rgb * shadow + 
 		direct_specular * specular_color.rgb * shadow + 
-		indirect_diffuse + 
-		indirect_specular +
+		indirect_diffuse * u_lightRgbAndIndirectIntensity.w + 
+		indirect_specular * u_lightRgbAndIndirectIntensity.w +
 		0
 		;
 	float prebaked_ao = gbuffer2_val.x;

@@ -16,7 +16,7 @@ SAMPLER2D(u_texColor, 0);
 #endif
 
 uniform vec4 u_lightPosRadius;
-uniform vec4 u_lightRgbAttenuation;
+uniform vec4 u_lightRgbAndIndirectIntensity;
 uniform vec4 u_ambientColor;
 uniform vec4 u_lightDirFov; 
 uniform mat4 u_shadowmapMatrices[4];
@@ -90,7 +90,7 @@ void main()
 			float ndotv = saturate(dot(normal, view));
 			vec3 direct_diffuse;
 			vec3 direct_specular;
-			PBR_ComputeDirectLight(normal, -u_lightDirFov.xyz, view, u_lightRgbAttenuation.rgb, f0, roughness, direct_diffuse, direct_specular);
+			PBR_ComputeDirectLight(normal, -u_lightDirFov.xyz, view, u_lightRgbAndIndirectIntensity.rgb, f0, roughness, direct_diffuse, direct_specular);
 
 			vec3 indirect_diffuse = PBR_ComputeIndirectDiffuse(u_irradiance_map, normal, diffuseColor.rgb);
 			vec3 rv = reflect(-view.xyz, normal.xyz);
@@ -102,8 +102,8 @@ void main()
 			vec3 lighting = 
 				direct_diffuse * diffuseColor.rgb * shadow + 
 				direct_specular * specularColor.rgb * shadow + 
-				indirect_diffuse + 
-				indirect_specular +
+				indirect_diffuse * u_lightRgbAndIndirectIntensity.w + 
+				indirect_specular * u_lightRgbAndIndirectIntensity.w +
 				0
 				;
 			float alpha = clamp(color.a * u_alphaMultiplier.x - u_layer.x, 0, 1);

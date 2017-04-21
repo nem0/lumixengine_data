@@ -28,7 +28,7 @@ uniform vec3 u_specColor;
 uniform vec4 u_lightDirFov; 
 uniform vec4 u_flowDir; 
 uniform vec4 u_fullColorDepth; 
-uniform vec4 u_lightRgbAttenuation;
+uniform vec4 u_lightRgbAndIndirectIntensity;
 uniform vec4 u_lightSpecular;
 
 #define normal_strength u_normalStrength.x
@@ -63,7 +63,7 @@ vec3 deferred(vec2 screen_uv)
 	
 	vec3 diffuse = shadeDirectionalLight(u_lightDirFov.xyz
 					, view
-					, u_lightRgbAttenuation.rgb
+					, u_lightRgbAndIndirectIntensity.rgb
 					, u_lightSpecular.rgb
 					, normal
 					, mat_specular_shininess

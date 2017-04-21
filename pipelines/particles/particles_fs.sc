@@ -11,7 +11,7 @@ SAMPLER2D(u_texShadowmap, 14);
 SAMPLER2D(u_depthBuffer, 15);
 uniform mat4 u_shadowmapMatrices[4];
 uniform vec4 u_ambientColor;
-uniform vec4 u_lightRgbAttenuation;
+uniform vec4 u_lightRgbAndIndirectIntensity;
 
 void main()
 {
@@ -28,7 +28,7 @@ void main()
 		col = mix(col, col2, v_common2.x);
 	#endif
 	
-	vec3 diffuse = col.rgb * u_lightRgbAttenuation.rgb * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), 1); 
+	vec3 diffuse = col.rgb * u_lightRgbAndIndirectIntensity.rgb * directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1.0), 1); 
 	vec3 ambient = col.rgb * u_ambientColor.rgb;
 			
 	col.rgb = diffuse + ambient;

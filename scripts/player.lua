@@ -71,7 +71,7 @@ function update(dt)
 		speed = speed * 3
 	end
 	
-	Engine.setEntityLocalRotation(g_scene_hierarchy, camera_entity, makeQuat({1, 0, 0}, pitch))
+	Engine.setEntityLocalRotation(g_universe, camera_entity, makeQuat({1, 0, 0}, pitch))
 	
 	Engine.setEntityRotation(g_universe, this, {0, 1, 0}, yaw);
 

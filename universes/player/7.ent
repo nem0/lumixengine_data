@@ -10,10 +10,14 @@
 	1065353216
 #scale 1.000000
 	1065353216
+#parent
+	5
 #renderable
 	1512583253
 #source
 	"models/fps_hands/fps arms rig 1 test.msh"
+#flags
+	0
 #custom_materials
 	0
 #animable
@@ -24,17 +28,5 @@
 	0
 #animation
 	"models/fps_hands/fps arms rig 1 test.ani"
-#hierarchy
-	4202309806
-#parent
-	6
-#tranform (0.000000, 0.080000, 0.000000)  (0.000000, 0.000000, 0.000000, -1.000000)
-	0
-	1034147600
-	0
-	0
-	0
-	0
-	3212836864
 #cmp_end
 	0

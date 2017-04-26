@@ -10,17 +10,21 @@
 	1065353216
 #scale 1.000000
 	1065353216
+#parent
+	18446744073709551615
 #renderable
 	1512583253
 #source
 	"models/utils/plane/cube.msh"
+#flags
+	0
 #custom_materials
 	0
 #box_rigid_actor
 	894846619
 #layer
 	0
-#is_dynamic
+#dynamic_type
 	0
 #x 5.000000
 	1084227584

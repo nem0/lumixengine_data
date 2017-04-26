@@ -10,10 +10,14 @@
 	1056964608
 #scale 1.000000
 	1065353216
+#parent
+	18446744073709551615
 #renderable
 	1512583253
 #source
 	"models/utils/plane/cube.msh"
+#flags
+	0
 #custom_materials
 	0
 #box_rigid_actor

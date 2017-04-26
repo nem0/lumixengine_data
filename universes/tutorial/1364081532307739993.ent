@@ -10,10 +10,14 @@
 	1065353216
 #scale 1.000000
 	1065353216
+#parent
+	18446744073709551615
 #renderable
 	1512583253
 #source
 	"models/creatures/roach/roach.msh"
+#flags
+	0
 #custom_materials
 	0
 #box_rigid_actor
@@ -67,6 +71,8 @@
 #height 2.000000
 	1073741824
 #use_root_motion
+	0
+#get_root_motion_from_animation_controller
 	0
 #cmp_end
 	0

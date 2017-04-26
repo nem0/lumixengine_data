@@ -10,6 +10,8 @@
 	1065353216
 #scale 1.000000
 	1065353216
+#parent
+	18446744073709551615
 #lua_script
 	4143584752
 #count
@@ -17,7 +19,7 @@
 #source
 	"scripts/player.lua"
 #prop_count
-	5
+	4
 #prop_name
 	"camera_entity"
 #prop_type
@@ -25,28 +27,22 @@
 #prop_value
 	"6"
 #prop_name
-	"dest_entity"
+	"MOUSE_SENSITIVITY"
 #prop_type
-	2
+	1
 #prop_value
-	"18446744073709551615"
+	"1.00000000"
 #prop_name
 	"PLAYER_SPEED"
 #prop_type
 	1
 #prop_value
-	"10.10000038"
+	"0.10000000"
 #prop_name
 	"input_enabled"
 #prop_type
 	0
 #prop_value
 	"true"
-#prop_name
-	"MOUSE_SENSITIVITY"
-#prop_type
-	1
-#prop_value
-	"1.00000000"
 #cmp_end
 	0

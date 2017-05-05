@@ -16,6 +16,8 @@
 	1512583253
 #source
 	"models/utils/cube/cube.msh"
+#flags
+	0
 #custom_materials
 	0
 #cmp_end

@@ -15,6 +15,7 @@ local render_debug_deferred =
  { label = "Roughness", enabled = false, fullscreen = false, mask = {0, 0, 0, 1}, g_buffer_idx = 0},
  { label = "Metallic", enabled = false, fullscreen = false, mask = {0, 0, 0, 1}, g_buffer_idx = 1},
  { label = "AO", enabled = false, fullscreen = false, mask = {1, 1, 1, 0}, g_buffer_idx = 2},
+ { label = "Depth", enabled = false, fullscreen = false, mask = {1, 0, 0, 0}, g_buffer_idx = 3},
 }
 
 
@@ -82,7 +83,7 @@ function deferred(camera_slot)
 	
 	newView(this, "copyRenderbuffer");
 		copyRenderbuffer(this, "g_buffer", 3, ctx.main_framebuffer, 1)
-		
+
 	newView(this, "decals")
 		setPass(this, "DEFERRED")
 		disableDepthWrite(this)
@@ -90,12 +91,11 @@ function deferred(camera_slot)
 		applyCamera(this, camera_slot)
 		bindFramebufferTexture(this, ctx.main_framebuffer, 1, gbuffer_depth_uniform)
 		renderDecalsVolumes(this)
-	
+		
 	newView(this, "main")
 		setPass(this, "MAIN")
 		setFramebuffer(this, ctx.main_framebuffer)
 		applyCamera(this, camera_slot)
-		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
 		
 		setActiveGlobalLightUniforms(this)
 		bindFramebufferTexture(this, "g_buffer", 0, gbuffer0_uniform)

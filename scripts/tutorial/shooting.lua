@@ -14,7 +14,7 @@ end
 function update(time_delta)
     -- if left mouse button is pressed
     if Engine.getInputActionValue(g_engine, SHOOT_ACTION) > 0 then
-        local muzzle_pos = Engine.getEntityPosition(g_universe, muzzle)
+		local muzzle_pos = Engine.getEntityPosition(g_universe, muzzle)
         local muzzle_rot = Engine.getEntityRotation(g_universe, muzzle)
         local muzzle_dir = Engine.multVecQuat({0, 0, 1}, muzzle_rot)
 
@@ -24,13 +24,13 @@ function update(time_delta)
             -- spawn particle
             local instance = Engine.instantiatePrefab(g_engine, g_universe, hit_position, prefab)
             -- remember particles so we can destroy them later
-            local particle = { entity = instance[1], life = 1 }
+            local particle = { entity = instance, life = 1 }
             table.insert(particles, particle)
         
             -- if a creature is hit
             local env = LuaScript.getEnvironment(g_scene_lua_script, hit_entity, 0)
             if env ~= nil and env.kill ~= nil then
-                env.kill()
+				env.kill()
             end
         end
     end

@@ -38,7 +38,7 @@ function update(time_delta)
     if #creatures > 9 then return end -- spawn max 10 creatures
 
     local pos = getRandomSpawnPos()
-    local instance = Engine.instantiatePrefab(g_engine, g_universe, pos, prefab)[1]
+    local instance = Engine.instantiatePrefab(g_engine, g_universe, pos, prefab)
 
     local env = LuaScript.getEnvironment(g_scene_lua_script, instance, 0)
     env.followed_entity = player

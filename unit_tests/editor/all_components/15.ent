@@ -10,6 +10,8 @@
 	1065353216
 #scale 1.000000
 	1065353216
+#parent
+	18446744073709551615
 #distance_joint
 	1541544812
 #connected_body

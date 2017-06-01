@@ -1,6 +1,0 @@
-{
-	"shader" : "pipelines/rigid/rigid.shd"
-	, "texture" : {
-		"source" : "background.dds", "srgb" : true
- }
-}

@@ -1,9 +1,0 @@
-{"shader" : "pipelines/rigid/rigid.shd",
-"texture" : {"source" : "/models/manmade/wooden_crate02/diffuse.dds",
-"srgb" : true},
-"texture" : {"source" : "/models/manmade/wooden_crate02/normal.dds"},
-"uniforms" : [],
-
-"color" : [1.00000000,
-1.00000000,
-1.00000000]}

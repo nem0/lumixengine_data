@@ -1,9 +1,0 @@
-{
-	"shader" : "pipelines/rigid/rigid.shd"
-	, "texture" : {
-		"source" : "lambertian.dds", "srgb" : true
- }
-	, "texture" : {
-		"source" : "bump-lowRes.dds"
- }
-}

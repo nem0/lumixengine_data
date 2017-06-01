@@ -1,9 +1,0 @@
-{"shader" : "pipelines/rigid/rigid.shd",
-"texture" : {"source" : "/models/plants/ferns/fiscus/fiscus01.dds",
-"srgb" : true},
-"defines" : ["ALPHA_CUTOUT"],
-"uniforms" : [],
-
-"color" : [1.00000000,
-1.00000000,
-1.00000000]}

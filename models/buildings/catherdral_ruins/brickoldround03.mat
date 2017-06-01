@@ -1,8 +1,0 @@
-{"shader" : "pipelines/rigid/rigid.shd",
-"texture" : {"source" : "/models/buildings/catherdral_ruins/3td_brickoldround_03.dds",
-"srgb" : true},
-"texture" : {"source" : "/models/buildings/catherdral_ruins/3td_brickoldround_03_nrm.dds"},
-
-"color" : [1.00000000,
-1.00000000,
-1.00000000]}

@@ -1,9 +1,0 @@
-{
-	"shader" : "pipelines/rigid/rigid.shd"
-	, "texture" : {
-		"source" : "lion.dds", "srgb" : true
- }
-	, "texture" : {
-		"source" : "lion_ddn.dds"
- }
-}

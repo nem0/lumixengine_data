@@ -1,9 +1,0 @@
-{
-	"shader" : "pipelines/rigid/rigid.shd"
-	, "texture" : {
-		"source" : "sponza_thorn_diff.dds", "srgb" : true
- }
-	, "texture" : {
-		"source" : "sponza_thorn_ddn.dds"
- }
-}

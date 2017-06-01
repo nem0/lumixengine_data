@@ -1,8 +1,0 @@
-{"shader" : "pipelines/rigid/rigid.shd",
-"texture" : {"source" : "texture3.dds", "srgb" : true},
-"texture" : {"source" : "texture2.dds"},
-"uniforms" : [],
-
-"color" : [1.00000000,
-1.00000000,
-1.00000000]}

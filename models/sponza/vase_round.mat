@@ -1,9 +1,0 @@
-{
-	"shader" : "pipelines/rigid/rigid.shd"
-	, "texture" : {
-		"source" : "vase_round.dds", "srgb" : true
- }
-	, "texture" : {
-		"source" : "vase_round_ddn.dds"
- }
-}

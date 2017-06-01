@@ -1,6 +1,0 @@
-{
-	"shader" : "pipelines/rigid/rigid.shd"
-	, "texture" : {
-		"source" : "DeadTree_tile.dds", "srgb" : true
- }
-}

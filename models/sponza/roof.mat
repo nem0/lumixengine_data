@@ -1,6 +1,0 @@
-{
-	"shader" : "pipelines/rigid/rigid.shd"
-	, "texture" : {
-		"source" : "sponza_roof_diff.dds", "srgb" : true
- }
-}

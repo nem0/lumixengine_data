@@ -1,6 +1,7 @@
 common = require "pipelines/common"
 ctx = { pipeline = this, main_framebuffer = "forward" }
 do_gamma_mapping = true
+camera = "editor"
 
 local DEFAULT_RENDER_MASK = 1
 local TRANSPARENT_RENDER_MASK = 2
@@ -144,7 +145,7 @@ function main()
 		clear(this, CLEAR_ALL, 0xffffFFFF)
 		enableRGBWrite(this)
 		setFramebuffer(this, ctx.main_framebuffer)
-		applyCamera(this, "editor")
+		applyCamera(this, camera)
 		setActiveGlobalLightUniforms(this)
 		renderDebugShapes(this)
 end
@@ -154,7 +155,7 @@ function water()
 		setPass(this, "MAIN")
 		setFramebuffer(this, ctx.main_framebuffer)
 		disableDepthWrite(this)
-		applyCamera(this, "editor")
+		applyCamera(this, camera)
 		setActiveGlobalLightUniforms(this)
 		bindFramebufferTexture(this, "g_buffer", 0, gbuffer0_uniform) -- refraction
 		bindFramebufferTexture(this, "g_buffer", 1, gbuffer1_uniform) 
@@ -170,7 +171,7 @@ function fur()
 		setFramebuffer(this, ctx.main_framebuffer)
 		disableDepthWrite(this)
 		enableBlending(this, "alpha")
-		applyCamera(this, "editor")
+		applyCamera(this, camera)
 		setActiveGlobalLightUniforms(this)
 		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
 end
@@ -182,7 +183,7 @@ function pointLight()
 		setFramebuffer(this, ctx.main_framebuffer)
 		disableDepthWrite(this)
 		enableBlending(this, "add")
-		applyCamera(this, "editor")
+		applyCamera(this, camera)
 		renderPointLightLitGeometry(this)
 end
 
@@ -222,18 +223,18 @@ end
 
 
 function render()
-	common.shadowmap(ctx, "editor", DEFAULT_RENDER_MASK + FUR_RENDER_MASK)
-	deferred("editor")
-	common.particles(ctx, "editor")
+	common.shadowmap(ctx, camera, DEFAULT_RENDER_MASK + FUR_RENDER_MASK)
+	deferred(camera)
+	common.particles(ctx, camera)
 
-	doPostprocess(this, _ENV, "pre_transparent", "editor")
+	doPostprocess(this, _ENV, "pre_transparent", camera)
 
 	water()
 	fur()
 
 	renderModels(this, ALL_RENDER_MASK)
 	
-	doPostprocess(this, _ENV, "main", "editor")
+	doPostprocess(this, _ENV, "main", camera)
 	
 	if do_gamma_mapping then
 		newView(this, "SRGB")

@@ -117,7 +117,7 @@ function module.init(ctx)
 	ctx.blur_material = Engine.loadResource(g_engine, "pipelines/common/blur.mat", "material")
 	ctx.downsample_material = Engine.loadResource(g_engine, "pipelines/common/downsample.mat", "material")
 	ctx.depth_buffer_uniform = createUniform(ctx.pipeline, "u_depthBuffer")
-	ctx.multiplier_uniform = createUniform(ctx.pipeline, "u_multiplier")
+	ctx.multiplier_uniform = createVec4ArrayUniform(ctx.pipeline, "u_multiplier", 1)
 end
 
 

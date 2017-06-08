@@ -97,6 +97,7 @@ function deferred(camera_slot)
 		setPass(this, "MAIN")
 		setFramebuffer(this, ctx.main_framebuffer)
 		applyCamera(this, camera_slot)
+		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
 		
 		setActiveGlobalLightUniforms(this)
 		bindFramebufferTexture(this, "g_buffer", 0, gbuffer0_uniform)

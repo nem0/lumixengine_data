@@ -10,23 +10,23 @@ end
 
 local different_files = 0
 for key, value in pairs(tests) do
-	App.frame(App.instance)
-	App.frame(App.instance)
-	App.loadUniverse(App.instance, "unit_tests/render_tests/"..value[1]..".unv")
+	App.frame()
+	App.frame()
+	App.loadUniverse("unit_tests/render_tests/"..value[1]..".unv")
 	waitForLoad()
-	App.frame(App.instance)
+	App.frame()
 	waitForLoad()
 
-	App.frame(App.instance)
-	App.frame(App.instance)
-	App.frame(App.instance)
+	App.frame()
+	App.frame()
+	App.frame()
 	local out_tga = "unit_tests/render_tests/"..value[1].."_res.tga";
 	local template_tga = "unit_tests/render_tests/"..value[1]..".tga"
 	Renderer.makeScreenshot(g_scene_renderer, out_tga)
-	App.frame(App.instance)
-	App.frame(App.instance)
-	App.frame(App.instance)
-	App.frame(App.instance)
+	App.frame()
+	App.frame()
+	App.frame()
+	App.frame()
 	dif = Renderer.compareTGA(g_scene_renderer, out_tga, template_tga, value[2], true)
 	local log_msg = "Universe unit_tests/render_tests/" .. value[1] .. ".unv => difference " .. tostring(dif)
 	if dif > 5000 then
@@ -35,8 +35,8 @@ for key, value in pairs(tests) do
 	else
 		Engine.logInfo(log_msg)
 	end
-	App.frame(App.instance)
+	App.frame()
 end
 
-App.exit(App.instance, different_files)
+App.exit(different_files)
 	

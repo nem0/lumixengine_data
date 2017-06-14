@@ -38,8 +38,8 @@ function initPostprocess(pipeline, env)
 	pipeline_env = env
 	env.ctx.ssao_material = Engine.loadResource(g_engine, "pipelines/ssao/ssao.mat", "material")
 	env.ctx.normal_buffer_uniform = createUniform(pipeline, "u_normal_buffer")
-	env.ctx.ssao_intensity_uniform = createUniform(pipeline, "u_intensity");
-	env.ctx.ssao_radius_uniform = createUniform(pipeline, "u_radius")
+	env.ctx.ssao_intensity_uniform = createVec4ArrayUniform(pipeline, "u_intensity", 1);
+	env.ctx.ssao_radius_uniform = createVec4ArrayUniform(pipeline, "u_radius", 1)
 	
 	addFramebuffer(pipeline,  "SSAO", {
 		width = 512,

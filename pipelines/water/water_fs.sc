@@ -143,20 +143,21 @@ void main()
 	{
 		wnormal = texture2D(u_gbuffer1, screen_uv.xy * 0.5 + 0.5).xyz * 2 - 1;	
 		wnormal = mix(vec3(0, 1, 0), wnormal, normal_strength);
+		wnormal = normalize(wnormal);
 	}
 	
 	vec3 refl_color = getReflectionColor(v_view, wnormal);
 	vec3 refr_color = getRefractionColor(v_wpos, v_view, wnormal, wave);
 	
 	vec3 halfvec = normalize(mix(-u_lightDirFov.xyz, normalize(v_view), 0.5));
-	float spec_strength = pow(dot(halfvec, wnormal), spec_power);
+	float spec_strength = pow(max(0.0, dot(halfvec, wnormal)), spec_power);
 	vec3 spec_color = u_specColor.rgb * spec_strength;
 	
 	float fresnel = eta + (1.0 - eta) * pow(max(0.0, 1.0 - dot(normalize(v_view), wnormal)), fresnel_power);
 
 	fresnel *= saturate((depth_diff - wave)*10); 
 	
-	vec3 color = mix(refr_color, refl_color, fresnel);
+	vec3 color = mix(refr_color, refl_color, saturate(fresnel));
 	#ifdef FOAM_TEXTURE
 		vec3 foam = texture2D(u_texFoam, v_texcoord0 * texture_scale * FOAM_TEXTURE_SCALE).rgb;
 		color = color + foam * saturate(FOAM_DEPTH-abs(FOAM_DEPTH - depth_diff * FOAM_WIDTH)) * (1/FOAM_DEPTH);

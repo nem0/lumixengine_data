@@ -269,12 +269,13 @@ float directionalLightShadow(sampler2D shadowmap, mat4 shadowmap_matrices[4], ve
 		return 1.0;
 
 	BEGIN_CONST_ARRAY(float, 5, offsets) 0.0000009, 0.000005, 0.00001, 0.00005, -1.0 END_CONST_ARRAY; // for distances 6, 14, 40, 100
+	BEGIN_CONST_ARRAY(float, 5, mults) 15000, 7500, 5000, 500, -1 END_CONST_ARRAY; 
 	float nl_tan = tan(acos(ndotl));
 	float bias = clamp(offsets[split_index] * nl_tan, 0.0, 0.1); 
 	float next_bias = clamp(offsets[split_index + 1] * nl_tan, 0.0, 0.1); 
 
-	float v1 = noCheckESM(shadowmap, shadow_subcoords[0], shadow_coord[split_index].z - bias, 15000.0);
-	float v2 = split_index == 3 ? 1.0 : noCheckESM(shadowmap, shadow_subcoords[1], shadow_coord[split_index + 1].z - next_bias, 15000.0);
+	float v1 = noCheckESM(shadowmap, shadow_subcoords[0], shadow_coord[split_index].z - bias, (1 - shadow_coord[split_index].z) * mults[split_index]);
+	float v2 = split_index == 3 ? 1.0 : noCheckESM(shadowmap, shadow_subcoords[1], shadow_coord[split_index + 1].z - next_bias, (1 - shadow_coord[split_index+1].z) * mults[split_index + 1]);
 	return mix(v1, v2, weight);
 }
 

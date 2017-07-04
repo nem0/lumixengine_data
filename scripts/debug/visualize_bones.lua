@@ -1,12 +1,13 @@
 local is_enabled = false
+local RENDERABLE_TYPE = Engine.getComponentType("renderable") 
 
 function onGUI()
 	local changed
 	changed, is_enabled = ImGui.Checkbox("Visualize", is_enabled)
 	
 	if is_enabled then
-		local renderable = Renderer.getRenderableComponent(g_scene_renderer, this)
-		local model = Renderer.getRenderableModel(g_scene_renderer, renderable)
+		local renderable = Engine.getComponent(g_universe, this, RENDERABLE_TYPE)
+		local model = Renderer.getModelInstanceModel(g_scene_renderer, renderable)
 		local bone_count = Model.getBoneCount(model)
 		for i = 0, bone_count-1 do
 			local pos = Model.getBonePosition(model, i)

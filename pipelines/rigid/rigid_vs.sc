@@ -2,7 +2,7 @@
 	$input a_position, a_normal, a_tangent, a_texcoord0, a_weight, a_indices
 	$output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_common2
 
-	uniform mat4 u_boneMatrices[128];
+	uniform mat4 u_boneMatrices[196];
 #else
 	$input a_position, a_normal, a_tangent, a_texcoord0, i_data0, i_data1, i_data2, i_data3
 	#ifdef BUMP_TEXTURE

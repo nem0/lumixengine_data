@@ -128,11 +128,16 @@ vec2 lit(vec3 light_dir, vec3 normal, vec3 view_dir, float shininess)
 float getFogFactor(vec3 camera_wpos, float fog_density, vec3 fragment_wpos, vec4 fog_params) 
 { 
 	vec3 v = fragment_wpos - camera_wpos;
-	float to_top = max(0.0, camera_wpos.y - (fog_params.x + fog_params.y));
-	camera_wpos += v * to_top / -v.y;
+	float fog_top = fog_params.x + fog_params.y;
+	float to_top = max(0.0, camera_wpos.y - fog_top);
+	float frag_to_top = max(0.0, fragment_wpos.y - fog_top);
 
-	float frag_to_top = max(0.0, fragment_wpos.y - (fog_params.x + fog_params.y));
-	fragment_wpos += v * frag_to_top / -v.y;
+	if(v.y != 0.0)
+	{
+		float inv_vy = -1.0 / v.y;
+		fragment_wpos += v * frag_to_top * inv_vy;
+		camera_wpos += v * to_top * inv_vy;
+	}
 	
 	float avg_y = (fragment_wpos.y + camera_wpos.y) * 0.5;
 	float avg_density = fog_density * clamp(1.0 - (avg_y - fog_params.x) / fog_params.y, 0, 1);

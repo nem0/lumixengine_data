@@ -1,4 +1,4 @@
-$input v_wpos, v_view, v_texcoord0, v_texcoord1, v_common, v_common2 // in...
+$input v_wpos, v_view, v_texcoord0, v_texcoord1, v_common2 // in...
 
 #include "common.sh"
 
@@ -27,14 +27,14 @@ void main()
 	#else
 		vec2 detail_uv = v_texcoord0.xy * texture_scale.x;
 
-		vec2 uv = v_texcoord1;
+		vec2 hm_uv = v_texcoord1;
 		float tex_size = u_terrainParams.x;
 		vec3 off = vec3(-0.5 / tex_size, 0.0, 0.5 / tex_size);
 		
-		float s01 = texture2D(u_texHeightmap, uv + off.xy).x;
-		float s21 = texture2D(u_texHeightmap, uv + off.zy).x;
-		float s10 = texture2D(u_texHeightmap, uv + off.yx).x;
-		float s12 = texture2D(u_texHeightmap, uv + off.yz).x;
+		float s01 = texture2D(u_texHeightmap, hm_uv + off.xy).x;
+		float s21 = texture2D(u_texHeightmap, hm_uv + off.zy).x;
+		float s10 = texture2D(u_texHeightmap, hm_uv + off.yx).x;
+		float s12 = texture2D(u_texHeightmap, hm_uv + off.yz).x;
 		vec3 va = normalize(vec3(1.0, (s21-s01) * u_terrainScale.y, 0.0));
 		vec3 vb = normalize(vec3(0.0, (s12-s10) * u_terrainScale.y, 1.0));
 		#if BGFX_SHADER_LANGUAGE_HLSL
@@ -54,20 +54,15 @@ void main()
 		tbn = transpose(tbn);
 
 		float splatmap_size = u_terrainParams.z;
-		float half_texel = 0.5 / splatmap_size;
 					
-		float u = v_texcoord1.x * splatmap_size - 1.0;
-		float v = v_texcoord1.y * splatmap_size - 1.0;
-		float x = floor(u);
-		float y = floor(v);
-		float u_ratio = u - x;
-		float v_ratio = v - y;
-		float u_opposite = 1.0 - u_ratio;
-		float v_opposite = 1.0 - v_ratio;
-		vec4 splat00 = texture2D(u_texSplatmap, vec2(x/splatmap_size, y/splatmap_size)).rgba;
-		vec4 splat01 = texture2D(u_texSplatmap, vec2(x/splatmap_size, (y+1.0)/splatmap_size)).rgba;
-		vec4 splat10 = texture2D(u_texSplatmap, vec2((x+1.0)/splatmap_size, y/splatmap_size)).rgba;
-		vec4 splat11 = texture2D(u_texSplatmap, vec2((x+1.0)/splatmap_size, (y+1.0)/splatmap_size)).rgba;
+		vec2 uv = v_texcoord1 * splatmap_size - 1.0;
+		vec2 xy = floor(uv);
+		vec2 uv_ratio = uv - xy;
+		vec2 uv_opposite = 1.0 - uv_ratio;
+		vec4 splat00 = texture2D(u_texSplatmap, vec2(xy.x, xy.y) / splatmap_size).rgba;
+		vec4 splat01 = texture2D(u_texSplatmap, vec2(xy.x, xy.y + 1.0) / splatmap_size).rgba;
+		vec4 splat10 = texture2D(u_texSplatmap, vec2(xy.x + 1.0, xy.y) / splatmap_size).rgba;
+		vec4 splat11 = texture2D(u_texSplatmap, vec2(xy.x + 1.0, xy.y+1.0) / splatmap_size).rgba;
 	
 		vec4 c00 = texture2DArray(u_texColor, vec3(detail_uv, splat00.x * 256.0));
 		vec4 c01 = texture2DArray(u_texColor, vec3(detail_uv, splat01.x * 256.0));
@@ -75,10 +70,10 @@ void main()
 		vec4 c11 = texture2DArray(u_texColor, vec3(detail_uv, splat11.x * 256.0));
 
 		vec4 bicoef = vec4(
-			u_opposite * v_opposite,
-			u_opposite * v_ratio,
-			u_ratio * v_opposite,
-			u_ratio * v_ratio
+			uv_opposite.x * uv_opposite.y,
+			uv_opposite.x * uv_ratio.y,
+			uv_ratio.x * uv_opposite.y,
+			uv_ratio.x * uv_ratio.y
 		);
 			
 		float a00 = (splat00.y * c00.a) * bicoef.x;
@@ -120,8 +115,8 @@ void main()
 		
 		float dist = length(v_view);
 		float t = (dist - detail_texture_distance.x) / detail_texture_distance.x;
-		color = mix(color, texture2D(u_texSatellitemap, v_texcoord1), clamp(t, 0.0, 1.0));
-		wnormal = mix(wnormal, terrain_normal, clamp(t, 0.0, 1.0));
+		color = mix(color, texture2D(u_texSatellitemap, v_texcoord1), saturate(t));
+		wnormal = mix(wnormal, terrain_normal, saturate(t));
 
 		gl_FragData[0].rgb = color.rgb;
 		gl_FragData[0].w = u_roughnessMetallic.x;

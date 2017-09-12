@@ -10,3 +10,4 @@ imgui.ini
 error.log
 studio.ini
 universes/__test_result__*
+.lumix/

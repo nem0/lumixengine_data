@@ -26,6 +26,8 @@
 	0
 #dynamic_type
 	0
+#trigger
+	0
 #radius 1.000000
 	1065353216
 #cmp_end

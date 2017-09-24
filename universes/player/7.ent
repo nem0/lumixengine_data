@@ -1,13 +1,13 @@
 #name
 	""
-#transform (-2.933720, 1.981334, 0.038023)  (0.000000, 0.000000, 0.000000, 1.000000)
-	3225141779
-	1073585243
-	1025228384
+#transform (-2.923421, 0.096493, -0.268471)  (0.000000, -1.000000, 0.000000, -0.000000)
+	3225098580
+	1036361232
+	3196679430
 	0
+	3212836864
 	0
-	0
-	1065353216
+	3007036718
 #scale 1.000000
 	1065353216
 #parent
@@ -15,7 +15,7 @@
 #renderable
 	1512583253
 #source
-	"models/fps_hands/fps arms rig 1 test.msh"
+	"models/manmade/weapon/untitled.msh"
 #flags
 	0
 #custom_materials
@@ -27,6 +27,6 @@
 #start_time 0.000000
 	0
 #animation
-	"models/fps_hands/fps arms rig 1 test.ani"
+	"models/manmade/weapon/untitled.ani"
 #cmp_end
 	0

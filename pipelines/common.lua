@@ -71,18 +71,18 @@ function module.shadowmapDebug(ctx, x, y)
 	end
 end
 
-function module.initShadowmap(ctx)
+function module.initShadowmap(ctx, shadowmap_size)
 	addFramebuffer(ctx.pipeline, "shadowmap_blur", {
-		width = 2048,
-		height = 2048,
+		width = shadowmap_size,
+		height = shadowmap_size,
 		renderbuffers = {
 			{ format = "r32f" }
 		}
 	})
 
 	addFramebuffer(ctx.pipeline, "shadowmap", {
-		width = 2048,
-		height = 2048,
+		width = shadowmap_size,
+		height = shadowmap_size,
 		renderbuffers = {
 			{format="r32f"},
 			{format = "depth24"}

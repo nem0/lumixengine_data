@@ -21,6 +21,23 @@ local render_debug_deferred =
  { label = "Depth", enabled = false, fullscreen = false, mask = {1, 0, 0, 0}, g_buffer_idx = 3},
 }
 
+local blur_test_size = 4096
+
+addFramebuffer(this, "blur_test_out", {
+	width = blur_test_size,
+	height = blur_test_size,
+	renderbuffers = {
+		{ format = "rgba8" },
+	}
+})
+
+addFramebuffer(this, "blur_test_in", {
+	width = blur_test_size,
+	height = blur_test_size,
+	renderbuffers = {
+		{ format = "rgba8" },
+	}
+})
 
 addFramebuffer(this, "default", {
 	width = 1024,
@@ -54,7 +71,7 @@ addFramebuffer(this, "g_buffer", {
 })
   
 common.init(ctx)
-common.initShadowmap(ctx)
+common.initShadowmap(ctx, 1024)
 
 
 local texture_uniform = createUniform(this, "u_texture")
@@ -230,6 +247,14 @@ function render()
 		newView(ctx.pipeline, "a")
 			clear(this, CLEAR_ALL, 0x00000000)
 			setPass(this, "MAIN")
+--[[
+		newView(ctx.pipeline, "blur_test")
+			setPass(ctx.pipeline, "BLUR_H")
+			setFramebuffer(ctx.pipeline, "blur_test_out")
+			disableDepthWrite(ctx.pipeline)
+			bindFramebufferTexture(ctx.pipeline, "blur_test_in", 0, ctx.shadowmap_uniform)
+			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material)
+			enableDepthWrite(ctx.pipeline)]]--
 		return
 	end
 

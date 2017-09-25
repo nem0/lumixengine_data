@@ -44,7 +44,7 @@ addFramebuffer(this, "g_buffer", {
 })
   
 common.init(ctx)
-common.initShadowmap(ctx)
+common.initShadowmap(ctx, 2048)
 
 
 local texture_uniform = createUniform(this, "u_texture")

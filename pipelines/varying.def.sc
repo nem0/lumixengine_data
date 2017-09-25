@@ -1,3 +1,10 @@
+vec4 v_tc0 	: TEXCOORD0 = vec4(0.0, 0.0, 0.0, 0.0);
+vec4 v_tc1 	: TEXCOORD1 = vec4(0.0, 0.0, 0.0, 0.0);
+vec4 v_tc2 	: TEXCOORD2 = vec4(0.0, 0.0, 0.0, 0.0);
+vec4 v_tc3 	: TEXCOORD3 = vec4(0.0, 0.0, 0.0, 0.0);
+vec4 v_tc4 	: TEXCOORD4 = vec4(0.0, 0.0, 0.0, 0.0);
+
+
 vec2 v_texcoord0 	: TEXCOORD0 = vec2(0.0, 0.0);
 vec3 v_wpos      		: TEXCOORD1 = vec3(0.0, 0.0, 0.0);
 vec3 v_view      		: TEXCOORD2 = vec3(0.0, 0.0, 0.0);

@@ -29,20 +29,20 @@ void main()
 		);
 	#else
 		v_tc1 = vec4(
-			a_texcoord0.x, a_texcoord0.y + 1 * u_textureSize.z,
-			a_texcoord0.x, a_texcoord0.y + 2 * u_textureSize.z
+			a_texcoord0.x, a_texcoord0.y + 1 * u_textureSize.w,
+			a_texcoord0.x, a_texcoord0.y + 2 * u_textureSize.w
 		);
 		v_tc2 = vec4(
-			a_texcoord0.x, a_texcoord0.y + 3 * u_textureSize.z, 
-			a_texcoord0.x, a_texcoord0.y + 4 * u_textureSize.z
+			a_texcoord0.x, a_texcoord0.y + 3 * u_textureSize.w, 
+			a_texcoord0.x, a_texcoord0.y + 4 * u_textureSize.w
 		);
 		v_tc3 = vec4(
-			a_texcoord0.x, a_texcoord0.y - 1 * u_textureSize.z, 
-			a_texcoord0.x, a_texcoord0.y - 2 * u_textureSize.z
+			a_texcoord0.x, a_texcoord0.y - 1 * u_textureSize.w, 
+			a_texcoord0.x, a_texcoord0.y - 2 * u_textureSize.w
 		);
 		v_tc4 = vec4(
-			a_texcoord0.x, a_texcoord0.y - 3 * u_textureSize.z, 
-			a_texcoord0.x, a_texcoord0.y - 4 * u_textureSize.z
+			a_texcoord0.x, a_texcoord0.y - 3 * u_textureSize.w, 
+			a_texcoord0.x, a_texcoord0.y - 4 * u_textureSize.w
 		);
 	#endif
 	

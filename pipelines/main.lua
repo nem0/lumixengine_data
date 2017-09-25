@@ -9,6 +9,8 @@ local WATER_RENDER_MASK = 4
 local FUR_RENDER_MASK = 8
 local ALL_RENDER_MASK = DEFAULT_RENDER_MASK + TRANSPARENT_RENDER_MASK + WATER_RENDER_MASK + FUR_RENDER_MASK
 local render_fur = true
+local render_shadowmap = true
+local disable_render = false
 local render_debug_deferred = 
 { 
  { label = "Albedo", enabled = false, fullscreen = false, mask = {1, 1, 1, 0}, g_buffer_idx = 0},
@@ -224,7 +226,16 @@ end
 
 
 function render()
-	common.shadowmap(ctx, camera, DEFAULT_RENDER_MASK + FUR_RENDER_MASK)
+	if disable_render then
+		newView(ctx.pipeline, "a")
+			clear(this, CLEAR_ALL, 0x00000000)
+			setPass(this, "MAIN")
+		return
+	end
+
+	if render_shadowmap then
+		common.shadowmap(ctx, camera, DEFAULT_RENDER_MASK + FUR_RENDER_MASK)
+	end
 	deferred(camera)
 	common.particles(ctx, camera)
 
@@ -316,6 +327,8 @@ function onGUI()
 			render_debug_deferred[3].enabled = v
 			render_debug_deferred[4].enabled = v
 		end
+		changed, disable_render = ImGui.Checkbox("Disabled rendering", disable_render)
+		changed, render_shadowmap = ImGui.Checkbox("Render shadowmap", render_shadowmap)
 		changed, common.blur_shadowmap = ImGui.Checkbox("Blur shadowmap", common.blur_shadowmap)
 		changed, common.render_gizmos = ImGui.Checkbox("Render gizmos", common.render_gizmos)
 		changed, render_fur = ImGui.Checkbox("Render fur", render_fur)

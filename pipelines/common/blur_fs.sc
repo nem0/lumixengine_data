@@ -15,15 +15,11 @@ void main()
 	#define _BLUR9_NORMALIZE (_BLUR9_WEIGHT_0+2.0*(_BLUR9_WEIGHT_1+_BLUR9_WEIGHT_2+_BLUR9_WEIGHT_3+_BLUR9_WEIGHT_4) )
 	#define BLUR9_WEIGHT(_x) (_BLUR9_WEIGHT_##_x/_BLUR9_NORMALIZE)
 
-	vec4 color = texture2D(u_texture, v_tc0.xy) * BLUR9_WEIGHT(0)
-		+ texture2D(u_texture, v_tc1.xy) * BLUR9_WEIGHT(1)
-		+ texture2D(u_texture, v_tc1.zw) * BLUR9_WEIGHT(2)
-		+ texture2D(u_texture, v_tc2.xy) * BLUR9_WEIGHT(3)
-		+ texture2D(u_texture, v_tc2.zw) * BLUR9_WEIGHT(4)
-		+ texture2D(u_texture, v_tc3.xy) * BLUR9_WEIGHT(1)
-		+ texture2D(u_texture, v_tc3.zw) * BLUR9_WEIGHT(2)
-		+ texture2D(u_texture, v_tc4.xy) * BLUR9_WEIGHT(3)
-		+ texture2D(u_texture, v_tc4.zw) * BLUR9_WEIGHT(4);
+	vec4 color = texture2D(u_texture, v_tc0.xy) * 0.2270270270
+		+ texture2D(u_texture, v_tc1.xy) * 0.3162162162
+		+ texture2D(u_texture, v_tc1.zw) * 0.0702702703
+		+ texture2D(u_texture, v_tc2.xy) * 0.3162162162
+		+ texture2D(u_texture, v_tc2.zw) * 0.0702702703;
 		
 	gl_FragColor = color;
 }

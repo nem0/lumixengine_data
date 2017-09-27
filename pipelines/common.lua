@@ -76,7 +76,7 @@ function module.initShadowmap(ctx, shadowmap_size)
 		width = shadowmap_size,
 		height = shadowmap_size,
 		renderbuffers = {
-			{ format = "r32f" }
+			{ format = "r32f", min_filter = "anisotropic", mag_filter = "anisotropic" }
 		}
 	})
 
@@ -84,7 +84,7 @@ function module.initShadowmap(ctx, shadowmap_size)
 		width = shadowmap_size,
 		height = shadowmap_size,
 		renderbuffers = {
-			{format="r32f"},
+			{format="r32f", min_filter = "anisotropic", mag_filter = "anisotropic" },
 			{format = "depth24"}
 		}
 	})

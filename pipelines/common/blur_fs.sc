@@ -1,4 +1,4 @@
-$input v_tc0, v_tc1, v_tc2, v_tc3, v_tc4
+$input v_tc0, v_tc1, v_tc2
 
 #include "common.sh"
 

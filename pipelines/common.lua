@@ -76,7 +76,7 @@ function module.initShadowmap(ctx, shadowmap_size)
 		width = shadowmap_size,
 		height = shadowmap_size,
 		renderbuffers = {
-			{ format = "r32f", min_filter = "anisotropic", mag_filter = "anisotropic" }
+			{ format = "r32f" }
 		}
 	})
 
@@ -84,7 +84,7 @@ function module.initShadowmap(ctx, shadowmap_size)
 		width = shadowmap_size,
 		height = shadowmap_size,
 		renderbuffers = {
-			{format="r32f", min_filter = "anisotropic", mag_filter = "anisotropic" },
+			{format="r32f" },
 			{format = "depth24"}
 		}
 	})
@@ -153,7 +153,7 @@ function module.shadowmap(ctx, camera_slot, layer_mask)
 			setPass(ctx.pipeline, "BLUR_H")
 			setFramebuffer(ctx.pipeline, "shadowmap_blur")
 			disableDepthWrite(ctx.pipeline)
-			bindFramebufferTexture(ctx.pipeline, "shadowmap", 0, ctx.shadowmap_uniform)
+			bindFramebufferTexture(ctx.pipeline, "shadowmap", 0, ctx.shadowmap_uniform, TEXTURE_MAG_ANISOTROPIC | TEXTURE_MIN_ANISOTROPIC)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material)
 			enableDepthWrite(ctx.pipeline)
 
@@ -161,7 +161,7 @@ function module.shadowmap(ctx, camera_slot, layer_mask)
 			setPass(ctx.pipeline, "BLUR_V")
 			setFramebuffer(ctx.pipeline, "shadowmap")
 			disableDepthWrite(ctx.pipeline)
-			bindFramebufferTexture(ctx.pipeline, "shadowmap_blur", 0, ctx.shadowmap_uniform)
+			bindFramebufferTexture(ctx.pipeline, "shadowmap_blur", 0, ctx.shadowmap_uniform, TEXTURE_MAG_ANISOTROPIC | TEXTURE_MIN_ANISOTROPIC)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material);
 			enableDepthWrite(ctx.pipeline)
 	end

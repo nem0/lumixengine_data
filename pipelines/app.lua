@@ -1,6 +1,5 @@
 common = require "pipelines/common"
 ctx = { pipeline = this, main_framebuffer = "forward" }
-do_gamma_mapping = true
 
 local DEFAULT_RENDER_MASK = 1
 local TRANSPARENT_RENDER_MASK = 2
@@ -163,14 +162,12 @@ function render()
 	
 	doPostprocess(this, _ENV, "main", "main")
 	
-	if do_gamma_mapping then
-		newView(this, "SRGB")
-			clear(this, CLEAR_ALL, 0x00000000)
-			setPass(this, "MAIN")
-			setFramebuffer(this, "default")
-			bindFramebufferTexture(this, "forward", 0, texture_uniform)
-			drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
-	end
+	newView(this, "SRGB")
+		clear(this, CLEAR_ALL, 0x00000000)
+		setPass(this, "MAIN")
+		setFramebuffer(this, "default")
+		bindFramebufferTexture(this, ctx.main_framebuffer, 0, texture_uniform)
+		drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
 	ingameGUI()
 
 end

@@ -185,7 +185,6 @@ void main()
 	color *= exposure.x;
 	color = tonemap(color);
 	color = vignette(v_texcoord0, color);
-	color = toGamma(color);
 	color = filmGrain(v_texcoord0, color);
 	
 	gl_FragColor =  vec4(color, 1.0f);

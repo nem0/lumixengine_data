@@ -1,6 +1,10 @@
 common = require "pipelines/common"
-ctx = { pipeline = this, main_framebuffer = "forward" }
-camera = "editor"
+ctx = { pipeline = this, main_framebuffer = "deferred" }
+if game_view then
+	camera = "main"
+else
+	camera = "editor"
+end
 
 local DEFAULT_RENDER_MASK = 1
 local TRANSPARENT_RENDER_MASK = 2
@@ -29,7 +33,7 @@ addFramebuffer(this, "default", {
 	}
 })
 
-addFramebuffer(this, "forward", {
+addFramebuffer(this, "deferred", {
 	width = 1024,
 	height = 1024,
 	size_ratio = {1, 1},
@@ -69,7 +73,7 @@ local gamma_mapping_material = Engine.loadResource(g_engine, "pipelines/common/g
 
 
 function deferred(camera_slot)
-	deferred_view = newView(this, "deferred", DEFAULT_RENDER_MASK)
+	deferred_view = newView(this, "geometry_pass", DEFAULT_RENDER_MASK)
 		setPass(this, "DEFERRED")
 		setFramebuffer(this, "g_buffer")
 		applyCamera(this, camera_slot)
@@ -93,7 +97,7 @@ function deferred(camera_slot)
 		bindFramebufferTexture(this, ctx.main_framebuffer, 1, gbuffer_depth_uniform)
 		renderDecalsVolumes(this)
 		
-	newView(this, "main")
+	newView(this, "light_pass")
 		setPass(this, "MAIN")
 		setFramebuffer(this, ctx.main_framebuffer)
 		applyCamera(this, camera_slot)
@@ -107,19 +111,7 @@ function deferred(camera_slot)
 		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
 		drawQuad(this, 0, 0, 1, 1, pbr_material)
 		
-	newView(this, "deferred_debug_shapes")
-		setPass(this, "EDITOR")
-		setFramebuffer(this, ctx.main_framebuffer)
-		applyCamera(this, camera_slot)
-		setStencil(this, STENCIL_OP_PASS_Z_REPLACE 
-			| STENCIL_OP_FAIL_Z_KEEP 
-			| STENCIL_OP_FAIL_S_KEEP 
-			| STENCIL_TEST_ALWAYS)
-		setStencilRMask(this, 0xff)
-		setStencilRef(this, 1)
-		renderDebugShapes(this)
-		
-	newView(this, "deferred_local_light")
+	newView(this, "local_light_pass")
 		setPass(this, "MAIN")
 		setFramebuffer(this, ctx.main_framebuffer)
 		disableDepthWrite(this)
@@ -131,25 +123,20 @@ function deferred(camera_slot)
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform)
 		renderLightVolumes(this, pbr_local_light_material)
 		disableBlending(this)
-end
 
-function main()
-	main_view = newView(this, "MAIN", DEFAULT_RENDER_MASK)
+	newView(this, "deferred_debug_shapes")
+		setPass(this, "EDITOR")
+		setFramebuffer(this, ctx.main_framebuffer)
+		applyCamera(this, camera_slot)
 		setStencil(this, STENCIL_OP_PASS_Z_REPLACE 
 			| STENCIL_OP_FAIL_Z_KEEP 
 			| STENCIL_OP_FAIL_S_KEEP 
 			| STENCIL_TEST_ALWAYS)
 		setStencilRMask(this, 0xff)
 		setStencilRef(this, 1)
-		setPass(this, "MAIN")
-		enableDepthWrite(this)
-		clear(this, CLEAR_ALL, 0xffffFFFF)
-		enableRGBWrite(this)
-		setFramebuffer(this, ctx.main_framebuffer)
-		applyCamera(this, camera)
-		setActiveGlobalLightUniforms(this)
-		renderDebugShapes(this)
+		renderDebugShapes(this)	
 end
+
 
 function water()
 	water_view = newView(this, "WATER", WATER_RENDER_MASK)
@@ -248,19 +235,21 @@ function render()
 	
 	newView(this, "final_copy2")
 		setPass(this, "MAIN")
-		clear(this, CLEAR_ALL, 0x00000000)
+		clear(this, CLEAR_DEPTH, 0x00000000)
 		setFramebuffer(this, "default")
 	newView(this, "final_copy")
 		copyRenderbuffer(this, ctx.main_framebuffer, 0, "default", 0)
+		copyRenderbuffer(this, ctx.main_framebuffer, 1, "default", 1)
 
-	common.renderEditorIcons(ctx)
-	common.renderGizmo(ctx)
-	renderDebug(ctx)
+	if scene_view then
+		common.renderEditorIcons(ctx)
+		common.renderGizmo(ctx)
+		renderDebug(ctx)
+	end
 end
 
 local volume = 1
 local paused = false
-
 local timescale = 1
 
 function onGUI()

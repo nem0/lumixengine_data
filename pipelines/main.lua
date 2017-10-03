@@ -246,12 +246,12 @@ function render()
 	
 	doPostprocess(this, _ENV, "main", camera)
 	
-	newView(this, "final_copy")
-		clear(this, CLEAR_ALL, 0x00000000)
+	newView(this, "final_copy2")
 		setPass(this, "MAIN")
+		clear(this, CLEAR_ALL, 0x00000000)
 		setFramebuffer(this, "default")
-		bindFramebufferTexture(this, ctx.main_framebuffer, 0, texture_uniform)
-		drawQuad(this, 0, 0, 1, 1, screen_space_material)
+	newView(this, "final_copy")
+		copyRenderbuffer(this, ctx.main_framebuffer, 0, "default", 0)
 
 	common.renderEditorIcons(ctx)
 	common.renderGizmo(ctx)

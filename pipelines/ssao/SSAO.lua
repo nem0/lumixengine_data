@@ -17,11 +17,10 @@ end
 
 function renderSSAODDebug(pipeline, env)
 	if SSAO_debug then
-		newView(pipeline, "ssao_debug")
+		newView(pipeline, "ssao_debug", env.ctx.main_framebuffer)
 			setPass(pipeline, "MAIN")
 			disableBlending(pipeline)
 			disableDepthWrite(pipeline)
-			setFramebuffer(pipeline, env.ctx.main_framebuffer)
 			bindFramebufferTexture(pipeline, "SSAO", 0, env.ctx.texture_uniform)
 			if SSAO_debug_fullscreen then
 				drawQuad(pipeline, 0, 0, 1, 1, env.ctx.screen_space_material)
@@ -72,11 +71,10 @@ end
 function postprocess(pipeline, env)
 	if not enabled then return end
 	
-	newView(pipeline, "ssao")
+	newView(pipeline, "ssao", "SSAO")
 		setPass(pipeline, "MAIN")
 		disableBlending(pipeline)
 		disableDepthWrite(pipeline)
-		setFramebuffer(pipeline, "SSAO")
 		bindFramebufferTexture(pipeline, "g_buffer", 1, env.ctx.normal_buffer_uniform)
 		bindFramebufferTexture(pipeline, env.ctx.main_framebuffer, 1, env.ctx.texture_uniform)
 		setUniform(pipeline, env.ctx.ssao_radius_uniform, {{radius, 0, 0, 0}})
@@ -84,27 +82,24 @@ function postprocess(pipeline, env)
 		drawQuad(pipeline, 0, 0, 1, 1, env.ctx.ssao_material)
 
 	if blur_enabled then
-		newView(pipeline, "ssao_blur_h")
+		newView(pipeline, "ssao_blur_h", "blur_rgba8")
 			setPass(pipeline, "BLUR_H")
-			setFramebuffer(pipeline, "blur_rgba8")
 			disableDepthWrite(pipeline)
 			bindFramebufferTexture(pipeline, "SSAO", 0, env.ctx.texture_uniform)
 			drawQuad(pipeline, 0, 0, 1, 1, env.ctx.blur_material)
 			enableDepthWrite(pipeline)
 		
-		newView(pipeline, "ssao_blur_v")
+		newView(pipeline, "ssao_blur_v", "SSAO")
 			setPass(pipeline, "BLUR_V")
-			setFramebuffer(pipeline, "SSAO")
 			disableDepthWrite(pipeline)
 			bindFramebufferTexture(pipeline, "blur_rgba8", 0, env.ctx.texture_uniform)
 			drawQuad(pipeline, 0, 0, 1, 1, env.ctx.blur_material)
 			enableDepthWrite(pipeline)		
 			
-		newView(pipeline, "ssao_postprocess")
+		newView(pipeline, "ssao_postprocess", env.ctx.main_framebuffer)
 			setPass(pipeline, "MAIN")
 			enableBlending(pipeline, "multiply")
 			disableDepthWrite(pipeline)
-			setFramebuffer(pipeline, env.ctx.main_framebuffer)
 			bindFramebufferTexture(pipeline, "SSAO", 0, env.ctx.texture_uniform)
 			drawQuad(pipeline, 0, 0, 1, 1, env.ctx.screen_space_material)
 	end

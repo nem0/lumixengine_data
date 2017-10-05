@@ -33,10 +33,9 @@ end
 
 function module.renderEditorIcons(ctx)
 	if module.render_gizmos then
-		newView(ctx.pipeline, "editor", 0xFFFFffffFFFFffff)
+		newView(ctx.pipeline, "editor", "default", 0xFFFFffffFFFFffff)
 			bindFramebufferTexture(ctx.pipeline, ctx.main_framebuffer, 1, ctx.depth_buffer_uniform)
 			setPass(ctx.pipeline, "EDITOR")
-			setFramebuffer(ctx.pipeline, "default")
 			enableDepthWrite(ctx.pipeline)
 			enableBlending(ctx.pipeline, "alpha")
 			applyCamera(ctx.pipeline, "editor")
@@ -46,9 +45,8 @@ end
 
 function module.renderGizmo(ctx)
 	if module.render_gizmos then
-		newView(ctx.pipeline, "gizmo")
+		newView(ctx.pipeline, "gizmo", "default")
 			setPass(ctx.pipeline, "EDITOR")
-			setFramebuffer(ctx.pipeline, "default")
 			applyCamera(ctx.pipeline, "editor")
 			renderGizmos(ctx.pipeline)
 	end
@@ -56,16 +54,14 @@ end
 
 function module.shadowmapDebug(ctx, x, y)
 	if module.render_shadowmap_debug then
-		newView(ctx.pipeline, "shadowmap_debug")
+		newView(ctx.pipeline, "shadowmap_debug", "default")
 			setPass(ctx.pipeline, "MAIN")
-			setFramebuffer(ctx.pipeline, "default")
 			bindFramebufferTexture(ctx.pipeline, "shadowmap", 0, ctx.texture_uniform)
 			drawQuad(ctx.pipeline, 0.01 + x, 0.01 + y, 0.23, 0.23, ctx.screen_space_material)
 	end
 	if module.render_shadowmap_debug_fullsize then
-		newView(ctx.pipeline, "shadowmap_debug_fullsize")
-			setPass(ctx.pipeline, "MAIN")
-			setFramebuffer(ctx.pipeline, "default")
+		newView(ctx.pipeline, "shadowmap_debug_fullsize", "default")
+			setPass(ctx.pipeline, "MAIN", "default")
 			bindFramebufferTexture(ctx.pipeline, "shadowmap", 0, ctx.texture_uniform)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.screen_space_material)
 	end
@@ -122,44 +118,38 @@ end
 
 
 function module.shadowmap(ctx, camera_slot, layer_mask)
-	newView(ctx.pipeline, "shadow0", layer_mask)
+	newView(ctx.pipeline, "shadow0", "shadowmap", layer_mask)
 		setPass(ctx.pipeline, "SHADOW")
 		applyCamera(ctx.pipeline, camera_slot)
-		setFramebuffer(ctx.pipeline, "shadowmap")
 		renderShadowmap(ctx.pipeline, 0) 
 
-	newView(ctx.pipeline, "shadow1", layer_mask)
+	newView(ctx.pipeline, "shadow1", "shadowmap", layer_mask)
 		setPass(ctx.pipeline, "SHADOW")         
 		applyCamera(ctx.pipeline, camera_slot)
-		setFramebuffer(ctx.pipeline, "shadowmap")
 		renderShadowmap(ctx.pipeline, 1) 
 
-	newView(ctx.pipeline, "shadow2", layer_mask)
+	newView(ctx.pipeline, "shadow2", "shadowmap", layer_mask)
 		setPass(ctx.pipeline, "SHADOW")         
 		applyCamera(ctx.pipeline, camera_slot)
-		setFramebuffer(ctx.pipeline, "shadowmap")
 		renderShadowmap(ctx.pipeline, 2) 
 
-	newView(ctx.pipeline, "shadow3", layer_mask)
+	newView(ctx.pipeline, "shadow3", "shadowmap", layer_mask)
 		setPass(ctx.pipeline, "SHADOW")         
 		applyCamera(ctx.pipeline, camera_slot)
-		setFramebuffer(ctx.pipeline, "shadowmap")
 		renderShadowmap(ctx.pipeline, 3) 
 		
 		renderLocalLightsShadowmaps(ctx.pipeline, camera_slot, { "point_light_shadowmap", "point_light2_shadowmap" })
 		
 	if module.blur_shadowmap then
-		newView(ctx.pipeline, "blur_shadowmap_h")
+		newView(ctx.pipeline, "blur_shadowmap_h", "shadowmap_blur")
 			setPass(ctx.pipeline, "BLUR_H")
-			setFramebuffer(ctx.pipeline, "shadowmap_blur")
 			disableDepthWrite(ctx.pipeline)
 			bindFramebufferTexture(ctx.pipeline, "shadowmap", 0, ctx.shadowmap_uniform, TEXTURE_MAG_ANISOTROPIC | TEXTURE_MIN_ANISOTROPIC)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material)
 			enableDepthWrite(ctx.pipeline)
 
-		newView(ctx.pipeline, "blur_shadowmap_v")
+		newView(ctx.pipeline, "blur_shadowmap_v", "shadowmap")
 			setPass(ctx.pipeline, "BLUR_V")
-			setFramebuffer(ctx.pipeline, "shadowmap")
 			disableDepthWrite(ctx.pipeline)
 			bindFramebufferTexture(ctx.pipeline, "shadowmap_blur", 0, ctx.shadowmap_uniform, TEXTURE_MAG_ANISOTROPIC | TEXTURE_MIN_ANISOTROPIC)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material);
@@ -169,7 +159,7 @@ end
 
 function module.particles(ctx, camera_slot)
 	if module.particles_enabled then
-		newView(ctx.pipeline, "particles")
+		newView(ctx.pipeline, "particles", ctx.main_framebuffer)
 			setPass(ctx.pipeline, "PARTICLES")
 			disableDepthWrite(ctx.pipeline)
 			applyCamera(ctx.pipeline, camera_slot)

@@ -158,32 +158,28 @@ function initHDR(ctx)
 end
 
 function hdr(ctx, camera_slot)
-	newView(ctx.pipeline, "hdr_luminance")
+	newView(ctx.pipeline, "hdr_luminance", "lum128")
 		setPass(ctx.pipeline, "HDR_LUMINANCE")
-		setFramebuffer(ctx.pipeline, "lum128")
 		disableDepthWrite(ctx.pipeline)
 		disableBlending(ctx.pipeline)
 		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[128])
 		bindFramebufferTexture(ctx.pipeline, "hdr", 0, ctx.hdr_buffer_uniform)
 		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
 	
-	newView(ctx.pipeline, "hdr_avg_luminance")
+	newView(ctx.pipeline, "hdr_avg_luminance", "lum64")
 		setPass(ctx.pipeline, "HDR_AVG_LUMINANCE")
-		setFramebuffer(ctx.pipeline, "lum64")
 		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[64])
 		bindFramebufferTexture(ctx.pipeline, "lum128", 0, ctx.hdr_buffer_uniform)
 		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
 
-	newView(ctx.pipeline, "lum16")
+	newView(ctx.pipeline, "lum16", "lum16")
 		setPass(ctx.pipeline, "HDR_AVG_LUMINANCE")
-		setFramebuffer(ctx.pipeline, "lum16")
 		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[16])
 		bindFramebufferTexture(ctx.pipeline, "lum64", 0, ctx.hdr_buffer_uniform)
 		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
 	
-	newView(ctx.pipeline, "lum4")
+	newView(ctx.pipeline, "lum4", "lum4")
 		setPass(ctx.pipeline, "HDR_AVG_LUMINANCE")
-		setFramebuffer(ctx.pipeline, "lum4")
 		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[4])
 		bindFramebufferTexture(ctx.pipeline, "lum16", 0, ctx.hdr_buffer_uniform)
 		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
@@ -196,9 +192,8 @@ function hdr(ctx, camera_slot)
 		ctx.current_lum1 = "lum1a" 
 	end
 
-	newView(ctx.pipeline, "lum1")
+	newView(ctx.pipeline, "lum1", ctx.current_lum1)
 		setPass(ctx.pipeline, "LUM1")
-		setFramebuffer(ctx.pipeline, ctx.current_lum1)
 		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[1])
 		bindFramebufferTexture(ctx.pipeline, "lum4", 0, ctx.hdr_buffer_uniform)
 		bindFramebufferTexture(ctx.pipeline, old_lum1, 0, ctx.avg_luminance_uniform)
@@ -210,37 +205,33 @@ function hdr(ctx, camera_slot)
 	setMaterialDefine(ctx.pipeline, ctx.hdr_material, "DOF", dof_enabled)	
 	setMaterialDefine(ctx.pipeline, ctx.hdr_material, "VIGNETTE", vignette_enabled)	
 	if dof_enabled then
-		newView(ctx.pipeline, "dof")
+		newView(ctx.pipeline, "dof", "dof")
 			disableDepthWrite(ctx.pipeline)
 			setPass(ctx.pipeline, "MAIN")
-			setFramebuffer(ctx.pipeline, "dof")
 			bindFramebufferTexture(ctx.pipeline, "hdr", 0, ctx.texture_uniform)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.screen_space_material)
 
 
-		newView(ctx.pipeline, "blur_dof_h")
+		newView(ctx.pipeline, "blur_dof_h", "dof_blur")
 			setPass(ctx.pipeline, "BLUR_H")
-			setFramebuffer(ctx.pipeline, "dof_blur")
 			disableDepthWrite(ctx.pipeline)
 			bindFramebufferTexture(ctx.pipeline, "dof", 0, ctx.shadowmap_uniform)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material)
 			enableDepthWrite(ctx.pipeline)
 
-		newView(ctx.pipeline, "blur_dof_v")
+		newView(ctx.pipeline, "blur_dof_v", "dof")
 			setPass(ctx.pipeline, "BLUR_V")
-			setFramebuffer(ctx.pipeline, "dof")
 			disableDepthWrite(ctx.pipeline)
 			bindFramebufferTexture(ctx.pipeline, "dof_blur", 0, ctx.shadowmap_uniform)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material);
 			enableDepthWrite(ctx.pipeline)
 
-		newView(ctx.pipeline, "hdr_dof")
+		if fxaa_enabled then
+			newView(ctx.pipeline, "hdr_dof", "fxaa")
+		else
+			newView(ctx.pipeline, "hdr_dof", "default")
+		end
 			setPass(ctx.pipeline, "MAIN")
-			if fxaa_enabled then
-				setFramebuffer(ctx.pipeline, "fxaa")
-			else
-				setFramebuffer(ctx.pipeline, "default")
-			end
 			disableBlending(ctx.pipeline)
 			applyCamera(ctx.pipeline, camera_slot)
 			disableDepthWrite(ctx.pipeline)
@@ -257,13 +248,12 @@ function hdr(ctx, camera_slot)
 			setUniform(ctx.pipeline, ctx.dof_clear_range_uniform, {{dof_clear_range, 0, 0, 0}})
 			setUniform(ctx.pipeline, ctx.dof_near_multiplier_uniform, {{dof_near_multiplier, 0, 0, 0}})
 	else
-		newView(ctx.pipeline, "hdr")
+		if fxaa_enabled then
+			newView(ctx.pipeline, "hdr", "fxaa")
+		else
+			newView(ctx.pipeline, "hdr", "default")
+		end
 			setPass(ctx.pipeline, "MAIN")
-			if fxaa_enabled then
-				setFramebuffer(ctx.pipeline, "fxaa")
-			else
-				setFramebuffer(ctx.pipeline, "default")
-			end
 			disableBlending(ctx.pipeline)
 			applyCamera(ctx.pipeline, camera_slot)
 			disableDepthWrite(ctx.pipeline)
@@ -319,86 +309,70 @@ end
 function bloom(ctx, pipeline)
 	if not bloom_enabled then return end
 	
-	newView(pipeline, "bloom_extract")
+	newView(pipeline, "bloom_extract", "bloom_extract")
 		setPass(pipeline, "MAIN")
 		disableBlending(pipeline)
 		disableDepthWrite(pipeline)
 		setUniform(pipeline, ctx.bloom_cutoff, {{bloom_cutoff, 0, 0, 0}})
-		setFramebuffer(pipeline, "bloom_extract")
 		bindFramebufferTexture(pipeline, "hdr", 0, ctx.texture_uniform)
 		bindFramebufferTexture(pipeline, ctx.current_lum1, 0, ctx.avg_luminance_uniform)
 		drawQuad(pipeline, 0, 0, 1, 1, ctx.extract_material)
 	
 	if bloom_blur then
-		newView(ctx.pipeline, "blur_bloom2_downsample")
+		newView(ctx.pipeline, "blur_bloom2_downsample", "bloom_blur2")
 			setPass(ctx.pipeline, "MAIN")
-			setFramebuffer(ctx.pipeline, "bloom_blur2")
 			disableDepthWrite(ctx.pipeline)
 			bindFramebufferTexture(ctx.pipeline, "bloom_extract", 0, ctx.shadowmap_uniform)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.downsample_material)
 			enableDepthWrite(ctx.pipeline)
 
-		newView(ctx.pipeline, "blur_bloom2_h")
+		newView(ctx.pipeline, "blur_bloom2_h", "bloom_extract")
 			setPass(ctx.pipeline, "BLUR_H")
-			setFramebuffer(ctx.pipeline, "bloom_extract")
 			disableDepthWrite(ctx.pipeline)
 			bindFramebufferTexture(ctx.pipeline, "bloom_blur2", 0, ctx.shadowmap_uniform)
 			drawQuad(ctx.pipeline, 0, 0, 0.5, 0.5, ctx.blur_material)
 			enableDepthWrite(ctx.pipeline)
 
-		newView(ctx.pipeline, "blur_bloom2_v")
+		newView(ctx.pipeline, "blur_bloom2_v", "hdr")
 			setPass(ctx.pipeline, "BLUR_V")
 			enableBlending(pipeline, "add")
-			setFramebuffer(ctx.pipeline, "hdr")
 			disableDepthWrite(ctx.pipeline)
 			bindFramebufferTexture(ctx.pipeline, "bloom_extract", 0, ctx.shadowmap_uniform)
 			drawQuadEx(ctx.pipeline, 0, 0, 1, 1, 0, 0.5, 0.5, 0, ctx.blur_material);
 			enableDepthWrite(ctx.pipeline)
 			
-		newView(ctx.pipeline, "blur_bloom4_downsample")
+		newView(ctx.pipeline, "blur_bloom4_downsample", "bloom_blur4")
 			setPass(ctx.pipeline, "MAIN")
-			setFramebuffer(ctx.pipeline, "bloom_blur4")
 			disableDepthWrite(ctx.pipeline)
 			bindFramebufferTexture(ctx.pipeline, "bloom_blur2", 0, ctx.shadowmap_uniform)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.downsample_material)
 			enableDepthWrite(ctx.pipeline)
 			
-		newView(ctx.pipeline, "blur_bloom4_h")
+		newView(ctx.pipeline, "blur_bloom4_h", "bloom_extract")
 			setPass(ctx.pipeline, "BLUR_H")
-			setFramebuffer(ctx.pipeline, "bloom_extract")
 			disableDepthWrite(ctx.pipeline)
 			bindFramebufferTexture(ctx.pipeline, "bloom_blur4", 0, ctx.shadowmap_uniform)
 			drawQuad(ctx.pipeline, 0, 0, 0.25, 0.25, ctx.blur_material)
 			enableDepthWrite(ctx.pipeline)
 
-		newView(ctx.pipeline, "blur_bloom4_v")
+		newView(ctx.pipeline, "blur_bloom4_v", "hdr")
 			setPass(ctx.pipeline, "BLUR_V")
 			enableBlending(pipeline, "add")
-			setFramebuffer(ctx.pipeline, "hdr")
 			disableDepthWrite(ctx.pipeline)
 			bindFramebufferTexture(ctx.pipeline, "bloom_extract", 0, ctx.shadowmap_uniform)
 			drawQuadEx(ctx.pipeline, 0, 0, 1, 1, 0, 0, 0.25, 0.25, ctx.blur_material);
 			enableDepthWrite(ctx.pipeline)
 
 	end
-		
-	--newView(pipeline, "bloom")
-	--	setPass(pipeline, "MAIN")
-	--	enableBlending(pipeline, "add")
-	--	disableDepthWrite(pipeline)
-	--	setFramebuffer(pipeline, "hdr")
-	--	bindFramebufferTexture(pipeline, "bloom_extract", 0, ctx.texture_uniform)
-	--	drawQuad(pipeline, 0, 0, 1, 1, ctx.bloom_material)
-		
+			
 	renderBloomDebug(ctx, pipeline)
 end
 
 function fxaa(ctx, camera_slot)
 		if not fxaa_enabled then return end
 		
-		newView(ctx.pipeline, "fxaa")
+		newView(ctx.pipeline, "fxaa", "default")
 			setPass(ctx.pipeline, "MAIN")
-			setFramebuffer(ctx.pipeline, "default")
 			disableBlending(ctx.pipeline)
 			applyCamera(ctx.pipeline, camera_slot)
 			disableDepthWrite(ctx.pipeline)
@@ -432,11 +406,10 @@ end
 
 function renderBloomDebug(ctx, pipeline)
 	if bloom_debug then
-		newView(pipeline, "bloom_debug")
+		newView(pipeline, "bloom_debug", ctx.main_framebuffer)
 			setPass(pipeline, "MAIN")
 			disableBlending(pipeline)
 			disableDepthWrite(pipeline)
-			setFramebuffer(pipeline, ctx.main_framebuffer)
 			bindFramebufferTexture(pipeline, "bloom_extract", 0, ctx.texture_uniform)
 			if bloom_debug_fullscreen then
 				drawQuad(pipeline, 0, 0, 1, 1, ctx.screen_space_material)

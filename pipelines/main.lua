@@ -73,9 +73,8 @@ local gamma_mapping_material = Engine.loadResource(g_engine, "pipelines/common/g
 
 
 function deferred(camera_slot)
-	deferred_view = newView(this, "geometry_pass", DEFAULT_RENDER_MASK)
+	deferred_view = newView(this, "geometry_pass", "g_buffer", DEFAULT_RENDER_MASK)
 		setPass(this, "DEFERRED")
-		setFramebuffer(this, "g_buffer")
 		applyCamera(this, camera_slot)
 		clear(this, CLEAR_ALL, 0x00000000)
 		
@@ -86,20 +85,18 @@ function deferred(camera_slot)
 		setStencilRMask(this, 0xff)
 		setStencilRef(this, 1)
 	
-	newView(this, "copyRenderbuffer");
+	newView(this, "copyRenderbuffer", ctx.main_framebuffer);
 		copyRenderbuffer(this, "g_buffer", 3, ctx.main_framebuffer, 1)
 
-	newView(this, "decals")
+	newView(this, "decals", "g_buffer")
 		setPass(this, "DEFERRED")
 		disableDepthWrite(this)
-		setFramebuffer(this, "g_buffer")
 		applyCamera(this, camera_slot)
 		bindFramebufferTexture(this, ctx.main_framebuffer, 1, gbuffer_depth_uniform)
 		renderDecalsVolumes(this)
 		
-	newView(this, "light_pass")
+	newView(this, "light_pass", ctx.main_framebuffer)
 		setPass(this, "MAIN")
-		setFramebuffer(this, ctx.main_framebuffer)
 		applyCamera(this, camera_slot)
 		clear(this, CLEAR_COLOR, 0x00000000)
 		
@@ -111,9 +108,8 @@ function deferred(camera_slot)
 		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
 		drawQuad(this, 0, 0, 1, 1, pbr_material)
 		
-	newView(this, "local_light_pass")
+	newView(this, "local_light_pass", ctx.main_framebuffer)
 		setPass(this, "MAIN")
-		setFramebuffer(this, ctx.main_framebuffer)
 		disableDepthWrite(this)
 		enableBlending(this, "add")
 		applyCamera(this, camera_slot)
@@ -124,9 +120,8 @@ function deferred(camera_slot)
 		renderLightVolumes(this, pbr_local_light_material)
 		disableBlending(this)
 
-	newView(this, "deferred_debug_shapes")
+	newView(this, "deferred_debug_shapes", ctx.main_framebuffer)
 		setPass(this, "EDITOR")
-		setFramebuffer(this, ctx.main_framebuffer)
 		applyCamera(this, camera_slot)
 		setStencil(this, STENCIL_OP_PASS_Z_REPLACE 
 			| STENCIL_OP_FAIL_Z_KEEP 
@@ -139,9 +134,8 @@ end
 
 
 function water()
-	water_view = newView(this, "WATER", WATER_RENDER_MASK)
+	water_view = newView(this, "WATER", ctx.main_framebuffer, WATER_RENDER_MASK)
 		setPass(this, "MAIN")
-		setFramebuffer(this, ctx.main_framebuffer)
 		disableDepthWrite(this)
 		applyCamera(this, camera)
 		setActiveGlobalLightUniforms(this)
@@ -154,9 +148,8 @@ end
 
 function fur()
 	if not render_fur then return end
-	fur_view = newView(this, "FUR", FUR_RENDER_MASK)
+	fur_view = newView(this, "FUR", ctx.main_framebuffer, FUR_RENDER_MASK)
 		setPass(this, "FUR")
-		setFramebuffer(this, ctx.main_framebuffer)
 		disableDepthWrite(this)
 		enableBlending(this, "alpha")
 		applyCamera(this, camera)
@@ -166,9 +159,8 @@ end
 
 
 function pointLight()
-	newView(this, "POINT_LIGHT")
+	newView(this, "POINT_LIGHT", ctx.main_framebuffer)
 		setPass(this, "POINT_LIGHT")
-		setFramebuffer(this, ctx.main_framebuffer)
 		disableDepthWrite(this)
 		enableBlending(this, "add")
 		applyCamera(this, camera)
@@ -182,9 +174,8 @@ function renderDebug(ctx)
 	local offset_y = 0
 	for i, _ in ipairs(render_debug_deferred) do
 		if render_debug_deferred[i].enabled then
-			newView(ctx.pipeline, "deferred_debug_"..tostring(i))
+			newView(ctx.pipeline, "deferred_debug_"..tostring(i), "default")
 				setPass(ctx.pipeline, "MAIN")
-				setFramebuffer(ctx.pipeline, "default")
 				bindFramebufferTexture(ctx.pipeline, "g_buffer", render_debug_deferred[i].g_buffer_idx, ctx.texture_uniform)
 				setUniform(ctx.pipeline, ctx.multiplier_uniform, {render_debug_deferred[i].mask})
 				drawQuad(ctx.pipeline, 0.01 + offset_x, 0.01 + offset_y, 0.23, 0.23, ctx.screen_space_debug_material)
@@ -199,9 +190,8 @@ function renderDebug(ctx)
 	common.shadowmapDebug(ctx, offset_x, offset_y)
 	for i, _ in ipairs(render_debug_deferred) do
 		if render_debug_deferred[i].enabled and render_debug_deferred[i].fullscreen then
-			newView(ctx.pipeline, "deferred_debug_fullsize")
+			newView(ctx.pipeline, "deferred_debug_fullsize", "default")
 				setPass(ctx.pipeline, "MAIN")
-				setFramebuffer(ctx.pipeline, "default")
 				bindFramebufferTexture(ctx.pipeline, "g_buffer", render_debug_deferred[i].g_buffer_idx, ctx.texture_uniform)
 				setUniform(ctx.pipeline, ctx.multiplier_uniform, {render_debug_deferred[i].mask})
 				drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.screen_space_debug_material)
@@ -212,7 +202,7 @@ end
 
 function render()
 	if disable_render then
-		newView(ctx.pipeline, "a")
+		newView(ctx.pipeline, "render_disable", "default")
 			clear(this, CLEAR_ALL, 0x00000000)
 			setPass(this, "MAIN")
 		return
@@ -233,14 +223,12 @@ function render()
 	
 	doPostprocess(this, _ENV, "main", camera)
 	
-	newView(this, "clear_depth")
+	newView(this, "clear_depth", "default")
 		setPass(this, "MAIN")
-		setFramebuffer(this, "default")
 		clear(this, CLEAR_DEPTH, 0x00000000)
 
-	newView(this, "final_copy")
+	newView(this, "final_copy", ctx.main_framebuffer)
 		setPass(this, "MAIN")
-		setFramebuffer(this, ctx.main_framebuffer)
 		copyRenderbuffer(this, ctx.main_framebuffer, 0, "default", 0)
 
 	if scene_view then

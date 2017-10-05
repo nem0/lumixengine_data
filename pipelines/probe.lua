@@ -62,9 +62,8 @@ local default_cube_texture = Engine.loadResource(g_engine, "pipelines/pbr/defaul
 
 
 function deferred(camera_slot)
-	deferred_view = newView(this, "deferred", DEFAULT_RENDER_MASK)
+	deferred_view = newView(this, "deferred", "g_buffer", DEFAULT_RENDER_MASK)
 		setPass(this, "DEFERRED")
-		setFramebuffer(this, "g_buffer")
 		applyCamera(this, camera_slot)
 		clear(this, CLEAR_ALL, 0x00000000)
 		
@@ -75,12 +74,11 @@ function deferred(camera_slot)
 		setStencilRMask(this, 0xff)
 		setStencilRef(this, 1)
 	
-	newView(this, "copyRenderbuffer");
+	newView(this, "copyRenderbuffer", ctx.main_framebuffer);
 		copyRenderbuffer(this, "g_buffer", 3, ctx.main_framebuffer, 1)
 		
-	newView(this, "main")
+	newView(this, "main", ctx.main_framebuffer)
 		setPass(this, "MAIN")
-		setFramebuffer(this, ctx.main_framebuffer)
 		applyCamera(this, camera_slot)
 		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
 		
@@ -93,9 +91,8 @@ function deferred(camera_slot)
 		bindTexture(this, irradiance_map_uniform, default_cube_texture)
 		drawQuad(this, 0, 0, 1, 1, deferred_material)
 
-	newView(this, "deferred_debug_shapes")
+	newView(this, "deferred_debug_shapes", ctx.main_framebuffer)
 		setPass(this, "EDITOR")
-		setFramebuffer(this, ctx.main_framebuffer)
 		applyCamera(this, camera_slot)
 		setStencil(this, STENCIL_OP_PASS_Z_REPLACE 
 			| STENCIL_OP_FAIL_Z_KEEP 
@@ -105,9 +102,8 @@ function deferred(camera_slot)
 		setStencilRef(this, 1)
 		renderDebugShapes(this)
 		
-	newView(this, "deferred_local_light")
+	newView(this, "deferred_local_light", ctx.main_framebuffer)
 		setPass(this, "MAIN")
-		setFramebuffer(this, ctx.main_framebuffer)
 		disableDepthWrite(this)
 		enableBlending(this, "add")
 		applyCamera(this, camera_slot)
@@ -121,32 +117,9 @@ function deferred(camera_slot)
 		disableBlending(this)
 end
 
-function main()
-	main_view = newView(this, "MAIN", DEFAULT_RENDER_MASK)
-		setPass(this, "MAIN")
-		enableDepthWrite(this)
-		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0xffffFFFF)
-		enableRGBWrite(this)
-		setFramebuffer(this, ctx.main_framebuffer)
-		applyCamera(this, "probe")
-		setActiveGlobalLightUniforms(this)
-		renderDebugShapes(this)
-end
-
-function pointLight()
-	newView(this, "POINT_LIGHT")
-		setPass(this, "POINT_LIGHT")
-		setFramebuffer(this, ctx.main_framebuffer)
-		disableDepthWrite(this)
-		enableBlending(this, "add")
-		applyCamera(this, "probe")
-		renderPointLightLitGeometry(this)
-end
-
 function ingameGUI()
-	newView(this, "ingame_gui")
+	newView(this, "ingame_gui", "default")
 		setPass(this, "MAIN")
-		setFramebuffer(this, "default")
 		clear(this, CLEAR_DEPTH, 0x303030ff)
 		renderIngameGUI(this)
 end
@@ -162,9 +135,8 @@ function render()
 	doPostprocess(this, _ENV, "main", "probe")
 
 	if do_gamma_mapping then
-		newView(this, "SRGB")
+		newView(this, "SRGB", "default")
 			setPass(this, "MAIN")
-			setFramebuffer(this, "default")
 			bindFramebufferTexture(this, "forward", 0, texture_uniform)
 			drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
 	end

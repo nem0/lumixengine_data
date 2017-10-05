@@ -12,14 +12,13 @@ end
 
 function postprocess(pipeline, env)
 	if not enabled then return end
-	newView(pipeline, "godrays")
+	newView(pipeline, "godrays", env.ctx.main_framebuffer)
 		local godrays_params = {exposure, decay, weight, 0}
 		setActiveGlobalLightUniforms(pipeline)
 		setUniform(pipeline, env.ctx.godrays_params, {godrays_params})
 		setPass(pipeline, "MAIN")
 		enableBlending(pipeline, "add")
 		disableDepthWrite(pipeline)
-		setFramebuffer(pipeline, env.ctx.main_framebuffer)
 		bindFramebufferTexture(pipeline, "g_buffer", 3, env.ctx.texture_uniform)
 		drawQuad(pipeline, 0, 0, 1, 1, env.ctx.godrays_material)
 end

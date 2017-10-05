@@ -101,7 +101,7 @@ function deferred(camera_slot)
 		setPass(this, "MAIN")
 		setFramebuffer(this, ctx.main_framebuffer)
 		applyCamera(this, camera_slot)
-		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
+		clear(this, CLEAR_COLOR, 0x00000000)
 		
 		setActiveGlobalLightUniforms(this)
 		bindFramebufferTexture(this, "g_buffer", 0, gbuffer0_uniform)
@@ -233,13 +233,15 @@ function render()
 	
 	doPostprocess(this, _ENV, "main", camera)
 	
-	newView(this, "final_copy2")
+	newView(this, "clear_depth")
 		setPass(this, "MAIN")
-		clear(this, CLEAR_DEPTH, 0x00000000)
 		setFramebuffer(this, "default")
+		clear(this, CLEAR_DEPTH, 0x00000000)
+
 	newView(this, "final_copy")
+		setPass(this, "MAIN")
+		setFramebuffer(this, ctx.main_framebuffer)
 		copyRenderbuffer(this, ctx.main_framebuffer, 0, "default", 0)
-		copyRenderbuffer(this, ctx.main_framebuffer, 1, "default", 1)
 
 	if scene_view then
 		common.renderEditorIcons(ctx)

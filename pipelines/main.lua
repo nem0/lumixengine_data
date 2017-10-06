@@ -1,5 +1,5 @@
 common = require "pipelines/common"
-ctx = { pipeline = this, main_framebuffer = "deferred" }
+ctx = { pipeline = this, main_framebuffer = "default" }
 if game_view then
 	camera = "main"
 else
@@ -27,16 +27,6 @@ local render_debug_deferred =
 addFramebuffer(this, "default", {
 	width = 1024,
 	height = 1024,
-	renderbuffers = {
-		{ format = "rgba8" },
-		{ format = "depth24stencil8" }
-	}
-})
-
-addFramebuffer(this, "deferred", {
-	width = 1024,
-	height = 1024,
-	size_ratio = {1, 1},
 	renderbuffers = {
 		{ format = "rgba8" },
 		{ format = "depth24stencil8" }
@@ -226,10 +216,6 @@ function render()
 	newView(this, "clear_depth", "default")
 		setPass(this, "MAIN")
 		clear(this, CLEAR_DEPTH, 0x00000000)
-
-	newView(this, "final_copy", ctx.main_framebuffer)
-		setPass(this, "MAIN")
-		copyRenderbuffer(this, ctx.main_framebuffer, 0, "default", 0)
 
 	if scene_view then
 		common.renderEditorIcons(ctx)

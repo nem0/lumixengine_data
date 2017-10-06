@@ -34,7 +34,7 @@ end
 function module.renderEditorIcons(ctx)
 	if module.render_gizmos then
 		newView(ctx.pipeline, "editor", "default", 0xFFFFffffFFFFffff)
-			bindFramebufferTexture(ctx.pipeline, ctx.main_framebuffer, 1, ctx.depth_buffer_uniform)
+			bindFramebufferTexture(ctx.pipeline, "g_buffer", 3, ctx.depth_buffer_uniform)
 			setPass(ctx.pipeline, "EDITOR")
 			enableDepthWrite(ctx.pipeline)
 			enableBlending(ctx.pipeline, "alpha")

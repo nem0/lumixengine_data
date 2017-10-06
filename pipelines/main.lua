@@ -230,7 +230,7 @@ function render()
 			setPass(this, "MAIN")
 			clear(this, CLEAR_DEPTH, 0x00000000)
 
-		if scene_view then
+		if SCENE_VIEW then
 			common.renderEditorIcons(ctx)
 			common.renderGizmo(ctx)
 			renderDebug(ctx)

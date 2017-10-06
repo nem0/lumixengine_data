@@ -1,6 +1,9 @@
 common = require "pipelines/common"
 ctx = { pipeline = this, main_framebuffer = "default" }
-if game_view then
+if APP then
+	camera = "main"
+	ctx.main_framebuffer = "deferred"
+elseif GAME_VIEW  then
 	camera = "main"
 else
 	camera = "editor"
@@ -24,15 +27,27 @@ local render_debug_deferred =
  { label = "Depth", enabled = false, fullscreen = false, mask = {1, 0, 0, 0}, g_buffer_idx = 3},
 }
 
-addFramebuffer(this, "default", {
-	width = 1024,
-	height = 1024,
-	renderbuffers = {
-		{ format = "rgba8" },
-		{ format = "depth24stencil8" }
-	}
-})
-
+if APP then
+	addFramebuffer(this, "deferred", {
+		width = 1024,
+		height = 1024,
+		size_ratio = {1, 1},
+		renderbuffers = {
+			{ format = "rgba8" },
+			{ format = "depth24stencil8" }
+		}
+	})
+else
+	addFramebuffer(this, "default", {
+		width = 1024,
+		height = 1024,
+		renderbuffers = {
+			{ format = "rgba8" },
+			{ format = "depth24stencil8" }
+		}
+	})
+end
+	
 addFramebuffer(this, "g_buffer", {
 	width = 1024,
 	height = 1024,
@@ -148,17 +163,6 @@ function fur()
 end
 
 
-function pointLight()
-	newView(this, "POINT_LIGHT", ctx.main_framebuffer)
-		setPass(this, "POINT_LIGHT")
-		disableDepthWrite(this)
-		enableBlending(this, "add")
-		applyCamera(this, camera)
-		renderPointLightLitGeometry(this)
-end
-
-
-
 function renderDebug(ctx)
 	local offset_x = 0
 	local offset_y = 0
@@ -213,14 +217,24 @@ function render()
 	
 	doPostprocess(this, _ENV, "main", camera)
 	
-	newView(this, "clear_depth", "default")
-		setPass(this, "MAIN")
-		clear(this, CLEAR_DEPTH, 0x00000000)
+	if APP then
+		newView(this, "SRGB", "default")
+			clear(this, CLEAR_ALL, 0x00000000)
+			setPass(this, "MAIN")
+			bindFramebufferTexture(this, ctx.main_framebuffer, 0, texture_uniform)
+			drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
 
-	if scene_view then
-		common.renderEditorIcons(ctx)
-		common.renderGizmo(ctx)
-		renderDebug(ctx)
+	else
+			
+		newView(this, "clear_depth", "default")
+			setPass(this, "MAIN")
+			clear(this, CLEAR_DEPTH, 0x00000000)
+
+		if scene_view then
+			common.renderEditorIcons(ctx)
+			common.renderGizmo(ctx)
+			renderDebug(ctx)
+		end
 	end
 end
 

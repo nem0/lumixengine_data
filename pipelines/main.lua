@@ -217,6 +217,10 @@ function render()
 	
 	doPostprocess(this, _ENV, "main", camera)
 	
+	
+	newView(this, "draw2d", ctx.main_framebuffer)
+		render2D(this)
+	
 	if APP then
 		newView(this, "SRGB", "default")
 			clear(this, CLEAR_ALL, 0x00000000)

@@ -1,0 +1,7 @@
+pass "MAIN"
+   
+
+depth_test(false)
+alpha_blending "alpha"
+  
+texture_slot("Diffuse", "s_texColor")

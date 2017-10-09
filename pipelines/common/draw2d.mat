@@ -1,0 +1,4 @@
+{"shader" : "pipelines/common/draw2d.shd",
+"uniforms" : [],
+"backface_culling" : false
+}

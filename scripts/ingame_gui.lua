@@ -75,10 +75,12 @@ function settings()
 	ImGui.EndChildFrame()
 end
 
+_G["toggleGUI"] = toggleGUI;
+
 function update()
-	if not gui.shown and Engine.getInputActionValue(g_engine, MENU_ACTION) > 0 then
-		toggleGUI()
-	end
+	--if not gui.shown and Engine.getInputActionValue(g_engine, MENU_ACTION) > 0 then
+		--toggleGUI()
+	--end
 	
 	if not gui.shown then return end
 
@@ -108,6 +110,6 @@ function init()
 	Gui.endGUI(Gui.instance)
 end
 
-Engine.addInputAction(g_engine, MENU_ACTION, Engine.INPUT_TYPE_DOWN, string.byte("M"), -1)
+--Engine.addInputAction(g_engine, MENU_ACTION, Engine.INPUT_TYPE_DOWN, string.byte("M"), -1)
 
 

@@ -193,6 +193,12 @@ function renderDebug(ctx)
 	end
 end
 
+function ingameGUI()
+	newView(this, "ingame_gui", "default")
+		setPass(this, "MAIN")
+		clear(this, CLEAR_DEPTH, 0x303030ff)
+		renderIngameGUI(this)
+end
 
 function render()
 	if disable_render then
@@ -234,11 +240,15 @@ function render()
 			setPass(this, "MAIN")
 			clear(this, CLEAR_DEPTH, 0x00000000)
 
+			
 		if SCENE_VIEW then
 			common.renderEditorIcons(ctx)
 			common.renderGizmo(ctx)
 			renderDebug(ctx)
 		end
+	end
+	if GAME_VIEW or APP then
+		ingameGUI()
 	end
 end
 

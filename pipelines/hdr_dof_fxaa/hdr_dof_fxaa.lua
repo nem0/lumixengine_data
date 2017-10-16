@@ -377,7 +377,7 @@ function fxaa(ctx, camera_slot)
 			applyCamera(ctx.pipeline, camera_slot)
 			disableDepthWrite(ctx.pipeline)
 			clear(ctx.pipeline, CLEAR_DEPTH, 0x00000000)
-			bindFramebufferTexture(ctx.pipeline, "fxaa", 0, ctx.fxaa_buffer_uniform)
+			bindFramebufferTexture(ctx.pipeline, "fxaa", 0, ctx.fxaa_buffer_uniform, TEXTURE_MAG_ANISOTROPIC | TEXTURE_MIN_ANISOTROPIC)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.fxaa_material)
 end
 

@@ -359,7 +359,7 @@ function bloom(ctx, pipeline)
 			setPass(ctx.pipeline, "BLUR_V")
 			enableBlending(pipeline, "add")
 			disableDepthWrite(ctx.pipeline)
-			bindFramebufferTexture(ctx.pipeline, "bloom_extract", 0, ctx.shadowmap_uniform)
+			bindFramebufferTexture(ctx.pipeline, "bloom_extract", 0, ctx.shadowmap_uniform, TEXTURE_MAG_ANISOTROPIC | TEXTURE_MIN_ANISOTROPIC)
 			drawQuadEx(ctx.pipeline, 0, 0, 1, 1, 0, 0, 0.25, 0.25, ctx.blur_material);
 			enableDepthWrite(ctx.pipeline)
 

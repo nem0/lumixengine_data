@@ -43,9 +43,9 @@ void main()
 	vec4 diffuse_color = albedo - albedo * metallic;
 	#ifdef HAS_SHADOWMAP
 		float shadow = pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(wpos, 1.0), v_dir_fov.w);
-		diffuse_color *= shadow;
+		attn *= shadow;
 	#endif
 
-	gl_FragColor.xyz = diffuse_color.rgb; //attn * (diff * diffuse_color.rgb + spec * specular_color.rgb);
+	gl_FragColor.xyz = attn * (diff * diffuse_color.rgb + spec * specular_color.rgb);
 	gl_FragColor.w = 1;
 }

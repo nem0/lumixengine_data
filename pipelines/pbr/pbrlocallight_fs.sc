@@ -36,27 +36,16 @@ void main()
 	vec3 view = normalize(v_view);
 	vec3 light_dir = normalize(v_pos_radius.xyz - wpos.xyz);
 	PBR_ComputeDirectLight(normal, light_dir, view, v_color_attn.rgb, f0, roughness, diff, spec);
-/*	float ndotl = -dot(normal, v_dir_fov.xyz);
-	vec3 view = normalize(v_view);
-	vec3 diffuse = color.rgb * calcLight(v_dir_fov
-		, wpos
-		, normal
-		, view
-		, screen_coord.xy
-		, v_pos_radius.xyz
-		, v_pos_radius.w
-		, v_color_attn.xyz
-		, v_color_attn.w
-		, v_specular.xyz); 
-	#ifdef HAS_SHADOWMAP
-		diffuse = diffuse * pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(wpos, 1.0), v_dir_fov.w); 
-	#endif
-*/
 	vec3 lp = v_pos_radius.xyz - wpos;
 	float dist = length(lp);
 	float attn = pow(max(0, 1 - dist / v_pos_radius.w), v_color_attn.w);		
 	vec4 specular_color = (f0 - f0 * metallic) + albedo * metallic;
 	vec4 diffuse_color = albedo - albedo * metallic;
-	gl_FragColor.xyz =  attn * (diff * diffuse_color.rgb + spec * specular_color.rgb);
+	#ifdef HAS_SHADOWMAP
+		float shadow = pointLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(wpos, 1.0), v_dir_fov.w);
+		diffuse_color *= shadow;
+	#endif
+
+	gl_FragColor.xyz = diffuse_color.rgb; //attn * (diff * diffuse_color.rgb + spec * specular_color.rgb);
 	gl_FragColor.w = 1;
 }

@@ -6,7 +6,7 @@ weight = 0.1
 
 function initPostprocess(pipeline, env)
 	env.ctx.godrays_material = Engine.loadResource(g_engine, "pipelines/godrays/godrays.mat", "material")
-	env.ctx.godrays_params = createUniform(pipeline, "u_godrays_params")
+	env.ctx.godrays_params = createVec4ArrayUniform(pipeline, "u_godrays_params", 1)
 end
 
 

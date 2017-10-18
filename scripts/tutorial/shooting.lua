@@ -1,5 +1,3 @@
-local LBUTTON = 1 -- should be exported as a constant from engine, it's not at the moment, so we have to hardcode it here
-local SHOOT_ACTION = 1001 -- be careful so that the number does not collide with other actions
 local prefab = -1
 local particles = {}
 
@@ -7,13 +5,26 @@ muzzle = -1
 Editor.setPropertyType("muzzle", Editor.ENTITY_PROPERTY)
 
 function init()
-    Engine.addInputAction(g_engine, SHOOT_ACTION, Engine.INPUT_TYPE_DOWN, LBUTTON, -1)
     prefab = Engine.loadResource(g_engine, "prefabs/tutorial/particle.fab", "prefab") -- clean up in onDestroy
 end
 
+local actions = {
+	shoot = false
+}
+
+function onInputEvent(event)
+	if event.type == Engine.INPUT_EVENT_BUTTON then
+		if event.device.type == Engine.INPUT_DEVICE_MOUSE then
+			actions.shoot = true
+		end
+	end
+end
+
+
 function update(time_delta)
     -- if left mouse button is pressed
-    if Engine.getInputActionValue(g_engine, SHOOT_ACTION) > 0 then
+    if actions.shoot then
+		actions.shoot = false
 		local muzzle_pos = Engine.getEntityPosition(g_universe, muzzle)
         local muzzle_rot = Engine.getEntityRotation(g_universe, muzzle)
         local muzzle_dir = Engine.multVecQuat({0, 0, 1}, muzzle_rot)

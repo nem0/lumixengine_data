@@ -4,13 +4,6 @@ MOUSE_SENSITIVITY = 1
 Editor.setPropertyType("camera_entity", Editor.ENTITY_PROPERTY)
 input_enabled = true
 
-local LSHIFT_KEY = 160
-
-local CONTROLLER_ROT_X = 7
-local CONTROLLER_ROT_Y = 8
-local CONTROLLER_MOVE_X = 9
-local CONTROLLER_MOVE_Y = 10
-
 local yaw = 0
 local pitch = 0
 

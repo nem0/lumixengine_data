@@ -14,6 +14,7 @@ local TRANSPARENT_RENDER_MASK = 2
 local WATER_RENDER_MASK = 4
 local FUR_RENDER_MASK = 8
 local ALL_RENDER_MASK = DEFAULT_RENDER_MASK + TRANSPARENT_RENDER_MASK + WATER_RENDER_MASK + FUR_RENDER_MASK
+local screenshot_request = 0
 local render_fur = true
 local render_shadowmap = true
 local disable_render = false
@@ -250,6 +251,22 @@ function render()
 	if GAME_VIEW or APP then
 		ingameGUI()
 	end
+	
+	if screenshot_request > 1 then
+		-- we have to wait for a few frames to propagate changed resolution to ingame gui
+		-- only then we can take a screeshot
+		-- otherwise ingame gui would be constructed in gameview size
+		-- 1st frame - set forceViewport
+		-- 2nd frame - set ImGui's display size (ingame) to forced value
+		-- 3rd frame - construct ingame gui with forced values
+		-- 4th frame - render and save (save is internally two more frames)
+		screenshot_request = screenshot_request - 1
+		GameView.forceViewport(true, 4096, 2160)
+	elseif screenshot_request == 1 then
+		saveRenderbuffer(this, "default", 0, "screenshot.tga")
+		GameView.forceViewport(false, 0, 0)
+		screenshot_request = 0
+	end
 end
 
 local volume = 1
@@ -257,6 +274,14 @@ local paused = false
 local timescale = 1
 
 function onGUI()
+	if GAME_VIEW then
+		ImGui.SameLine()
+		if ImGui.Button("Screenshot") then
+			screenshot_request = 4
+		end
+		return
+	end
+
 	local changed
 	ImGui.SameLine()
 	changed, volume = ImGui.SliderFloat("Volume", volume, 0, 1)

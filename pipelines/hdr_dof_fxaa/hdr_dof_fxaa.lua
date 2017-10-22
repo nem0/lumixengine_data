@@ -208,21 +208,21 @@ function hdr(ctx, camera_slot)
 		newView(ctx.pipeline, "dof", "dof")
 			disableDepthWrite(ctx.pipeline)
 			setPass(ctx.pipeline, "MAIN")
-			bindFramebufferTexture(ctx.pipeline, "hdr", 0, ctx.texture_uniform)
+			bindFramebufferTexture(ctx.pipeline, "hdr", 0, ctx.texture_uniform, TEXTURE_MAG_ANISOTROPIC | TEXTURE_MIN_ANISOTROPIC)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.screen_space_material)
 
 
 		newView(ctx.pipeline, "blur_dof_h", "dof_blur")
 			setPass(ctx.pipeline, "BLUR_H")
 			disableDepthWrite(ctx.pipeline)
-			bindFramebufferTexture(ctx.pipeline, "dof", 0, ctx.shadowmap_uniform)
+			bindFramebufferTexture(ctx.pipeline, "dof", 0, ctx.shadowmap_uniform, TEXTURE_MAG_ANISOTROPIC | TEXTURE_MIN_ANISOTROPIC)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material)
 			enableDepthWrite(ctx.pipeline)
 
 		newView(ctx.pipeline, "blur_dof_v", "dof")
 			setPass(ctx.pipeline, "BLUR_V")
 			disableDepthWrite(ctx.pipeline)
-			bindFramebufferTexture(ctx.pipeline, "dof_blur", 0, ctx.shadowmap_uniform)
+			bindFramebufferTexture(ctx.pipeline, "dof_blur", 0, ctx.shadowmap_uniform, TEXTURE_MAG_ANISOTROPIC | TEXTURE_MIN_ANISOTROPIC)
 			drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.blur_material);
 			enableDepthWrite(ctx.pipeline)
 
@@ -239,7 +239,7 @@ function hdr(ctx, camera_slot)
 
 			bindFramebufferTexture(ctx.pipeline, "hdr", 0, ctx.hdr_buffer_uniform)
 			bindFramebufferTexture(ctx.pipeline, ctx.current_lum1, 0, ctx.avg_luminance_uniform)
-			bindFramebufferTexture(ctx.pipeline, "dof", 0, ctx.dof_buffer_uniform)
+			bindFramebufferTexture(ctx.pipeline, "dof", 0, ctx.dof_buffer_uniform, TEXTURE_MAG_ANISOTROPIC | TEXTURE_MIN_ANISOTROPIC)
 			bindFramebufferTexture(ctx.pipeline, "hdr", 1, ctx.depth_buffer_uniform)
 
 			setUniform(ctx.pipeline, ctx.dof_focal_distance_uniform, {{dof_focal_distance, 0, 0, 0}})

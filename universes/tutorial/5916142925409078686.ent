@@ -1,0 +1,44 @@
+#name
+	""
+#transform (78.055145, 11.017210, 96.419395)  (0.000000, 0.000000, 0.000000, 1.000000)
+	1117527100
+	1093682814
+	1119934139
+	0
+	0
+	0
+	1065353216
+#scale 1.000000
+	1065353216
+#parent
+	18446744073709551615
+#camera
+	991751685
+#far 10000.000000
+	1176256512
+#fov 1.570796
+	1070141403
+#is_ortho
+	0
+#ortho_size 10.000000
+	1092616192
+#near 0.100000
+	1036831949
+#slot
+	"probe"
+#lua_script
+	4143584752
+#count
+	1
+#source
+	"pipelines/cubesky/cubesky.lua"
+#prop_count
+	1
+#prop_name
+	"sky_material"
+#prop_type
+	3
+#prop_value
+	"models/sky/clouded01/sky.mat"
+#cmp_end
+	0

@@ -47,18 +47,12 @@
 #source
 	"scripts/tutorial/shooting.lua"
 #prop_count
-	2
+	1
 #prop_name
 	"muzzle"
 #prop_type
 	2
 #prop_value
 	"16148665572437121714"
-#prop_name
-	""
-#prop_type
-	5
-#prop_value
-	""
 #cmp_end
 	0

@@ -59,6 +59,15 @@ function init()
 	cmp = Engine.createComponent(g_universe, this, "physical_controller")
 end
 
+function angleDiff(a, b)
+	local PI2 = 3.14159265 * 2
+	local diff = (b - a) % PI2
+	if diff > 3.14159265 then
+		diff = diff - PI2
+	end
+	return diff
+end
+
 function update(dt)
 	if not input_enabled then return end
 	local PITCH_LIMIT = 0.7
@@ -77,10 +86,11 @@ function update(dt)
 	if actions.forward or actions.back or actions.left or actions.right then
 		local ROT_SPEED = 3
 		local dir = 1
-		if camera_yaw < player_yaw then dir = -1 end
+		local old_diff = angleDiff(player_yaw, camera_yaw)
+		if old_diff < 0 then dir = -1 end
 		dir = dir * dt * ROT_SPEED
 		player_yaw = player_yaw + dir
-		local new_diff = (player_yaw - camera_yaw) * 0.99
+		local new_diff = angleDiff(player_yaw, camera_yaw) * 0.99
 		if new_diff < dt * ROT_SPEED and new_diff > -dt * ROT_SPEED then
 			player_yaw = camera_yaw
 		end

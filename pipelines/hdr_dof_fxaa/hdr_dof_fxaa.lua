@@ -229,7 +229,7 @@ function hdr(ctx, camera_slot)
 		if fxaa_enabled then
 			newView(ctx.pipeline, "hdr_dof", "fxaa")
 		else
-			newView(ctx.pipeline, "hdr_dof", "default")
+			newView(ctx.pipeline, "hdr_dof", original_framebuffer)
 		end
 			setPass(ctx.pipeline, "MAIN")
 			disableBlending(ctx.pipeline)
@@ -251,7 +251,7 @@ function hdr(ctx, camera_slot)
 		if fxaa_enabled then
 			newView(ctx.pipeline, "hdr", "fxaa")
 		else
-			newView(ctx.pipeline, "hdr", "default")
+			newView(ctx.pipeline, "hdr", original_framebuffer)
 		end
 			setPass(ctx.pipeline, "MAIN")
 			disableBlending(ctx.pipeline)
@@ -371,7 +371,7 @@ end
 function fxaa(ctx, camera_slot)
 		if not fxaa_enabled then return end
 		
-		newView(ctx.pipeline, "fxaa", "default")
+		newView(ctx.pipeline, "fxaa", original_framebuffer)
 			setPass(ctx.pipeline, "MAIN")
 			disableBlending(ctx.pipeline)
 			applyCamera(ctx.pipeline, camera_slot)

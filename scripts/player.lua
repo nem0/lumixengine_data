@@ -30,13 +30,14 @@ local actions = {
 function onInputEvent(event)
 	if event.type == Engine.INPUT_EVENT_BUTTON then
 		if event.device.type == Engine.INPUT_DEVICE_KEYBOARD then
-			if event.key_id == 119 then
+			Engine.logError(tostring(event.scancode) .. tostring(Engine.INPUT_SCANCODE_A));
+			if event.scancode == Engine.INPUT_SCANCODE_W then
 				actions.forward = event.state ~= 0
-			elseif event.key_id == 97 then
+			elseif event.scancode == Engine.INPUT_SCANCODE_A then
 				actions.left = event.state ~= 0
-			elseif event.key_id == 100 then
+			elseif event.scancode == Engine.INPUT_SCANCODE_D then
 				actions.right = event.state ~= 0
-			elseif event.key_id == 115 then
+			elseif event.scancode == Engine.INPUT_SCANCODE_S then
 				actions.back = event.state ~= 0
 			elseif event.key_id == 1073742049 then
 				actions.sprint = event.state ~= 0

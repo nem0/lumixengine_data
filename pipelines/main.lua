@@ -103,6 +103,7 @@ function deferred(camera_slot)
 	newView(this, "light_pass", ctx.main_framebuffer)
 		setPass(this, "MAIN")
 		applyCamera(this, camera_slot)
+		-- there are strange artifacts on some platforms without CLEAR_DEPTH here
 		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
 		
 		disableDepthWrite(this)

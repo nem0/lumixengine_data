@@ -30,7 +30,6 @@ local actions = {
 function onInputEvent(event)
 	if event.type == Engine.INPUT_EVENT_BUTTON then
 		if event.device.type == Engine.INPUT_DEVICE_KEYBOARD then
-			Engine.logError(tostring(event.scancode) .. tostring(Engine.INPUT_SCANCODE_A));
 			if event.scancode == Engine.INPUT_SCANCODE_W then
 				actions.forward = event.state ~= 0
 			elseif event.scancode == Engine.INPUT_SCANCODE_A then

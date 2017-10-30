@@ -1,8 +1,7 @@
 common = require "pipelines/common"
-ctx = { pipeline = this, main_framebuffer = "default" }
+ctx = { pipeline = this, main_framebuffer = "linear" }
 if APP then
 	camera = "main"
-	ctx.main_framebuffer = "deferred"
 elseif GAME_VIEW  then
 	camera = "main"
 else
@@ -28,17 +27,17 @@ local render_debug_deferred =
  { label = "Depth", enabled = false, fullscreen = false, mask = {1, 0, 0, 0}, g_buffer_idx = 3},
 }
 
-if APP then
-	addFramebuffer(this, "deferred", {
-		width = 1024,
-		height = 1024,
-		size_ratio = {1, 1},
-		renderbuffers = {
-			{ format = "rgba8" },
-			{ format = "depth24stencil8" }
-		}
-	})
-else
+addFramebuffer(this, "linear", {
+	width = 1024,
+	height = 1024,
+	size_ratio = {1, 1},
+	renderbuffers = {
+		{ format = "rgba8" },
+		{ format = "depth24stencil8" }
+	}
+})
+
+if not APP then
 	addFramebuffer(this, "default", {
 		width = 1024,
 		height = 1024,
@@ -104,8 +103,10 @@ function deferred(camera_slot)
 	newView(this, "light_pass", ctx.main_framebuffer)
 		setPass(this, "MAIN")
 		applyCamera(this, camera_slot)
-		clear(this, CLEAR_COLOR, 0x00000000)
+		-- there are strange artifacts on some platforms without CLEAR_DEPTH here
+		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
 		
+		disableDepthWrite(this)
 		setActiveGlobalLightUniforms(this)
 		bindFramebufferTexture(this, "g_buffer", 0, gbuffer0_uniform)
 		bindFramebufferTexture(this, "g_buffer", 1, gbuffer1_uniform)
@@ -228,25 +229,16 @@ function render()
 	newView(this, "draw2d", ctx.main_framebuffer)
 		render2D(this)
 	
-	if APP then
-		newView(this, "SRGB", "default")
-			clear(this, CLEAR_ALL, 0x00000000)
-			setPass(this, "MAIN")
-			bindFramebufferTexture(this, ctx.main_framebuffer, 0, texture_uniform)
-			drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
+	newView(this, "SRGB", "default")
+		clear(this, CLEAR_ALL, 0x00000000)
+		setPass(this, "MAIN")
+		bindFramebufferTexture(this, "linear", 0, texture_uniform)
+		drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
 
-	else
-			
-		newView(this, "clear_depth", "default")
-			setPass(this, "MAIN")
-			clear(this, CLEAR_DEPTH, 0x00000000)
-
-			
-		if SCENE_VIEW then
-			common.renderEditorIcons(ctx)
-			common.renderGizmo(ctx)
-			renderDebug(ctx)
-		end
+	if SCENE_VIEW then
+		common.renderEditorIcons(ctx)
+		common.renderGizmo(ctx)
+		renderDebug(ctx)
 	end
 	if GAME_VIEW or APP then
 		ingameGUI()

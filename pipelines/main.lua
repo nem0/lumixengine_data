@@ -137,6 +137,7 @@ function deferred(camera_slot)
 		setStencilRMask(this, 0xff)
 		setStencilRef(this, 1)
 		renderDebugShapes(this)	
+	
 end
 
 
@@ -150,6 +151,17 @@ function water()
 		bindFramebufferTexture(this, "g_buffer", 1, gbuffer1_uniform) 
 		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform) 
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform) -- depth
+		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
+end
+
+function transparency()
+	newView(this, "TRANSPARENT", ctx.main_framebuffer, TRANSPARENT_RENDER_MASK)
+		setViewMode(this, VIEW_MODE_DEPTH_ASCENDING)
+		setPass(this, "FORWARD")
+		disableDepthWrite(this)
+		enableBlending(this, "alpha")
+		applyCamera(this, camera)
+		setActiveGlobalLightUniforms(this)
 		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
 end
 
@@ -220,7 +232,8 @@ function render()
 
 	water()
 	fur()
-
+	transparency()
+	
 	renderModels(this, ALL_RENDER_MASK)
 	
 	doPostprocess(this, _ENV, "main", camera)

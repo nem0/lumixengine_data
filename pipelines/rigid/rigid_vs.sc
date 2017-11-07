@@ -4,7 +4,11 @@
 
 	uniform mat4 u_boneMatrices[196];
 #else
-	$input a_position, a_normal, a_tangent, a_texcoord0, i_data0, i_data1, i_data2, i_data3
+	#ifdef INSTANCED
+		$input a_position, a_normal, a_tangent, a_texcoord0, i_data0, i_data1, i_data2, i_data3
+	#else 
+		$input a_position, a_normal, a_tangent, a_texcoord0
+	#endif
 	#ifdef BUMP_TEXTURE
 		$output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0, v_common2, v_tangent_view_pos
 	#else
@@ -25,7 +29,7 @@ void main()
 	const float FREQUENCY = 2;
 	const float WIND_STRENGTH = 1.0;
 	const vec3 WIND_DIR = vec3(1, 0, 0);
-	#ifdef SKINNED
+	#if !defined INSTANCED || defined SKINNED
 		mat4 model = u_model[0];
 	#else
 		mat4 model;
@@ -58,7 +62,11 @@ void main()
 
 		v_wpos = mul(model, vec4(position, 1.0) ).xyz;
 	#else
-		v_wpos = instMul(model, vec4(position, 1.0) ).xyz;
+		#ifdef INSTANCED
+			v_wpos = instMul(model, vec4(position, 1.0) ).xyz;
+		#else
+			v_wpos = mul(model, vec4(position, 1.0) ).xyz;
+		#endif
 	#endif
 	
 	#ifndef SHADOW

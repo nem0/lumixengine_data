@@ -1,0 +1,4 @@
+pass "MAIN"
+ 
+depth_test(false)
+ 

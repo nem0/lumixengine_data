@@ -48,6 +48,17 @@ if not APP then
 	})
 end
 	
+if SCENE_VIEW then
+	addFramebuffer(this, "selection_mask", {
+		width = 1024,
+		height = 1024,
+		size_ratio = {1, 1},
+		renderbuffers = {
+			{ format = "rgba8" }
+		}
+	})
+end
+	
 addFramebuffer(this, "g_buffer", {
 	width = 1024,
 	height = 1024,
@@ -65,6 +76,7 @@ common.initShadowmap(ctx, 1024)
 
 
 local texture_uniform = createUniform(this, "u_texture")
+local selection_outline_material = Engine.loadResource(g_engine, "pipelines/common/selection_outline.mat", "material")
 local screen_space_material = Engine.loadResource(g_engine, "pipelines/screenspace/screenspace.mat", "material")
 local gbuffer0_uniform = createUniform(this, "u_gbuffer0")
 local gbuffer1_uniform = createUniform(this, "u_gbuffer1")
@@ -155,6 +167,22 @@ function water()
 		bindFramebufferTexture(this, "g_buffer", 2, gbuffer2_uniform) 
 		bindFramebufferTexture(this, "g_buffer", 3, gbuffer_depth_uniform) -- depth
 		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
+end
+
+function renderSelectionOutline(ctx)
+	newView(this, "selection_mask", "selection_mask", ALL_RENDER_MASK)
+		clear(this, CLEAR_COLOR, 0)
+		setPass(this, "SHADOW")
+		disableDepthWrite(this)
+		applyCamera(this, camera)
+		renderSelection(this)
+
+	newView(this, "selection_outline", "default")
+		setPass(this, "MAIN")
+		disableDepthWrite(this)
+		bindFramebufferTexture(this, "selection_mask", 0, texture_uniform)
+		drawQuad(this, 0, 0, 1, 1, selection_outline_material)
+
 end
 
 function transparency()
@@ -255,6 +283,7 @@ function render()
 		common.renderEditorIcons(ctx)
 		common.renderGizmo(ctx)
 		renderDebug(ctx)
+		renderSelectionOutline(ctx)
 	end
 	if GAME_VIEW or APP then
 		ingameGUI()

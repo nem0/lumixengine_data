@@ -17,6 +17,7 @@ for key, value in pairs(tests) do
 	App.frame()
 	waitForLoad()
 
+	
 	App.frame()
 	App.frame()
 	App.frame()

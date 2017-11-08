@@ -25,8 +25,8 @@
 	1065353216
 #diffuse_intensity 1.000000
 	1065353216
-#indirect_intensity 1.000000
-	1065353216
+#indirect_intensity 0.000000
+	0
 #fog_bottom 0.000000
 	0
 #fog_color (1.000000, 1.000000, 1.000000)

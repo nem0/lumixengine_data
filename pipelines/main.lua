@@ -90,6 +90,10 @@ function deferred(camera_slot)
 		setStencilRMask(this, 0xff)
 		setStencilRef(this, 1)
 	
+	newView(this, "clear_main", ctx.main_framebuffer)
+		-- there are strange artifacts on some platforms without this clear
+		clear(this, CLEAR_ALL, 0x00000000)
+	
 	newView(this, "copyRenderbuffer", ctx.main_framebuffer);
 		copyRenderbuffer(this, "g_buffer", 3, ctx.main_framebuffer, 1)
 
@@ -103,8 +107,7 @@ function deferred(camera_slot)
 	newView(this, "light_pass", ctx.main_framebuffer)
 		setPass(this, "MAIN")
 		applyCamera(this, camera_slot)
-		-- there are strange artifacts on some platforms without CLEAR_DEPTH here
-		clear(this, CLEAR_COLOR | CLEAR_DEPTH, 0x00000000)
+		clear(this, CLEAR_COLOR, 0x00000000)
 		
 		disableDepthWrite(this)
 		setActiveGlobalLightUniforms(this)
@@ -156,7 +159,7 @@ end
 
 function transparency()
 	newView(this, "TRANSPARENT", ctx.main_framebuffer, TRANSPARENT_RENDER_MASK)
-		setViewMode(this, VIEW_MODE_DEPTH_ASCENDING)
+		setViewMode(this, VIEW_MODE_DEPTH_DESCENDING)
 		setPass(this, "FORWARD")
 		disableDepthWrite(this)
 		enableBlending(this, "alpha")

@@ -271,6 +271,7 @@ function render()
 	
 	
 	newView(this, "draw2d", ctx.main_framebuffer)
+		setPass(this, "MAIN")
 		render2D(this)
 	
 	newView(this, "SRGB", "default")

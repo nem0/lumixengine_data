@@ -47,6 +47,7 @@ function module.renderGizmo(ctx)
 	if module.render_gizmos then
 		newView(ctx.pipeline, "gizmo", "default")
 			setPass(ctx.pipeline, "EDITOR")
+			enableBlending(ctx.pipeline, "alpha")
 			applyCamera(ctx.pipeline, "editor")
 			renderGizmos(ctx.pipeline)
 	end

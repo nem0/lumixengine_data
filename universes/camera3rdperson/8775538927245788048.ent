@@ -15,7 +15,7 @@
 #renderable
 	1512583253
 #source
-	"models/creatures/roach/roach.msh"
+	"models/creatures/undead_squirrel/squirrel-anim.msh"
 #flags
 	0
 #custom_materials
@@ -27,7 +27,7 @@
 #source
 	"scripts/3rdperson.lua"
 #prop_count
-	6
+	8
 #prop_name
 	"camera_entity"
 #prop_type
@@ -64,5 +64,17 @@
 	2
 #prop_value
 	"8326873857796478880"
+#prop_name
+	"player_yaw"
+#prop_type
+	1
+#prop_value
+	"0.00000000"
+#prop_name
+	"camera_yaw"
+#prop_type
+	1
+#prop_value
+	"0.00000000"
 #cmp_end
 	0

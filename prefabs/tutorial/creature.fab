@@ -1,37 +1,45 @@
 #version
-	1
+	2
 #entity_count
 	1
 #prefab
 	2493478670
+#parent
+	18446744073709551615
 #renderable
 	1512583253
 #scene_version
-	4
+	8
 #source
-	"models/creatures/roach/roach.msh"
+	"models/creatures/undead_squirrel/squirrel-anim.msh"
+#flags
+	0
 #custom_materials
 	0
 #box_rigid_actor
 	894846619
 #scene_version
-	1
+	3
 #layer
 	0
 #dynamic_type
 	2
-#x 1.000000
-	1065353216
+#trigger
+	0
+#x 0.500000
+	1056964608
 #y 1.000000
 	1065353216
-#z 1.000000
-	1065353216
+#z 0.500000
+	1056964608
 #anim_controller
 	284548379
 #scene_version
-	-1
+	1
 #source
-	"models/creatures/roach/roach.act"
+	"models/creatures/undead_squirrel/anim.act"
+#default_set
+	0
 #lua_script
 	4143584752
 #scene_version
@@ -47,13 +55,13 @@
 #prop_type
 	2
 #prop_value
-	"11"
+	"18446744073709551615"
 #prop_name
 	"followed_entity"
 #prop_type
 	2
 #prop_value
-	"7"
+	"18446744073709551615"
 #prop_name
 	"speed"
 #prop_type
@@ -63,12 +71,14 @@
 #navmesh_agent
 	3944425155
 #scene_version
-	1
+	2
 #radius 0.500000
 	1056964608
 #height 2.000000
 	1073741824
 #use_root_motion
+	0
+#get_root_motion_from_animation_controller
 	0
 #cmp_end
 	0

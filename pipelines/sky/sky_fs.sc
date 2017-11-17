@@ -9,14 +9,6 @@ uniform vec4 u_strength;
 uniform vec4 u_sunSize;
 
 
-const float rayleigh_collection_power = 0.51f;
-const float mie_collection_power = 0.39f;
-const float mie_distribution = 0.13f;
-
-const float surface_height = 0.993;
-const float intensity = 1.8;
-const int step_count = 4;
-
 //http://codeflow.org/entries/2011/apr/13/advanced-webgl-part-2-sky-rendering/
 
 
@@ -80,6 +72,15 @@ vec3 get_world_normal(vec2 frag_coord)
 
 void main()
 {
+	const float rayleigh_collection_power = 0.51f;
+	const float mie_collection_power = 0.39f;
+	const float mie_distribution = 0.13f;
+
+	const float surface_height = 0.993;
+	const float intensity = 1.8;
+	const int step_count = 4;
+
+	
 	vec3 lightdir = -u_lightDirFov.xyz;
 	vec3 eyedir = get_world_normal(v_wpos.xy);
 	

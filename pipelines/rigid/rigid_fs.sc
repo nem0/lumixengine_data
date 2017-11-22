@@ -90,14 +90,12 @@ void main()
 		vec2 tex_coords = v_texcoord0;
 	#endif
 
+	vec4 color = u_materialColor.rgba;
 	#ifdef DIFFUSE_TEXTURE
-		vec4 color = texture2D(u_texColor, tex_coords);
-		color.rgba *= u_materialColor.rgba;
+		color *= texture2D(u_texColor, tex_coords);
 		#ifdef ALPHA_CUTOUT
 			if(color.a < u_alphaRef) discard;
 		#endif
-	#else
-		vec4 color = vec4(1, 1, 1, 1);
 	#endif
 	#ifdef SHADOW
 		float depth = v_common2.z / v_common2.w;

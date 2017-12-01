@@ -8,11 +8,12 @@ else
 	camera = "editor"
 end
 
-local DEFAULT_RENDER_MASK = 1
-local TRANSPARENT_RENDER_MASK = 2
-local WATER_RENDER_MASK = 4
-local FUR_RENDER_MASK = 8
-local ALL_RENDER_MASK = DEFAULT_RENDER_MASK + TRANSPARENT_RENDER_MASK + WATER_RENDER_MASK + FUR_RENDER_MASK
+local DEFAULT_RENDER_MASK = getLayerMask(this, "default")
+local TRANSPARENT_RENDER_MASK = getLayerMask(this, "transparent")
+local WATER_RENDER_MASK = getLayerMask(this, "water")
+local FUR_RENDER_MASK = getLayerMask(this, "fur")
+local NOSHADOWS_RENDER_MASK = getLayerMask(this, "no_shadows")
+local ALL_RENDER_MASK = DEFAULT_RENDER_MASK + TRANSPARENT_RENDER_MASK + WATER_RENDER_MASK + FUR_RENDER_MASK + NOSHADOWS_RENDER_MASK
 local screenshot_request = 0
 local render_fur = true
 local render_shadowmap = true
@@ -90,7 +91,7 @@ local gamma_mapping_material = Engine.loadResource(g_engine, "pipelines/common/g
 
 
 function deferred(camera_slot)
-	deferred_view = newView(this, "geometry_pass", "g_buffer", DEFAULT_RENDER_MASK)
+	deferred_view = newView(this, "geometry_pass", "g_buffer", DEFAULT_RENDER_MASK + NOSHADOWS_RENDER_MASK)
 		setPass(this, "DEFERRED")
 		applyCamera(this, camera_slot)
 		clear(this, CLEAR_ALL, 0x00000000)

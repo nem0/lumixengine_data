@@ -1,9 +1,9 @@
 #name
 	""
-#transform (-2.758113, 0.461568, -1.532148)  (0.000000, 0.000000, 0.000000, 1.000000)
-	3224405230
-	1055675034
-	3217300844
+#transform (-0.000000, 0.000000, -3.000000)  (0.000000, 0.000000, 0.000000, 1.000000)
+	3023472959
+	0
+	3225419776
 	0
 	0
 	0
@@ -15,9 +15,9 @@
 #renderable
 	1512583253
 #source
-	"models/utils/cube/cube.msh"
+	"models/utils/sphere/untitled.msh"
 #flags
-	0
+	8
 #custom_materials
 	0
 #cmp_end

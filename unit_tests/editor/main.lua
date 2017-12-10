@@ -6,7 +6,7 @@ local tests = {
 	"copy_paste_delete",
 }
 
-local success = Editor.runTest(Editor.editor, "unit_tests/editor/", "mismatch")
+local success = Editor.runTest("unit_tests/editor/", "mismatch")
 if success then
 	failed_count = 1
 	Engine.logError("Test mismatch.json should have failed, but it did not.");
@@ -14,7 +14,7 @@ end
 
 
 for index,test in ipairs(tests) do
-	local success = Editor.runTest(Editor.editor, "unit_tests/editor/", test)
+	local success = Editor.runTest("unit_tests/editor/", test)
 	if not success then
 		failed_count = failed_count + 1
 		Engine.logError("Test " .. index .. " failed.");
@@ -24,6 +24,6 @@ for index,test in ipairs(tests) do
 end
 
 Engine.logInfo("Editor tests finished, " .. tostring(failed_count) .. " tests failed.");
-Editor.exit(Editor.editor, failed_count)
+Editor.exitWithCode(failed_count)
 
 

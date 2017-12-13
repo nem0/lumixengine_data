@@ -26,33 +26,24 @@ local bloom_blur = true
 
 
 function computeLumUniforms()
-	local sizes = {64, 16, 4, 1 }
+	local sizes = {256, 64, 16, 4, 1 }
 	for key,value in ipairs(sizes) do
 		lum_uniforms[value] = {}
-		for j = 0,3 do
-			for i = 0,3 do
-				local x = (i) / value; 
-				local y = (j) / value; 
-				lum_uniforms[value][1 + i + j * 4] = {x, y, 0, 0}
+		for j = 0,1 do
+			for i = 0,1 do
+				local x = 1 / (4 * value) + i / (2 * value) - 1 / (2 * value)
+				local y = 1 / (4 * value) + j / (2 * value) - 1 / (2 * value)
+				lum_uniforms[value][1 + i + j * 2] = {x, y, 0, 0}
 			end
-		end
-	end
-
-	lum_uniforms[128] = {}
-	for j = 0,1 do
-		for i = 0,1 do
-			local x = i / 128; 
-			local y = j / 128; 
-			lum_uniforms[128][1 + i + j * 4] = {x, y, 0, 0}
 		end
 	end
 end
 computeLumUniforms()
 
 function initHDR(ctx)
-	addFramebuffer(ctx.pipeline, "lum128", {
-		width = 128,
-		height = 128,
+	addFramebuffer(ctx.pipeline, "lum256", {
+		width = 256,
+		height = 256,
 		renderbuffers = {
 			{ format = "r32f" }
 		}
@@ -158,30 +149,30 @@ function initHDR(ctx)
 end
 
 function hdr(ctx, camera_slot)
-	newView(ctx.pipeline, "hdr_luminance", "lum128")
-		setPass(ctx.pipeline, "HDR_LUMINANCE")
+	newView(ctx.pipeline, "hdr_luminance", "lum256")
+		setPass(ctx.pipeline, "HDR_EXTRACT_LUMINANCE")
 		disableDepthWrite(ctx.pipeline)
 		disableBlending(ctx.pipeline)
-		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[128])
-		bindFramebufferTexture(ctx.pipeline, "hdr", 0, ctx.hdr_buffer_uniform)
+		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[256])
+		bindFramebufferTexture(ctx.pipeline, "hdr", 0, ctx.hdr_buffer_uniform, TEXTURE_MAG_ANISOTROPIC | TEXTURE_MIN_ANISOTROPIC)
 		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
 	
-	newView(ctx.pipeline, "hdr_avg_luminance", "lum64")
-		setPass(ctx.pipeline, "HDR_AVG_LUMINANCE")
+	newView(ctx.pipeline, "lum64", "lum64")
+		setPass(ctx.pipeline, "MAIN")
 		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[64])
-		bindFramebufferTexture(ctx.pipeline, "lum128", 0, ctx.hdr_buffer_uniform)
+		bindFramebufferTexture(ctx.pipeline, "lum256", 0, ctx.hdr_buffer_uniform, TEXTURE_MAG_ANISOTROPIC | TEXTURE_MIN_ANISOTROPIC)
 		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
 
 	newView(ctx.pipeline, "lum16", "lum16")
-		setPass(ctx.pipeline, "HDR_AVG_LUMINANCE")
+		setPass(ctx.pipeline, "MAIN")
 		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[16])
-		bindFramebufferTexture(ctx.pipeline, "lum64", 0, ctx.hdr_buffer_uniform)
+		bindFramebufferTexture(ctx.pipeline, "lum64", 0, ctx.hdr_buffer_uniform, TEXTURE_MAG_ANISOTROPIC | TEXTURE_MIN_ANISOTROPIC)
 		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
 	
 	newView(ctx.pipeline, "lum4", "lum4")
-		setPass(ctx.pipeline, "HDR_AVG_LUMINANCE")
+		setPass(ctx.pipeline, "MAIN")
 		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[4])
-		bindFramebufferTexture(ctx.pipeline, "lum16", 0, ctx.hdr_buffer_uniform)
+		bindFramebufferTexture(ctx.pipeline, "lum16", 0, ctx.hdr_buffer_uniform, TEXTURE_MAG_ANISOTROPIC | TEXTURE_MIN_ANISOTROPIC)
 		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
 
 	local old_lum1 = "lum1b"
@@ -193,9 +184,9 @@ function hdr(ctx, camera_slot)
 	end
 
 	newView(ctx.pipeline, "lum1", ctx.current_lum1)
-		setPass(ctx.pipeline, "LUM1")
+		setPass(ctx.pipeline, "FINAL")
 		setUniform(ctx.pipeline, ctx.lum_size_uniform, lum_uniforms[1])
-		bindFramebufferTexture(ctx.pipeline, "lum4", 0, ctx.hdr_buffer_uniform)
+		bindFramebufferTexture(ctx.pipeline, "lum4", 0, ctx.hdr_buffer_uniform, TEXTURE_MAG_ANISOTROPIC | TEXTURE_MIN_ANISOTROPIC)
 		bindFramebufferTexture(ctx.pipeline, old_lum1, 0, ctx.avg_luminance_uniform)
 		drawQuad(ctx.pipeline, 0, 0, 1, 1, ctx.lum_material)
 
@@ -383,7 +374,7 @@ end
 
 function onDestroy()
 	if pipeline_env then
-		removeFramebuffer(pipeline_env.ctx.pipeline, "lum128")
+		removeFramebuffer(pipeline_env.ctx.pipeline, "lum256")
 		removeFramebuffer(pipeline_env.ctx.pipeline, "lum64")
 		removeFramebuffer(pipeline_env.ctx.pipeline, "lum16")
 		removeFramebuffer(pipeline_env.ctx.pipeline, "lum4")

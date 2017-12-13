@@ -1,6 +1,6 @@
-pass "HDR_LUMINANCE"
-pass "HDR_AVG_LUMINANCE"
-pass "LUM1"
+pass "HDR_EXTRACT_LUMINANCE"
+pass "MAIN"
+pass "FINAL"
    
 depth_test(false) 
  

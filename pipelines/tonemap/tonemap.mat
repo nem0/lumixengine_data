@@ -1,0 +1,4 @@
+{"shader" : "pipelines/tonemap/tonemap.shd",
+"backface_culling" : false,
+"uniforms" : [ {"name" : "midgray", "float_value" : 0.18000001} ]
+}

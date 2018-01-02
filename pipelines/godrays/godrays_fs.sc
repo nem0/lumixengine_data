@@ -112,6 +112,6 @@ void main()
 		res += sample;
 		illuminationDecay *= decay;
 	}
-	gl_FragColor = res * exposure * vec4(u_fogColorDensity.rgb, 1);
+	gl_FragColor = vec4(res, 0, 0, 1);
 }
 

@@ -385,8 +385,16 @@ vec3 getScreenCoord(vec3 world_pos)
 
 float toLinearDepth(float ndc_depth)
 {
-	vec4 linear_depth_v = mul(u_invProj, vec4(0, 0, ndc_depth, 1));
-	return linear_depth_v.z / linear_depth_v.w;
+	#if BGFX_SHADER_LANGUAGE_HLSL
+		ndc_depth = ndc_depth;
+	#else
+		ndc_depth = ndc_depth * 2.0 - 1.0;
+	#endif // BGFX_SHADER_LANGUAGE_HLSL
+	vec4 pos_proj = vec4(0, 0, ndc_depth, 1.0);
+	
+	vec4 view_pos = mul(u_camInvProj, pos_proj);
+	
+	return -view_pos.z / view_pos.w;
 }
 
 

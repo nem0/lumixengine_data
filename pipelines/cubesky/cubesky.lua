@@ -8,7 +8,7 @@ _postprocess_slot = "pre_transparent"
 
 function postprocess(pipeline, env)
 	if sky_material < 0 then return end
-	newView(pipeline, "sky", env.ctx.main_framebuffer)
+	newView(pipeline, "sky", "hdr")
 		setPass(pipeline, "MAIN")
 		setStencil(pipeline, STENCIL_OP_PASS_Z_KEEP 
 			| STENCIL_OP_FAIL_Z_KEEP 

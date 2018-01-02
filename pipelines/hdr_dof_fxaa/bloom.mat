@@ -1,3 +1,0 @@
-{"shader" : "pipelines/hdr_dof_fxaa/bloom.shd",
-"backface_culling" : false,
-"uniforms" : []}

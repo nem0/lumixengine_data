@@ -1,7 +1,0 @@
-pass "MAIN"
-	fs { "DOF", "FILM_GRAIN", "VIGNETTE" }
-
-depth_test(false)
-
-uniform("u_time", "time")
-uniform("midgray", "float")

@@ -1,0 +1,6 @@
+pass "HDR_EXTRACT_LUMINANCE"
+pass "MAIN"
+pass "FINAL"
+   
+depth_test(false) 
+ 

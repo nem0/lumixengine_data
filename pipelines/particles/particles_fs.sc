@@ -20,7 +20,7 @@ void main()
 	
 	float depth = texture2D(u_depthBuffer, screen_coord.xy * 0.5 + 0.5).x;
 
-	float depth_diff = toLinearDepth(screen_coord.z) - toLinearDepth(depth);
+	float depth_diff = toLinearDepth(depth) - toLinearDepth(screen_coord.z);
 	
 	vec4 col = texture2D(u_texColor, v_texcoord0) * v_common.x;
 	#ifdef SUBIMAGE

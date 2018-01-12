@@ -355,8 +355,7 @@ end
 
 function postprocess(pipeline, env)
 	if enabled then
-		camera_cmp = Renderer.getCameraComponent(g_scene_renderer, this)
-		slot = Renderer.getCameraSlot(g_scene_renderer, camera_cmp)
+		slot = Renderer.getCameraSlot(g_scene_renderer, this)
 		postprocessBasic(pipeline, env, slot)
 	end
 end

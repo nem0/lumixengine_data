@@ -45,14 +45,12 @@ function doPostprocess(pipeline, this_env, slot, camera_slot)
 	local scene_renderer = Renderer.getPipelineScene(pipeline)
 	local universe = Engine.getSceneUniverse(scene_renderer)
 	local scene_lua_script = Engine.getScene(universe, "lua_script")
-	local camera_cmp = Renderer.getCameraInSlot(scene_renderer, camera_slot)
-	if camera_cmp < 0 then return end
-	local camera_entity = Renderer.getCameraEntity(scene_renderer, camera_cmp)
-	local script_cmp = Engine.getComponent(universe, camera_entity, LUA_SCRIPT_TYPE)
-	if script_cmp < 0 then return end
-	local script_count = LuaScript.getScriptCount(scene_lua_script, script_cmp)
+	local camera_entity = Renderer.getCameraInSlot(scene_renderer, camera_slot)
+	if camera_entity < 0 then return end
+	if not Engine.hasComponent(universe, camera_entity, LUA_SCRIPT_TYPE) then return end
+	local script_count = LuaScript.getScriptCount(scene_lua_script, camera_entity)
 	for i = 1, script_count do
-		local env = LuaScript.getEnvironment(scene_lua_script, script_cmp, i - 1)
+		local env = LuaScript.getEnvironment(scene_lua_script, camera_entity, i - 1)
 		if env ~= nil then 
 			if env._IS_POSTPROCESS_INITIALIZED == nil and env.initPostprocess ~= nil then
 				env.initPostprocess(pipeline, this_env)

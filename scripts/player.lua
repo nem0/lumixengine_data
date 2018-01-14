@@ -51,7 +51,7 @@ function onInputEvent(event)
 end
 
 function init()
-	cmp = Engine.createComponent(g_universe, this, "physical_controller")
+	Engine.createComponent(g_universe, this, "physical_controller")
 end
 
 function update(dt)
@@ -75,18 +75,18 @@ function update(dt)
 
 	if actions.left then
 		local v = Engine.multVecQuat({-speed, 0, 0}, {0, 1, 0}, yaw)
-		Physics.moveController(scene, cmp, v, dt)
+		Physics.moveController(scene, this, v, dt)
 	end
 	if actions.right then
 		local v = Engine.multVecQuat({speed, 0, 0}, {0, 1, 0}, yaw)
-		Physics.moveController(scene, cmp, v, dt)
+		Physics.moveController(scene, this, v, dt)
 	end
 	if actions.forward then
 		local v = Engine.multVecQuat({0, 0, -speed}, {0, 1, 0}, yaw)
-		Physics.moveController(scene, cmp, v, dt)
+		Physics.moveController(scene, this, v, dt)
 	end
 	if actions.back then
 		local v = Engine.multVecQuat({0, 0, speed}, {0, 1, 0}, yaw)
-		Physics.moveController(scene, cmp, v, dt)
+		Physics.moveController(scene, this, v, dt)
 	end
 end

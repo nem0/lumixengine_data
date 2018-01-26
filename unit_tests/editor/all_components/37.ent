@@ -12,6 +12,12 @@
 	1065353216
 #parent
 	18446744073709551615
+#gui_button
+	4219002549
+#normal_color
+	4294967295
+#hovered_color
+	4294967295
 #gui_rect
 	41313106
 #flags
@@ -32,11 +38,5 @@
 	0
 #left_rel 0.000000
 	0
-#gui_button
-	4219002549
-#normal_color
-	4294967295
-#hovered_color
-	4294967295
 #cmp_end
 	0

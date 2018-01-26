@@ -12,8 +12,8 @@
 	1065353216
 #parent
 	18446744073709551615
-#distance_joint
-	1541544812
+#hinge_joint
+	2641119429
 #connected_body
 	18446744073709551615
 #local_frame (0.000000, 0.000000, 0.000000)  (0.000000, 0.000000, 0.000000, 1.000000)
@@ -25,16 +25,20 @@
 	0
 	1065353216
 #flags
-	10
+	0
+#bounce_threshold 0.500000
+	1056964608
+#contact_distance 0.100000
+	1036831949
 #damping 0.000000
+	0
+#restitution 0.000000
 	0
 #stiffness 0.000000
 	0
-#tolerance 0.025000
-	1020054733
-#min_distance 0.000000
-	0
-#max_distance 0.000000
-	0
+#lower -1.570796
+	3217625051
+#upper 1.570796
+	1070141403
 #cmp_end
 	0

@@ -1,5 +1,5 @@
 #name
-	"physics_controller"
+	""
 #transform (-0.000000, 0.000000, -3.000000)  (0.000000, 0.000000, 0.000000, 1.000000)
 	3023472959
 	0
@@ -12,5 +12,15 @@
 	1065353216
 #parent
 	18446744073709551615
+#navmesh_agent
+	3944425155
+#radius 0.500000
+	1056964608
+#height 2.000000
+	1073741824
+#use_root_motion
+	1
+#get_root_motion_from_animation_controller
+	0
 #cmp_end
 	0

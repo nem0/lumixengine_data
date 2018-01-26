@@ -12,13 +12,15 @@
 	1065353216
 #parent
 	18446744073709551615
-#renderable
-	1512583253
-#source
-	"models/buildings/tower/house2.msh"
-#flags
-	8
-#custom_materials
+#rigid_actor
+	401297833
+#layer
+	0
+#dynamic_type
+	0
+#trigger
+	0
+#count
 	0
 #cmp_end
 	0

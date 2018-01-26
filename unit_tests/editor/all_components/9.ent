@@ -1,5 +1,5 @@
 #name
-	"navmesh_agent"
+	""
 #transform (-0.000000, 0.000000, -3.000000)  (0.000000, 0.000000, 0.000000, 1.000000)
 	3023472959
 	0
@@ -12,5 +12,29 @@
 	1065353216
 #parent
 	18446744073709551615
+#particle_emitter
+	2085777965
+#autoemit
+	1
+#local_space
+	0
+#spawn_period_from 1.000000
+	1065353216
+#spawn_period_to 2.000000
+	1073741824
+#initial_life_from 1.000000
+	1065353216
+#initial_life_to 2.000000
+	1073741824
+#initial_size_from 1.000000
+	1065353216
+#initial_size_to 1.000000
+	1065353216
+#spawn_count_from
+	1
+#spawn_count_to
+	1
+#material
+	""
 #cmp_end
 	0

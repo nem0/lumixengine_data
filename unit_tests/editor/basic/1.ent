@@ -31,7 +31,7 @@
 #count
 	1
 #source
-	"pipelines/cubesky/cubesky.lua"
+	"pipelines/sky/sky.lua"
 #flags
 	1
 #prop_count
@@ -41,6 +41,6 @@
 #prop_type
 	3
 #prop_value
-	"models/sky/clouded01/sky.mat"
+	"pipelines/sky/sky.mat"
 #cmp_end
 	0

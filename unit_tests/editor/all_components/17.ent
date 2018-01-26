@@ -1,5 +1,5 @@
 #name
-	"physics_sphericaljoint"
+	""
 #transform (-0.000000, 0.000000, -3.000000)  (0.000000, 0.000000, 0.000000, 1.000000)
 	3023472959
 	0
@@ -12,5 +12,11 @@
 	1065353216
 #parent
 	18446744073709551615
+#particle_emitter_spawn_shape
+	4292570585
+#shape
+	0
+#radius 1.000000
+	1065353216
 #cmp_end
 	0

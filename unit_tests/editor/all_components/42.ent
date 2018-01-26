@@ -12,13 +12,21 @@
 	1065353216
 #parent
 	18446744073709551615
-#renderable
-	1512583253
-#source
-	"models/buildings/tower/house2.msh"
-#flags
-	8
-#custom_materials
+#chorus_zone
+	86252075
+#radius 10.000000
+	1092616192
+#delay 500.000000
+	1140457472
+#depth 1.000000
+	1065353216
+#feedback 0.000000
 	0
+#frequency 1.000000
+	1065353216
+#phase
+	0
+#wet_dry_mix 0.500000
+	1056964608
 #cmp_end
 	0

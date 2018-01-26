@@ -12,15 +12,27 @@
 	1065353216
 #parent
 	18446744073709551615
-#physical_heightfield
-	2591613726
-#heightmap
-	""
-#xz_scale 1.000000
-	1065353216
-#y_scale 1.000000
-	1065353216
-#layer
+#gui_rect
+	41313106
+#flags
+	3
+#top_pts 0.000000
 	0
+#top_rel 0.000000
+	0
+#right_pts 0.000000
+	0
+#right_rel 1.000000
+	1065353216
+#bottom_pts 0.000000
+	0
+#bottom_rel 1.000000
+	1065353216
+#left_pts 0.000000
+	0
+#left_rel 0.000000
+	0
+#gui_input_field
+	791002621
 #cmp_end
 	0

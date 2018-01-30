@@ -477,6 +477,8 @@ function transparency(camera_slot)
 		applyCamera(this, camera_slot)
 		setActiveGlobalLightUniforms(this)
 		bindEnvironmentMaps(this, irradiance_map_uniform, radiance_map_uniform)
+		
+		renderTextMeshes(this)
 end
 
 function fur(camera_slot)

@@ -1,6 +1,7 @@
 local tests = {
 	{"direct_light", 10},
-	{"indirect_light", 10}
+	{"indirect_light", 10},
+	{"text_mesh", 10}
 }
 
 local function waitForLoad()

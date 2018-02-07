@@ -39,6 +39,15 @@ void main()
 	vec3 lp = v_pos_radius.xyz - wpos;
 	float dist = length(lp);
 	float attn = pow(max(0, 1 - dist / v_pos_radius.w), v_color_attn.w);		
+	if(v_dir_fov.w < 3.14159)
+	{
+		float cosDir = dot(normalize(v_dir_fov.xyz), normalize(light_dir));
+		float cosCone = cos(v_dir_fov.w * 0.5);
+
+		if(cosDir < cosCone)
+			discard;
+		attn *= (cosDir - cosCone) / (1 - cosCone);	
+	}
 	vec4 specular_color = (f0 - f0 * metallic) + albedo * metallic;
 	vec4 diffuse_color = albedo - albedo * metallic;
 	#ifdef HAS_SHADOWMAP

@@ -81,6 +81,15 @@ vec2 parallaxMapping(sampler2D bump_map, vec2 tex_coords, vec3 view_dir)
 
 #endif
 
+vec3 toLinear(vec3 _rgb)
+{
+	return pow(abs(_rgb), vec3_splat(2.2) );
+}
+
+vec4 toLinear(vec4 _rgba)
+{
+	return vec4(toLinear(_rgba.xyz), _rgba.w);
+}
 
 void main()
 {     
@@ -90,7 +99,7 @@ void main()
 		vec2 tex_coords = v_texcoord0;
 	#endif
 
-	vec4 color = u_materialColor.rgba;
+	vec4 color = toLinear(u_materialColor.rgba);
 	#ifdef DIFFUSE_TEXTURE
 		color *= texture2D(u_texColor, tex_coords);
 		#ifdef ALPHA_CUTOUT

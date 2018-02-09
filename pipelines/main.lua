@@ -207,7 +207,6 @@ function loadResources(ctx)
 	ctx.blur_material = Engine.loadResource(g_engine, "pipelines/common/blur.mat", "material")
 	ctx.pbr_material = Engine.loadResource(g_engine, "pipelines/pbr/pbr.mat", "material")
 	ctx.pbr_local_light_material = Engine.loadResource(g_engine, "pipelines/pbr/pbrlocallight.mat", "material")
-	ctx.gamma_mapping_material = Engine.loadResource(g_engine, "pipelines/common/gamma_mapping.mat", "material")
 	ctx.tonemap_material = Engine.loadResource(g_engine, "pipelines/tonemap/tonemap.mat", "material")
 	ctx.extract_luminance_material = Engine.loadResource(g_engine, "pipelines/tonemap/extractluminance.mat", "material")
 	ctx.selection_outline_material = Engine.loadResource(g_engine, "pipelines/common/selection_outline.mat", "material")
@@ -374,14 +373,6 @@ function tonemapping()
 		bindFramebufferTexture(this, "hdr", 0, texture_uniform)
 		bindFramebufferTexture(this, current_lum1, 0, avg_luminance_uniform)
 		drawQuad(this, 0, 0, 1, 1, tonemap_material)
-end
-
-function gammamapping()
-	newView(this, "SRGB", "default")
-		clear(this, CLEAR_ALL, 0x00000000)
-		setPass(this, "MAIN")
-		bindFramebufferTexture(this, "linear", 0, texture_uniform)
-		drawQuad(this, 0, 0, 1, 1, gamma_mapping_material)
 end
 
 function renderSelectionOutline(ctx, camera_slot)
@@ -588,7 +579,9 @@ function render()
 
 	doPostprocess(this, _ENV, "post_tonemapping", camera_slot)
 
-	gammamapping()
+	newView(this, "copy_to_linear", "default")
+		clear(this, CLEAR_ALL, 0x00000000)
+		copyRenderbuffer(this, "linear", 0, "default", 0)
 	
 	newView(this, "draw2d", "default")
 		setPass(this, "MAIN")

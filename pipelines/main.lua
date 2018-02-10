@@ -581,7 +581,8 @@ function render()
 
 	newView(this, "copy_to_linear", "default")
 		clear(this, CLEAR_ALL, 0x00000000)
-		copyRenderbuffer(this, "linear", 0, "default", 0)
+		bindFramebufferTexture(this, "linear", 0, texture_uniform)
+		drawQuad(this, 0, 0, 1, 1, screen_space_material)
 	
 	newView(this, "draw2d", "default")
 		setPass(this, "MAIN")

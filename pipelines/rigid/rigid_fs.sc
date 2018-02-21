@@ -30,12 +30,11 @@
 	SAMPLER2D(u_texShadowmap, 13);
 #endif
 uniform vec4 u_materialColor;
-uniform vec4 u_roughnessMetallic;
+uniform vec4 u_roughnessMetallicEmission;
 uniform vec4 u_parallaxScale;
 
 uniform vec4 u_lightPosRadius;
 uniform vec4 u_lightRgbAndIndirectIntensity;
-uniform vec4 u_ambientColor;
 uniform vec4 u_lightDirFov; 
 uniform mat4 u_shadowmapMatrices[4];
 uniform vec4 u_fogColorDensity; 
@@ -112,15 +111,16 @@ void main()
 	#else
 		#ifdef DEFERRED
 			#ifdef ROUGHNESS_TEXTURE
-				float roughness = texture2D(u_texRoughness, tex_coords).x * u_roughnessMetallic.x;
+				float roughness = texture2D(u_texRoughness, tex_coords).x * u_roughnessMetallicEmission.x;
 			#else
-				float roughness = u_roughnessMetallic.x;
+				float roughness = u_roughnessMetallicEmission.x;
 			#endif
 			#ifdef METALLIC_TEXTURE
-				float metallic = texture2D(u_texMetallic, tex_coords).x * u_roughnessMetallic.y;
+				float metallic = texture2D(u_texMetallic, tex_coords).x * u_roughnessMetallicEmission.y;
 			#else
-				float metallic = u_roughnessMetallic.y;
+				float metallic = u_roughnessMetallicEmission.y;
 			#endif
+			float emission = u_roughnessMetallicEmission.z;
 		
 			gl_FragData[0] = vec4(color.rgb, roughness);
 			vec3 normal;
@@ -140,10 +140,11 @@ void main()
 			#endif
 			gl_FragData[1].xyz = (normal + 1) * 0.5; // todo: store only xz 
 			gl_FragData[1].w = metallic;
+			float packed_emission = packEmission(emission);
 			#ifdef AMBIENT_OCCLUSION
-				gl_FragData[2] = vec4(texture2D(u_texAO, tex_coords).x, 0, 0, 1);
+				gl_FragData[2] = vec4(texture2D(u_texAO, tex_coords).x, packed_emission, 0, 1);
 			#else
-				gl_FragData[2] = vec4(1, 0, 0, 1);
+				gl_FragData[2] = vec4(1, packed_emission, 0, 1);
 			#endif
 		#else // DEFERRED
 			mat3 tbn = mat3(
@@ -166,8 +167,9 @@ void main()
 			
 			vec3 normal = wnormal;
 			vec4 albedo = color;
-			float roughness = u_roughnessMetallic.x;
-			float metallic = u_roughnessMetallic.y;
+			float roughness = u_roughnessMetallicEmission.x;
+			float metallic = u_roughnessMetallicEmission.y;
+			float emission = u_roughnessMetallicEmission.z;
 			
 			vec4 camera_wpos = mul(u_camInvView, vec4(0, 0, 0, 1));
 			vec3 view = normalize(camera_wpos.xyz - v_wpos.xyz);
@@ -188,6 +190,7 @@ void main()
 			float shadow = directionalLightShadow(u_texShadowmap, u_shadowmapMatrices, vec4(v_wpos, 1), ndotl);
 			float fog_factor = getFogFactor(camera_wpos.xyz / camera_wpos.w, u_fogColorDensity.w, v_wpos.xyz, u_fogParams);
 			vec3 lighting = 
+				emission * albedo +
 				direct_diffuse * diffuseColor.rgb * shadow + 
 				direct_specular * specularColor.rgb * shadow + 
 				indirect_diffuse * u_lightRgbAndIndirectIntensity.w + 

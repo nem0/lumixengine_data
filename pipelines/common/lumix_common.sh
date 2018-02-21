@@ -52,6 +52,15 @@ BEGIN_CONST_ARRAY (vec2, 16, POISSON_DISK_16)
 	vec2(0.6104985,0.7838438)
 END_CONST_ARRAY;
 
+float packEmission(float emission)
+{
+	return log2(1 + emission / 64);
+}
+
+float unpackEmission(float emission)
+{
+	return (exp2(emission) - 1) * 64;
+}
 
 float rand(vec4 seed)
 {

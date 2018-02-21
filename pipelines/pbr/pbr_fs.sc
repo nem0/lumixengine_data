@@ -29,6 +29,7 @@ void main()
 	vec4 albedo = texture2D(u_gbuffer0, v_texcoord0);
 	float roughness = albedo.w;
 	float metallic = gbuffer1_val.w;
+	float emission = unpackEmission(gbuffer2_val.y);
 	
 	mat4 inv_view_proj = mul(u_camInvView, u_camInvProj); // to improve precision, shadows shimmer if we use u_canInvViewProj instead
 	vec3 wpos = getViewPosition(u_gbuffer_depth, inv_view_proj, v_texcoord0);
@@ -59,6 +60,6 @@ void main()
 		0
 		;
 	float prebaked_ao = gbuffer2_val.x;
-	gl_FragColor.rgb = mix(lighting * prebaked_ao, u_fogColorDensity.rgb, fog_factor);
+	gl_FragColor.rgb = mix(emission * albedo.rgb + lighting * prebaked_ao, u_fogColorDensity.rgb, fog_factor);
 	gl_FragColor.w = 1;
 }

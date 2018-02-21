@@ -13,10 +13,7 @@ http://machinesdontcare.wordpress.com/2009/06/25/3d-perlin-noise-sphere-vertex-s
 #include "common.sh"
 
 SAMPLER2D(u_texture, 15);
-#ifdef DOF
-	SAMPLER2D(u_dofBuffer, 14);
-	SAMPLER2D(u_cocBuffer, 13);
-#endif
+SAMPLER2D(u_colorGradingLUT, 14);
 
 
 uniform vec4 exposure;
@@ -136,6 +133,37 @@ vec3 vignette(vec2 tex_coord, vec3 in_color)
 }
 
 
+#ifdef COLOR_GRADING
+// http://kpulv.com/359/Dev_Log__Color_Grading_Shader/
+vec4 sampleColorGradingLUT(vec3 uv, float width) 
+{
+    float sliceSize = 1.0 / width;              // space of 1 slice
+    float slicePixelSize = sliceSize / width;           // space of 1 pixel
+    float sliceInnerSize = slicePixelSize * (width - 1.0);  // space of width pixels
+    float zSlice0 = min(floor(uv.z * width), width - 1.0);
+    float zSlice1 = min(zSlice0 + 1.0, width - 1.0);
+    float xOffset = slicePixelSize * 0.5 + uv.x * sliceInnerSize;
+    float s0 = xOffset + (zSlice0 * sliceSize);
+    float s1 = xOffset + (zSlice1 * sliceSize);
+    vec4 slice0Color = texture2D(u_colorGradingLUT, vec2(s0, uv.y));
+    vec4 slice1Color = texture2D(u_colorGradingLUT, vec2(s1, uv.y));
+    float zOffset = mod(uv.z * width, 1.0);
+    vec4 result = mix(slice0Color, slice1Color, zOffset);
+    return result;
+}
+#endif
+
+vec3 colorGrading(vec3 color)
+{
+	const float SIZE = 16;
+	#ifdef COLOR_GRADING
+		return sampleColorGradingLUT(color, 16);
+	#else
+		return color;
+	#endif
+}
+
+
 void main()
 {
 	vec3 color = texture2D(u_texture, v_texcoord0).xyz;
@@ -143,6 +171,7 @@ void main()
 	//color *= exposure.x;
 	color = vignette(v_texcoord0, color);
 	color = filmGrain(v_texcoord0, color);
+	color = colorGrading(color);
 	
 	gl_FragColor = vec4(color, 1.0f);
 }

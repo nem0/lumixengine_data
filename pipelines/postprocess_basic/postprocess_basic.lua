@@ -1,3 +1,6 @@
+lut_texture = -1
+Editor.setPropertyType("lut_texture", Editor.RESOURCE_PROPERTY, "texture")
+
 _postprocess_slot = "post_tonemapping"
 
 dof_near_blur = 0
@@ -67,6 +70,7 @@ function initPostprocessBasic(pipeline, ctx)
 	
 	ctx.bloom_cutoff = createVec4ArrayUniform(pipeline, "u_bloomCutoff", 1)
 	ctx.grain_amount_uniform = createVec4ArrayUniform(pipeline, "u_grainAmount", 1)
+	ctx.lut_texture_uniform = createUniform(pipeline, "u_colorGradingLUT")
 	ctx.grain_size_uniform = createVec4ArrayUniform(pipeline, "u_grainSize", 1)
 	ctx.downsample_material = Engine.loadResource(g_engine, "pipelines/common/downsample.mat", "material")
 	ctx.ppbasic_material = Engine.loadResource(g_engine, "pipelines/postprocess_basic/ppbasic.mat", "material")
@@ -86,6 +90,7 @@ end
 function postprocessBasic(pipeline, ctx, camera_slot)
 	bloom(ctx, pipeline)
 		
+	setMaterialDefine(pipeline, ctx.ppbasic_material, "COLOR_GRADING", lut_texture ~= -1)
 	setMaterialDefine(pipeline, ctx.ppbasic_material, "FILM_GRAIN", film_grain_enabled)
 	setMaterialDefine(pipeline, ctx.ppbasic_material, "DOF", dof_enabled)
 	setMaterialDefine(pipeline, ctx.ppbasic_material, "VIGNETTE", vignette_enabled)
@@ -170,6 +175,9 @@ function postprocessBasic(pipeline, ctx, camera_slot)
 	if film_grain_enabled then
 		setUniform(pipeline, ctx.grain_amount_uniform, {{grain_amount, 0, 0, 0}})
 		setUniform(pipeline, ctx.grain_size_uniform, {{grain_size, 0, 0, 0}})
+	end
+	if lut_texture ~= -1 then
+		bindTexture(pipeline, ctx.lut_texture_uniform, lut_texture)
 	end
 	drawQuad(pipeline, 0, 0, 1, 1, ctx.ppbasic_material)
 

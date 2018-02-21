@@ -1,5 +1,5 @@
 pass "MAIN"
-	fs { "DOF", "FILM_GRAIN", "VIGNETTE" }
+	fs { "DOF", "FILM_GRAIN", "VIGNETTE", "COLOR_GRADING" }
 
 depth_test(false)
 

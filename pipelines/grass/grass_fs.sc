@@ -6,7 +6,7 @@ SAMPLER2D(u_texColor, 0);
 
 
 uniform vec4 u_materialColor;
-uniform vec4 u_roughnessMetallic;
+uniform vec4 u_roughnessMetallicEmission;
 
 
 void main()
@@ -20,9 +20,9 @@ void main()
 		color.rgb *= min(1.0, 2 * v_common.y + 0.2);
 	#endif
 	gl_FragData[0].rgb = color.rgb;
-	gl_FragData[0].w = u_roughnessMetallic.x;
+	gl_FragData[0].w = u_roughnessMetallicEmission.x;
 	vec3 normal = v_normal;
 	gl_FragData[1].xyz = (normal + 1) * 0.5; // todo: store only xz 
-	gl_FragData[1].w = u_roughnessMetallic.y;
+	gl_FragData[1].w = u_roughnessMetallicEmission.y;
 	gl_FragData[2] = vec4(1, 0, 0, 1);
 }

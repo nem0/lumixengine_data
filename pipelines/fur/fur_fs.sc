@@ -27,7 +27,7 @@ uniform vec4 u_fogParams;
 uniform vec4 u_layer;
 uniform vec4 u_alphaMultiplier;
 uniform vec4 u_darkening;
-uniform vec4 u_roughnessMetallic;
+uniform vec4 u_roughnessMetallicEmission;
 
 
 void main()
@@ -36,7 +36,7 @@ void main()
 	color.xyz *= u_materialColor.rgb;
 	#ifdef DEFERRED
 		gl_FragData[0].rgb = color.rgb;
-		gl_FragData[0].w = u_roughnessMetallic.x;
+		gl_FragData[0].w = u_roughnessMetallicEmission.x;
 		mat3 tbn = mat3(
 			normalize(v_tangent),
 			normalize(v_normal),
@@ -51,7 +51,7 @@ void main()
 			normal = normalize(v_normal.xyz);
 		#endif
 		gl_FragData[1].xyz = (normal + 1) * 0.5; // todo: store only xz 
-		gl_FragData[1].w = u_roughnessMetallic.y;
+		gl_FragData[1].w = u_roughnessMetallicEmission.y;
 		gl_FragData[2] = vec4(1, 0, 0, 1);
 	#else
 		#ifdef SHADOW
@@ -78,8 +78,8 @@ void main()
 			
 			vec3 normal = wnormal;
 			vec4 albedo = color;
-			float roughness = u_roughnessMetallic.x;
-			float metallic = u_roughnessMetallic.y;
+			float roughness = u_roughnessMetallicEmission.x;
+			float metallic = u_roughnessMetallicEmission.y;
 			
 			vec4 camera_wpos = mul(u_camInvView, vec4(0, 0, 0, 1));
 			vec3 view = normalize(camera_wpos.xyz - v_wpos.xyz);

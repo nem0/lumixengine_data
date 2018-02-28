@@ -563,10 +563,10 @@ function render()
 		shadowmap(ctx, camera_slot, DEFAULT_RENDER_MASK + FUR_RENDER_MASK)
 	end
 	rigid(camera_slot)
-	particles(camera_slot)
 	
 	doPostprocess(this, _ENV, "pre_transparent", camera_slot)
 
+	particles(camera_slot)
 	transparency(camera_slot)
 	fur(camera_slot)
 	water(camera_slot)

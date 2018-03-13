@@ -19,6 +19,6 @@ function render()
 		clear(this, CLEAR_ALL, 0xff00ff00)
 		applyCamera(this, "main")
 		setActiveGlobalLightUniforms(this)
-		renderModels(this, DEFAULT_RENDER_MASK)
+		renderModels(this)
 end
 

@@ -20,5 +20,9 @@
 	1048576000
 #height 1.800000
 	1072064102
+#custom_gravity
+	0
+#custom_gravity_acceleration 9.800000
+	1092406477
 #cmp_end
 	0

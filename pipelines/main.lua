@@ -2,6 +2,7 @@ local DEFAULT_RENDER_MASK = getLayerMask(this, "default")
 local TRANSPARENT_RENDER_MASK = getLayerMask(this, "transparent")
 local WATER_RENDER_MASK = getLayerMask(this, "water")
 local FUR_RENDER_MASK = getLayerMask(this, "fur")
+local OCCLUDER_MASK = getLayerMask(this, "occluder")
 local NOSHADOWS_RENDER_MASK = getLayerMask(this, "no_shadows")
 local ALL_RENDER_MASK = DEFAULT_RENDER_MASK + TRANSPARENT_RENDER_MASK + WATER_RENDER_MASK + FUR_RENDER_MASK + NOSHADOWS_RENDER_MASK
 local LUA_SCRIPT_TYPE = Engine.getComponentType("lua_script")
@@ -9,6 +10,7 @@ local SHADOWMAP_SIZE = 1024
 
 local exposure = 4
 local screenshot_request = 0
+local occlusion_culling_enabled = false
 local particles_enabled = true
 local render_gizmos = true
 local render_shadowmap_debug = false
@@ -571,7 +573,10 @@ function render()
 	fur(camera_slot)
 	water(camera_slot)
 	
-	renderModels(this, ALL_RENDER_MASK)
+	if occlusion_culling_enabled then
+		rasterizeOccluders(this, OCCLUDER_MASK)
+	end
+	renderModels(this, occlusion_culling_enabled)
 
 	doPostprocess(this, _ENV, "main", camera_slot)
 

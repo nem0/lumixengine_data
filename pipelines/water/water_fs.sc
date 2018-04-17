@@ -42,7 +42,7 @@ uniform vec4 u_lightSpecular;
 
 vec3 getReflectionColor(vec3 view, vec3 normal)
 {
-	vec3 reflection = normalize(reflect(-view, normal));
+	vec3 reflection = reflect(-view, normal);
 	return textureCube(u_texReflection, reflection).rgb;
 }
 
@@ -83,10 +83,10 @@ vec3 getRefractionColor(vec3 wpos, vec3 view, vec3 normal, float wave)
 {
 	vec3 screen_uv = getScreenCoord(wpos);
 	float depth = texture2D(u_gbuffer_depth, screen_uv.xy * 0.5 + 0.5).x;
-	float depth_diff = toLinearDepth(screen_uv.z) - toLinearDepth(depth) + wave;
+	float depth_diff = toLinearDepth(depth) - toLinearDepth(screen_uv.z) + wave;
 	vec3 refraction = refract(-view, normal, eta);
 	vec2 refr_uv = screen_uv.xy * 0.5 + 0.5;
-	refr_uv += refraction.xz * saturate(depth_diff * 0.1);
+	refr_uv += refraction.xz * clamp(depth_diff * 0.3, 0, 0.5);
 	
 	refr_uv = clamp(refr_uv * 0.9 + 0.05, vec2_splat(0), vec2_splat(1));
 	
@@ -137,7 +137,7 @@ void main()
 	float wave = cos(time * WAVE_FREQUENCY + length(v_wpos)*0.5) * WAVE_HEIGHT - WAVE_HEIGHT - WAVE_HEIGHT * noise;
 	vec3 screen_uv = getScreenCoord(v_wpos);
 	float depth = texture2D(u_gbuffer_depth, screen_uv.xy * 0.5 + 0.5).x;
-	float depth_diff = toLinearDepth(screen_uv.z) - toLinearDepth(depth) + wave;
+	float depth_diff = toLinearDepth(depth) - toLinearDepth(screen_uv.z) + wave;
 
 	if(depth_diff < FOAM_DEPTH)
 	{
@@ -146,10 +146,11 @@ void main()
 		wnormal = normalize(wnormal);
 	}
 	
-	vec3 refl_color = getReflectionColor(v_view, wnormal);
-	vec3 refr_color = getRefractionColor(v_wpos, v_view, wnormal, wave);
+	vec3 view = normalize(v_view);
+	vec3 refl_color = getReflectionColor(view, wnormal);
+	vec3 refr_color = getRefractionColor(v_wpos, view, wnormal, wave);
 	
-	vec3 halfvec = normalize(mix(-u_lightDirFov.xyz, normalize(v_view), 0.5));
+	vec3 halfvec = normalize(mix(-u_lightDirFov.xyz, view, 0.5));
 	float spec_strength = pow(max(0.0, dot(halfvec, wnormal)), spec_power);
 	vec3 spec_color = u_specColor.rgb * spec_strength;
 	

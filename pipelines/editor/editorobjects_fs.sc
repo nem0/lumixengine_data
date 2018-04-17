@@ -30,5 +30,5 @@ void main()
 	#endif
 	color *= u_materialColor.rgb;
 	float depth = texture2D(u_depthBuffer, screen_coord.xy * 0.5 + 0.5).x;
-	gl_FragColor = vec4(toGamma(color.rgb), screen_coord.z < depth ? 1 : 0.1);
+	gl_FragColor = vec4(toGamma(color.rgb), screen_coord.z > depth ? 1 : 0.1);
 }

@@ -152,7 +152,7 @@ function createFramebuffers()
 			height = 1024,
 			size_ratio = {1, 1},
 			renderbuffers = {
-				{ format = "rgba8" }
+				{ format = "r32f" }
 			}
 		})
 	end
@@ -379,7 +379,7 @@ end
 
 function renderSelectionOutline(ctx, camera_slot)
 	newView(this, "selection_mask", "selection_mask", ALL_RENDER_MASK)
-		clear(this, CLEAR_COLOR, 0)
+		clear(this, CLEAR_COLOR, 0xffffffff)
 		setPass(this, "SHADOW")
 		disableDepthWrite(this)
 		applyCamera(this, camera_slot)
@@ -420,14 +420,14 @@ function shadowmapDebug(ctx, x, y)
 	if render_shadowmap_debug then
 		newView(this, "shadowmap_debug", "default")
 			setPass(this, "MAIN")
-			bindFramebufferTexture(this, "shadowmap", 0, ctx.texture_uniform)
-			drawQuad(this, 0.01 + x, 0.01 + y, 0.23, 0.23, ctx.screen_space_material)
+			bindFramebufferTexture(this, "shadowmap", 0, texture_uniform)
+			drawQuad(this, 0.01, 0.01, 0.23, 0.23, screen_space_material)
 	end
 	if render_shadowmap_debug_fullsize then
 		newView(this, "shadowmap_debug_fullsize", "default")
 			setPass(this, "MAIN", "default")
-			bindFramebufferTexture(this, "shadowmap", 0, ctx.texture_uniform)
-			drawQuad(this, 0, 0, 1, 1, ctx.screen_space_material)
+			bindFramebufferTexture(this, "shadowmap", 0, texture_uniform)
+			drawQuad(this, 0, 0, 1, 1, screen_space_material)
 	end
 end
 

@@ -10,7 +10,7 @@ SAMPLERCUBE(u_texColor, 0);
 
 vec3 getWorldNormal(vec2 frag_coord)
 {
-	vec4 posProj = vec4(frag_coord * 2 - 1, 1.0, 1.0);
+	vec4 posProj = vec4(frag_coord * 2 - 1, 0.0, 1.0);
 	vec4 view_space_dir = mul(u_camInvProj, posProj);
 	vec3 view = mul(u_camInvView, view_space_dir).xyz;
 	return normalize(view);

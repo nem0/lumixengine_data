@@ -181,7 +181,7 @@ float noCheckESM(sampler2D shadowmap, vec2 shadow_coord, float receiver, float d
 {
 	float occluder = texture2D(shadowmap, shadow_coord).r * 0.5 + 0.5;
 
-	float visibility = clamp(exp(depth_multiplier * (occluder - receiver)), 0.0, 1.0);
+	float visibility = clamp(exp(depth_multiplier * (receiver - occluder)), 0.0, 1.0);
 
 	return visibility;
 }
@@ -198,7 +198,7 @@ float ESM(sampler2D shadowmap, vec4 shadow_coord, float bias, float depth_multip
 	float receiver = (shadow_coord.z - bias) / shadow_coord.w;
 	float occluder = (texture2D(shadowmap, texCoord).r * 0.5 + 0.5);
 
-	float visibility = clamp(exp(depth_multiplier * (occluder - receiver)), 0.0, 1.0);
+	float visibility = clamp(exp(depth_multiplier * (receiver - occluder)), 0.0, 1.0);
 
 	return visibility;
 }
@@ -288,8 +288,8 @@ float directionalLightShadow(sampler2D shadowmap, mat4 shadowmap_matrices[4], ve
 	float bias = clamp(offsets[split_index] * nl_tan, 0.0, 0.1); 
 	float next_bias = clamp(offsets[split_index + 1] * nl_tan, 0.0, 0.1); 
 
-	float v1 = noCheckESM(shadowmap, shadow_subcoords[0], shadow_coord[split_index].z - bias, (1 - shadow_coord[split_index].z) * mults[split_index]);
-	float v2 = split_index == 3 ? 1.0 : noCheckESM(shadowmap, shadow_subcoords[1], shadow_coord[split_index + 1].z - next_bias, (1 - shadow_coord[split_index+1].z) * mults[split_index + 1]);
+	float v1 = noCheckESM(shadowmap, shadow_subcoords[0], shadow_coord[split_index].z + bias,  shadow_coord[split_index].z * mults[split_index]);
+	float v2 = split_index == 3 ? 1.0 : noCheckESM(shadowmap, shadow_subcoords[1], shadow_coord[split_index + 1].z + next_bias, shadow_coord[split_index+1].z * mults[split_index + 1]);
 	return mix(v1, v2, weight);
 }
 

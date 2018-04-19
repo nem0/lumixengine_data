@@ -1,11 +1,11 @@
 texture_slot("Diffuse", "u_texColor")
-	texture_define "DIFFUSE_TEXTURE"
+	default_texture "models/utils/white.tga"
 texture_slot("Normal","u_texNormal")
-	texture_define "NORMAL_MAPPING"
+	default_texture "models/utils/default_normal.tga"
 texture_slot("Roughness", "u_texRoughness")
-	texture_define "ROUGHNESS_TEXTURE"
+	default_texture "models/utils/white.tga"
 texture_slot("Metallic", "u_texMetallic")
-	texture_define "METALLIC_TEXTURE"
+	default_texture "models/utils/white.tga"
 texture_slot("Bump", "u_texBump")
 	texture_define "BUMP_TEXTURE"
 texture_slot("Ambient occlusion", "u_texAO")
@@ -14,15 +14,15 @@ texture_slot("Wind", "u_noise")
 	texture_define "WIND_ANIMATION"
 
 pass "SHADOW"
-	fs { "ALPHA_CUTOUT", "DIFFUSE_TEXTURE" }
+	fs { "ALPHA_CUTOUT" }
 	vs { "SKINNED", "WIND_ANIMATION", "BUMP_TEXTURE", "INSTANCED" }
 	
 pass "DEFERRED"
-	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT", "DIFFUSE_TEXTURE", "BUMP_TEXTURE", "ROUGHNESS_TEXTURE", "METALLIC_TEXTURE", "AMBIENT_OCCLUSION" }
+	fs { "ALPHA_CUTOUT", "BUMP_TEXTURE", "AMBIENT_OCCLUSION" }
 	vs { "SKINNED", "WIND_ANIMATION", "BUMP_TEXTURE", "VEGETATION", "INSTANCED" }
 	
 pass "FORWARD"
-	fs { "NORMAL_MAPPING", "ALPHA_CUTOUT", "DIFFUSE_TEXTURE", "BUMP_TEXTURE", "ROUGHNESS_TEXTURE", "METALLIC_TEXTURE", "AMBIENT_OCCLUSION" }
+	fs { "ALPHA_CUTOUT", "BUMP_TEXTURE", "AMBIENT_OCCLUSION" }
 	vs { "SKINNED", "WIND_ANIMATION", "BUMP_TEXTURE", "VEGETATION", "INSTANCED" }
 
 uniform("u_time", "time")

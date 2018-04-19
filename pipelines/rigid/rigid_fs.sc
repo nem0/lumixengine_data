@@ -6,18 +6,10 @@
 	
 #include "common.sh"
 
-#ifdef DIFFUSE_TEXTURE
-	SAMPLER2D(u_texColor, 0);
-#endif
-#ifdef NORMAL_MAPPING
-	SAMPLER2D(u_texNormal, 1);
-#endif
-#ifdef ROUGHNESS_TEXTURE
-	SAMPLER2D(u_texRoughness, 2);
-#endif
-#ifdef METALLIC_TEXTURE
-	SAMPLER2D(u_texMetallic, 3);
-#endif
+SAMPLER2D(u_texColor, 0);
+SAMPLER2D(u_texNormal, 1);
+SAMPLER2D(u_texRoughness, 2);
+SAMPLER2D(u_texMetallic, 3);
 #ifdef BUMP_TEXTURE
 	SAMPLER2D(u_texBump, 4);
 #endif
@@ -99,45 +91,31 @@ void main()
 	#endif
 
 	vec4 color = toLinear(u_materialColor.rgba);
-	#ifdef DIFFUSE_TEXTURE
-		color *= texture2D(u_texColor, tex_coords);
-		#ifdef ALPHA_CUTOUT
-			if(color.a < u_alphaRef) discard;
-		#endif
+	color *= texture2D(u_texColor, tex_coords);
+	#ifdef ALPHA_CUTOUT
+		if(color.a < u_alphaRef) discard;
 	#endif
 	#ifdef SHADOW
 		float depth = v_common2.z / v_common2.w;
 		gl_FragColor = vec4_splat(depth);
 	#else
 		#ifdef DEFERRED
-			#ifdef ROUGHNESS_TEXTURE
-				float roughness = texture2D(u_texRoughness, tex_coords).x * u_roughnessMetallicEmission.x;
-			#else
-				float roughness = u_roughnessMetallicEmission.x;
-			#endif
-			#ifdef METALLIC_TEXTURE
-				float metallic = texture2D(u_texMetallic, tex_coords).x * u_roughnessMetallicEmission.y;
-			#else
-				float metallic = u_roughnessMetallicEmission.y;
-			#endif
+			float roughness = texture2D(u_texRoughness, tex_coords).x * u_roughnessMetallicEmission.x;
+			float metallic = texture2D(u_texMetallic, tex_coords).x * u_roughnessMetallicEmission.y;
 			float emission = u_roughnessMetallicEmission.z;
 		
 			gl_FragData[0] = vec4(color.rgb, roughness);
 			vec3 normal;
-			#ifdef NORMAL_MAPPING
-				mat3 tbn = mat3(
-					normalize(v_tangent),
-					normalize(v_normal),
-					normalize(v_bitangent)
-					);
-				tbn = transpose(tbn);
-				
-				normal.xz = texture2D(u_texNormal, tex_coords).xy * 2.0 - 1.0;
-				normal.y = sqrt(clamp(1 - dot(normal.xz, normal.xz), 0, 1)); 
-				normal = normalize(mul(tbn, normal));
-			#else
-				normal = normalize(v_normal);
-			#endif
+			mat3 tbn = mat3(
+				normalize(v_tangent),
+				normalize(v_normal),
+				normalize(v_bitangent)
+				);
+			tbn = transpose(tbn);
+			
+			normal.xz = texture2D(u_texNormal, tex_coords).xy * 2.0 - 1.0;
+			normal.y = sqrt(clamp(1 - dot(normal.xz, normal.xz), 0, 1)); 
+			normal = normalize(mul(tbn, normal));
 			gl_FragData[1].xyz = (normal + 1) * 0.5; // todo: store only xz 
 			gl_FragData[1].w = metallic;
 			float packed_emission = packEmission(emission);
@@ -155,13 +133,9 @@ void main()
 			tbn = transpose(tbn);
 						
 			vec3 wnormal;
-			#ifdef NORMAL_MAPPING
-				wnormal.xz = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
-				wnormal.y = sqrt(1.0 - dot(wnormal.xz, wnormal.xz) );
-				wnormal = mul(tbn, wnormal);
-			#else
-				wnormal = normalize(v_normal.xyz);
-			#endif
+			wnormal.xz = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
+			wnormal.y = sqrt(1.0 - dot(wnormal.xz, wnormal.xz) );
+			wnormal = mul(tbn, wnormal);
 			
 			float f0 = 0.04;
 			

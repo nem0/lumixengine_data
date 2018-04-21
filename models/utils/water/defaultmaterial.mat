@@ -1,7 +1,7 @@
 {"render_layer" : "water",
 "shader" : "pipelines/water/water.shd",
 "texture" : {"source" : "/models/utils/water/normal.tga"},
-"texture" : {"source" : "/models/sky/miramar/sky.dds"},
+"texture" : {"source" : "/models/sky/clouded01/sky.dds"},
 "texture" : {"source" : "/models/utils/water/foam.tga"},
 "texture" : {"source" : "/models/utils/water/hf_noise.tga"},
 "defines" : ["DIFFUSE_TEXTURE",

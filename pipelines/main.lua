@@ -1,5 +1,6 @@
 local DEFAULT_RENDER_MASK = getLayerMask(this, "default")
 local TRANSPARENT_RENDER_MASK = getLayerMask(this, "transparent")
+local TERRAIN_RENDER_MASK = getLayerMask(this, "terrain")
 local WATER_RENDER_MASK = getLayerMask(this, "water")
 local FUR_RENDER_MASK = getLayerMask(this, "fur")
 local OCCLUDER_MASK = getLayerMask(this, "occluder")
@@ -253,7 +254,8 @@ end
 init(_ENV)
 
 function rigid(camera_slot)
-	deferred_view = newView(this, "geometry_pass", "g_buffer", DEFAULT_RENDER_MASK + NOSHADOWS_RENDER_MASK)
+
+	newView(this, "geometry_pass_terrain", "g_buffer", TERRAIN_RENDER_MASK)
 		setPass(this, "DEFERRED")
 		applyCamera(this, camera_slot)
 		clear(this, CLEAR_ALL, 0x00000000)
@@ -264,7 +266,19 @@ function rigid(camera_slot)
 			| STENCIL_TEST_ALWAYS)
 		setStencilRMask(this, 0xff)
 		setStencilRef(this, 1)
+
+	newView(this, "geometry_pass", "g_buffer", DEFAULT_RENDER_MASK + NOSHADOWS_RENDER_MASK)
+		setPass(this, "DEFERRED")
+		applyCamera(this, camera_slot)
+		
+		setStencil(this, STENCIL_OP_PASS_Z_REPLACE 
+			| STENCIL_OP_FAIL_Z_KEEP 
+			| STENCIL_OP_FAIL_S_KEEP 
+			| STENCIL_TEST_ALWAYS)
+		setStencilRMask(this, 0xff)
+		setStencilRef(this, 1)
 	
+
 	newView(this, "clear_main", "hdr")
 		-- there are strange artifacts on some platforms without this clear
 		clear(this, CLEAR_ALL, 0x00000000)
@@ -562,7 +576,7 @@ function render()
 	local camera_slot = getCameraSlot()
 	
 	if render_shadowmap then
-		shadowmap(ctx, camera_slot, DEFAULT_RENDER_MASK + FUR_RENDER_MASK)
+		shadowmap(ctx, camera_slot, DEFAULT_RENDER_MASK + FUR_RENDER_MASK + TERRAIN_RENDER_MASK)
 	end
 	rigid(camera_slot)
 	

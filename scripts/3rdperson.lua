@@ -35,13 +35,13 @@ local actions = {
 function onInputEvent(event)
 	if event.type == Engine.INPUT_EVENT_BUTTON then
 		if event.device.type == Engine.INPUT_DEVICE_KEYBOARD then
-			if event.key_id == 119 then
+			if event.scancode == Engine.INPUT_SCANCODE_W then
 				actions.forward = event.state ~= 0
-			elseif event.key_id == 97 then
+			elseif event.scancode == Engine.INPUT_SCANCODE_A then
 				actions.left = event.state ~= 0
-			elseif event.key_id == 100 then
+			elseif event.scancode == Engine.INPUT_SCANCODE_D then
 				actions.right = event.state ~= 0
-			elseif event.key_id == 115 then
+			elseif event.scancode == Engine.INPUT_SCANCODE_S then
 				actions.back = event.state ~= 0
 			elseif event.key_id == 1073742049 then
 				actions.sprint = event.state ~= 0
@@ -103,18 +103,18 @@ function update(dt)
 	
 	if actions.left then
 		local v = Engine.multVecQuat({speed, 0, 0}, {0, 1, 0}, player_yaw)
-		Physics.moveController(scene, cmp, v, dt)
+		Physics.moveController(scene, this, v, dt)
 	end
 	if actions.right then
 		local v = Engine.multVecQuat({-speed, 0, 0}, {0, 1, 0}, player_yaw)
-		Physics.moveController(scene, cmp, v, dt)
+		Physics.moveController(scene, this, v, dt)
 	end
 	if actions.forward then
 		local v = Engine.multVecQuat({0, 0, speed}, {0, 1, 0}, player_yaw)
-		Physics.moveController(scene, cmp, v, dt)
+		Physics.moveController(scene, this, v, dt)
 	end
 	if actions.back then
 		local v = Engine.multVecQuat({0, 0, -speed}, {0, 1, 0}, player_yaw)
-		Physics.moveController(scene, cmp, v, dt)
+		Physics.moveController(scene, this, v, dt)
 	end
 end

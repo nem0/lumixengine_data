@@ -116,7 +116,7 @@ void main()
 			normal.xz = texture2D(u_texNormal, tex_coords).xy * 2.0 - 1.0;
 			normal.y = sqrt(clamp(1 - dot(normal.xz, normal.xz), 0, 1)); 
 			normal = normalize(mul(tbn, normal));
-			gl_FragData[1].xyz = (normal + 1) * 0.5; // todo: store only xz 
+			gl_FragData[1].xyz = normal * 0.5 + 0.5; // todo: store only xz 
 			gl_FragData[1].w = metallic;
 			float packed_emission = packEmission(emission);
 			#ifdef AMBIENT_OCCLUSION

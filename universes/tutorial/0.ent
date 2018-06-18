@@ -32,6 +32,8 @@
 	1
 #source
 	"pipelines/cubesky/cubesky.lua"
+#flags
+	1
 #prop_count
 	1
 #prop_name

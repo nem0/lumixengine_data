@@ -18,6 +18,8 @@
 	1
 #source
 	"scripts/tutorial/spawn_point.lua"
+#flags
+	1
 #prop_count
 	0
 #cmp_end

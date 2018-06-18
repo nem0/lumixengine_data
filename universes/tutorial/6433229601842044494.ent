@@ -40,10 +40,14 @@
 	2
 #source
 	"scripts/tutorial/load_navmesh.lua"
+#flags
+	1
 #prop_count
 	0
 #source
 	"scripts/tutorial/spawner.lua"
+#flags
+	1
 #prop_count
 	1
 #prop_name

@@ -17,7 +17,7 @@
 #source
 	"models/buildings/tower/house2.msh"
 #flags
-	0
+	8
 #custom_materials
 	0
 #cmp_end

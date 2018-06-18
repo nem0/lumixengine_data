@@ -18,6 +18,8 @@
 	2
 #source
 	"scripts/player.lua"
+#flags
+	1
 #prop_count
 	4
 #prop_name
@@ -46,6 +48,8 @@
 	"true"
 #source
 	"scripts/tutorial/shooting.lua"
+#flags
+	1
 #prop_count
 	1
 #prop_name

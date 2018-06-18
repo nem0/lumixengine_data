@@ -36,20 +36,6 @@
 	10
 #material
 	"particles/test.mat"
-#particle_emitter_linear_movement
-	3269129633
-#x_from -1.000000
-	3212836864
-#x_to 1.000000
-	1065353216
-#y_from 1.000000
-	1065353216
-#y_to 1.000000
-	1065353216
-#z_from -1.000000
-	3212836864
-#z_to 1.000000
-	1065353216
 #particle_emitter_alpha
 	1578575532
 #count
@@ -90,6 +76,20 @@
 	1045220557
 # 0.000000
 	0
+#particle_emitter_linear_movement
+	3269129633
+#x_from -1.000000
+	3212836864
+#x_to 1.000000
+	1065353216
+#y_from 1.000000
+	1065353216
+#y_to 1.000000
+	1065353216
+#z_from -1.000000
+	3212836864
+#z_to 1.000000
+	1065353216
 #particle_emitter_random_rotation
 	2588269735
 #cmp_end

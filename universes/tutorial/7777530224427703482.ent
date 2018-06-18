@@ -16,5 +16,13 @@
 	3498698531
 #guid
 	7355165132735469801
+#flags
+	0
+#radiance_size
+	128
+#irradiance_size
+	32
+#reflection_size
+	1024
 #cmp_end
 	0

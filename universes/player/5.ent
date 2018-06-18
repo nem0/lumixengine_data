@@ -18,6 +18,8 @@
 	1
 #source
 	"scripts/player.lua"
+#flags
+	1
 #prop_count
 	4
 #prop_name

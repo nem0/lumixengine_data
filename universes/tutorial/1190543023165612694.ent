@@ -17,7 +17,7 @@
 #source
 	"models/yo_frankie/trees/trees_0.msh"
 #flags
-	0
+	8
 #custom_materials
 	0
 #box_rigid_actor

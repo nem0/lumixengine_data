@@ -17,7 +17,7 @@
 #source
 	"models/creatures/undead_squirrel/squirrel-anim.msh"
 #flags
-	0
+	8
 #custom_materials
 	0
 #lua_script
@@ -26,6 +26,8 @@
 	1
 #source
 	"scripts/3rdperson.lua"
+#flags
+	1
 #prop_count
 	8
 #prop_name

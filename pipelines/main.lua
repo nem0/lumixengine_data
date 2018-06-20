@@ -1,11 +1,12 @@
 local DEFAULT_RENDER_MASK = getLayerMask(this, "default")
 local TRANSPARENT_RENDER_MASK = getLayerMask(this, "transparent")
 local TERRAIN_RENDER_MASK = getLayerMask(this, "terrain")
+local GRASS_RENDER_MASK = getLayerMask(this, "grass")
 local WATER_RENDER_MASK = getLayerMask(this, "water")
 local FUR_RENDER_MASK = getLayerMask(this, "fur")
 local OCCLUDER_MASK = getLayerMask(this, "occluder")
 local NOSHADOWS_RENDER_MASK = getLayerMask(this, "no_shadows")
-local ALL_RENDER_MASK = DEFAULT_RENDER_MASK + TRANSPARENT_RENDER_MASK + WATER_RENDER_MASK + FUR_RENDER_MASK + NOSHADOWS_RENDER_MASK
+local ALL_RENDER_MASK = DEFAULT_RENDER_MASK + TRANSPARENT_RENDER_MASK + WATER_RENDER_MASK + FUR_RENDER_MASK + NOSHADOWS_RENDER_MASK + TERRAIN_RENDER_MASK + GRASS_RENDER_MASK
 local LUA_SCRIPT_TYPE = Engine.getComponentType("lua_script")
 local SHADOWMAP_SIZE = 1024
 
@@ -278,6 +279,16 @@ function rigid(camera_slot)
 		setStencilRMask(this, 0xff)
 		setStencilRef(this, 1)
 	
+	newView(this, "geometry_pass_grass", "g_buffer", GRASS_RENDER_MASK)
+		setPass(this, "DEFERRED")
+		applyCamera(this, camera_slot)
+		
+		setStencil(this, STENCIL_OP_PASS_Z_REPLACE 
+			| STENCIL_OP_FAIL_Z_KEEP 
+			| STENCIL_OP_FAIL_S_KEEP 
+			| STENCIL_TEST_ALWAYS)
+		setStencilRMask(this, 0xff)
+		setStencilRef(this, 1)
 
 	newView(this, "clear_main", "hdr")
 		-- there are strange artifacts on some platforms without this clear

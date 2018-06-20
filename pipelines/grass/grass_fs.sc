@@ -1,4 +1,4 @@
-$input v_wpos, v_normal, v_common, v_texcoord0, v_view
+$input v_normal, v_common, v_texcoord0
 
 #include "common.sh"
 
@@ -22,7 +22,7 @@ void main()
 	gl_FragData[0].rgb = color.rgb;
 	gl_FragData[0].w = u_roughnessMetallicEmission.x;
 	vec3 normal = v_normal;
-	gl_FragData[1].xyz = (normal + 1) * 0.5; // todo: store only xz 
+	gl_FragData[1].xyz = normal * 0.5 + 0.5; // todo: store only xz 
 	gl_FragData[1].w = u_roughnessMetallicEmission.y;
 	gl_FragData[2] = vec4(1, 0, 0, 1);
 }

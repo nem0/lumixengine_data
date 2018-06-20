@@ -52,6 +52,17 @@ BEGIN_CONST_ARRAY (vec2, 16, POISSON_DISK_16)
 	vec2(0.6104985,0.7838438)
 END_CONST_ARRAY;
 
+vec3 mul_quat_vec3(float4 q, float3 v)
+{
+	vec3 qvec = q.xyz;
+	vec3 uv = cross(qvec, v);
+	vec3 uuv = cross(qvec, uv);
+	uv *= (2.0f * q.w);
+	uuv *= 2.0f;
+
+	return v + uv + uuv;
+}
+
 float packEmission(float emission)
 {
 	return log2(1 + emission / 64);

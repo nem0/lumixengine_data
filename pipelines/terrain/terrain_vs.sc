@@ -1,5 +1,5 @@
 $input a_position, a_normal, a_tangent, a_texcoord0, i_data0, i_data1
-$output v_wpos, v_view, v_texcoord0, v_texcoord1, v_common2
+$output v_wpos, v_view, v_texcoord0, v_common2
 
 #include "common.sh"
 
@@ -42,8 +42,7 @@ void main()
 
 	vec2 uv = (v_wpos.xz + 0.5) / ROOT_SIZE;
 
-	v_texcoord1 = uv;
-	v_texcoord0 = uv * ROOT_SIZE;
+	v_texcoord0 = uv;
 
 	v_wpos.y = u_terrainScale.y * texture2DLod(u_texHeightmap, uv, 0).x;
 	v_wpos.xz *= u_terrainScale.xz;

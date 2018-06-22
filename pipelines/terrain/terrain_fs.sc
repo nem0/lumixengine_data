@@ -1,4 +1,4 @@
-$input v_wpos, v_view, v_texcoord0, v_texcoord1, v_common2 // in...
+$input v_wpos, v_view, v_texcoord0, v_common2 // in...
 
 #include "common.sh"
 
@@ -18,6 +18,7 @@ uniform vec4 u_terrainScale;
 uniform mat4 u_terrainMatrix;
 uniform vec4 u_roughnessMetallicEmission;
 
+#define ROOT_SIZE u_terrainParams.x
 
 void main()
 {
@@ -25,9 +26,9 @@ void main()
 		float depth = v_common2.z/v_common2.w;
 		gl_FragColor = vec4_splat(depth);
 	#else
-		vec2 detail_uv = v_texcoord0.xy * texture_scale.x;
+		vec2 detail_uv = v_texcoord0.xy * ROOT_SIZE * texture_scale.x;
 
-		vec2 hm_uv = v_texcoord1;
+		vec2 hm_uv = v_texcoord0;
 		float tex_size = u_terrainParams.x;
 		vec3 off = vec3(-0.5 / tex_size, 0.0, 0.5 / tex_size);
 		
@@ -51,18 +52,18 @@ void main()
 			terrain_normal,
 			terrain_bitangent
 			);
-		tbn = transpose(tbn);
 
 		float splatmap_size = u_terrainParams.z;
 					
-		vec2 uv = v_texcoord1 * splatmap_size - 1.0;
+		vec2 uv = v_texcoord0 * splatmap_size - 1.0;
 		vec2 xy = floor(uv);
 		vec2 uv_ratio = uv - xy;
 		vec2 uv_opposite = 1.0 - uv_ratio;
-		vec4 splat00 = texture2D(u_texSplatmap, vec2(xy.x, xy.y) / splatmap_size).rgba;
-		vec4 splat01 = texture2D(u_texSplatmap, vec2(xy.x, xy.y + 1.0) / splatmap_size).rgba;
-		vec4 splat10 = texture2D(u_texSplatmap, vec2(xy.x + 1.0, xy.y) / splatmap_size).rgba;
-		vec4 splat11 = texture2D(u_texSplatmap, vec2(xy.x + 1.0, xy.y+1.0) / splatmap_size).rgba;
+		float inv_splatmap_size = 1 / splatmap_size;
+		vec4 splat00 = texture2D(u_texSplatmap, xy * inv_splatmap_size).rgba;
+		vec4 splat01 = texture2D(u_texSplatmap, (xy + vec2(0, 1)) * inv_splatmap_size);
+		vec4 splat10 = texture2D(u_texSplatmap, (xy + vec2(1, 0)) * inv_splatmap_size);
+		vec4 splat11 = texture2D(u_texSplatmap, (xy + vec2(1, 1)) * inv_splatmap_size);
 	
 		vec4 c00 = texture2DArray(u_texColor, vec3(detail_uv, splat00.x * 256.0));
 		vec4 c01 = texture2DArray(u_texColor, vec3(detail_uv, splat01.x * 256.0));
@@ -91,9 +92,11 @@ void main()
 		float b3 = max(a10 - ma, 0);
 		float b4 = max(a11 - ma, 0);
 		
+		float inv_b_sum = 1 / (b1 + b2 + b3 + b4);
+		
 		vec4 color = 
-			texture2D(u_texColormap, v_texcoord1) * 
-			vec4((c00.rgb * b1 + c01.rgb * b2 + c10.rgb * b3 + c11.rgb * b4) / (b1 + b2 + b3 + b4), 1.0);
+			texture2D(u_texColormap, v_texcoord0) * 
+			vec4((c00.rgb * b1 + c01.rgb * b2 + c10.rgb * b3 + c11.rgb * b4) * inv_b_sum, 1.0);
 		color.rgb *= u_materialColor.rgb;
 			
 		vec3 wnormal;
@@ -102,9 +105,9 @@ void main()
 			vec4 n01 = texture2DArray(u_texNormal, vec3(detail_uv, splat01.x * 256.0));
 			vec4 n10 = texture2DArray(u_texNormal, vec3(detail_uv, splat10.x * 256.0));
 			vec4 n11 = texture2DArray(u_texNormal, vec3(detail_uv, splat11.x * 256.0));
-			wnormal.xzy = (n00.xyz * b1 + n01.xyz * b2 + n10.xyz * b3 + n11.xyz * b4) / (b1 + b2 + b3 + b4);
+			wnormal.xzy = (n00.xyz * b1 + n01.xyz * b2 + n10.xyz * b3 + n11.xyz * b4) * inv_b_sum;
 			wnormal = wnormal * 2.0 - 1.0;
-			wnormal = normalize(mul(tbn, wnormal));
+			wnormal = normalize(mul(wnormal, tbn));
 		#else
 			wnormal = terrain_normal;
 		#endif
@@ -114,15 +117,14 @@ void main()
 		//color = (c00 * u_opposite  + c10  * u_ratio) * v_opposite + (c01 * u_opposite  + c11 * u_ratio) * v_ratio;
 		
 		float dist = length(v_view);
-		float t = (dist - detail_texture_distance.x) / detail_texture_distance.x;
-		color = mix(color, texture2D(u_texSatellitemap, v_texcoord1), saturate(t));
-		wnormal = mix(wnormal, terrain_normal, saturate(t));
+		float t = saturate((dist - detail_texture_distance.x) / detail_texture_distance.x);
+		color = mix(color, texture2D(u_texSatellitemap, v_texcoord0), t);
+		wnormal = mix(wnormal, terrain_normal, t);
 
 		gl_FragData[0].rgb = color.rgb;
 		gl_FragData[0].w = u_roughnessMetallicEmission.x;
 		gl_FragData[1].xyz = (wnormal + vec3_splat(1.0)) * 0.5;
 		gl_FragData[1].w = u_roughnessMetallicEmission.y;
 		gl_FragData[2] = vec4(1, 0, 0.0, 1.0);
-		
 	#endif // else SHADOW
 }

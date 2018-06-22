@@ -111,11 +111,10 @@ void main()
 				normalize(v_normal),
 				normalize(v_bitangent)
 				);
-			tbn = transpose(tbn);
 			
 			normal.xz = texture2D(u_texNormal, tex_coords).xy * 2.0 - 1.0;
 			normal.y = sqrt(clamp(1 - dot(normal.xz, normal.xz), 0, 1)); 
-			normal = normalize(mul(tbn, normal));
+			normal = normalize(mul(normal, tbn));
 			gl_FragData[1].xyz = normal * 0.5 + 0.5; // todo: store only xz 
 			gl_FragData[1].w = metallic;
 			float packed_emission = packEmission(emission);
@@ -130,12 +129,11 @@ void main()
 				normalize(v_normal),
 				normalize(v_bitangent)
 			);
-			tbn = transpose(tbn);
 						
 			vec3 wnormal;
 			wnormal.xz = texture2D(u_texNormal, v_texcoord0).xy * 2.0 - 1.0;
 			wnormal.y = sqrt(1.0 - dot(wnormal.xz, wnormal.xz) );
-			wnormal = mul(tbn, wnormal);
+			wnormal = mul(wnormal, tbn);
 			
 			float f0 = 0.04;
 			

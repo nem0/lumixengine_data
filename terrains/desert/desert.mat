@@ -1,23 +1,8 @@
-{"shader" : "pipelines/terrain/terrain.shd",
-"texture" : {"source" : "hm.raw",
-"keep_data" : true},
-"texture" : {"source" : "splatmap.tga",
-"u_clamp" : true,
-"v_clamp" : true,
-"min_filter" : "point",
-"mag_filter" : "point",
-"keep_data" : true},
-"texture" : {"source" : "colormap.tga", "srgb" : true,
-"keep_data" : true},
-"texture" : {"source" : "colormap.tga", "srgb" : true,
-"keep_data" : true},
-"texture" : {"source" : "diffuse.dds", "srgb" : true},
-"texture" : {"source" : "normal.dds"},
-"uniforms" : [{"name" : "detail_texture_distance",
-"float_value" : 30.00000000},
-{"name" : "texture_scale",
-"float_value" : 1.00000000}],
+shader "pipelines/terrain.shd"
+texture { source = "hm.raw",keep_data = true }
+texture { source = "splatmap.tga", u_clamp = true, v_clamp = true, min_filter = "point", mag_filter = "point", keep_data = true}
+texture { source = "colormap.tga", srgb = true, keep_data = true}
+texture { source = "colormap.tga", srgb = true, keep_data = true}
+texture { source = "diffuse.dds", srgb = true}
+texture "normal.dds"
 
-"color" : [1.00000000,
-1.00000000,
-1.00000000]}

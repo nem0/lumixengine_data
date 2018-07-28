@@ -1,0 +1,5 @@
+shader "pipelines/standard.shd"
+texture { source = "/models/test/lantern_Base_Color.dds", srgb = true }
+texture "/models/test/lantern_Normal_OpenGL.dds"
+texture "/models/test/lantern_Roughness.dds"
+texture "/models/test/lantern_Metallic.dds"

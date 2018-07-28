@@ -1,0 +1,4 @@
+shader "pipelines/standard.shd"
+texture "squirrel-head.dds"
+texture "squirrel-head-norm.dds"
+defines { "ALPHA_CUTOUT" }

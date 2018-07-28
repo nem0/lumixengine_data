@@ -1,0 +1,5 @@
+shader "pipelines/standard.shd"
+texture { source = "T_JapaneseMapleLeaf_1_BaseColor.dds", srgb = true }
+texture "T_JapaneseMapleLeaf_1_Normal.dds"
+texture "/models/common/white.tga"
+defines { "ALPHA_CUTOUT" }

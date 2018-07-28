@@ -1,4 +1,0 @@
-{"shader" : "pipelines/tonemap/extractluminance.shd",
-"backface_culling" : false,
-"uniforms" : []
-}

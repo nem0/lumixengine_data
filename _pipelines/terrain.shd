@@ -1,0 +1,100 @@
+include "pipelines/common.glsl"
+
+texture_slot {
+	name = "Heightmap",
+	uniform = "u_texHeightmap",
+	default_texture = "models/common/white.tga"
+}
+
+texture_slot {
+	name = "Splatmap",
+	uniform = "u_texSplatmap",
+	default_texture = "models/common/white.tga"
+}
+
+texture_slot {
+	name = "Colormap",
+	uniform = "u_texColormap",
+	default_texture = "models/common/white.tga"
+}
+
+texture_slot {
+	name = "Satellite map",
+	uniform = "u_texSatellitemap",
+	default_texture = "models/common/white.tga"
+}
+
+texture_slot {
+	name = "Detail",
+	uniform = "u_texColor",
+	default_texture = "models/common/white.tga"
+}
+
+texture_slot {
+	name = "Normalmap",
+	uniform = "u_texNormal",
+	default_texture = "models/common/white.tga"
+}
+
+
+vertex_shader [[
+	layout(location = 0) in vec3 a_position;
+	layout(location = 1) in vec2 a_uv;
+	layout(location = 2) in vec3 i_quad_min;
+	layout(location = 3) in float i_size;
+	layout(location = 4) in vec3 i_morph_consts;
+
+	uniform sampler2D u_texHeightmap;
+	uniform mat4 u_terrain_matrix;
+	uniform vec4 u_terrain_params;
+	uniform vec4 u_terrain_scale;
+
+	out vec2 v_uv;
+	
+	float computeWeight(vec3 pos, vec3 quad_min, vec2 morph_const)
+	{
+		float dist = distance(pos.xz, quad_min.xz + pos.xz);
+		float inner_r = i_morph_consts.y;
+		float outer_r = i_morph_consts.x;
+		float weight = (dist - inner_r) / (outer_r - inner_r);
+		
+		return saturate(weight);
+	}
+	
+	void main()
+	{
+		float m = i_size / 8.0;
+		vec3 v_wpos = a_position;  
+		v_wpos.xz *= i_size;
+		
+		vec2 fraction = fract(v_wpos.xz / m);
+
+		float weight = computeWeight(v_wpos, i_quad_min, i_morph_consts.xy);
+		
+		v_wpos.xz = v_wpos.xz - weight * fraction * m;
+		
+		v_wpos += i_quad_min;
+
+		float root_size = u_terrain_params.x;
+		vec2 uv = (v_wpos.xz + 0.5) / root_size;
+
+		v_uv = a_uv;
+		
+		v_wpos.y = u_terrain_scale.y * textureLod(u_texHeightmap, uv, 0).x;
+		v_wpos.xz *= u_terrain_scale.xz;
+
+		gl_Position = u_camera_view_projection * u_terrain_matrix * vec4(v_wpos, 1);
+	
+		//gl_Position = vec4(gl_VertexID & 1, 0.5 * (gl_VertexID & 2), 0, 1);
+	}
+]]
+
+
+fragment_shader [[
+	in vec2 v_uv;
+	out vec4 o_color;
+	void main()
+	{
+		o_color = vec4(v_uv, 0, 1);
+	}
+]]

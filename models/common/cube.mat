@@ -1,0 +1,5 @@
+shader "pipelines/standard.shd"
+texture "/models/common/noise.dds"
+texture ""
+texture "/models/common/white.tga"
+texture ""

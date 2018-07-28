@@ -1,8 +1,3 @@
-{"shader" : "pipelines/editor/editorobjects.shd",
-"backface_culling" : false,
-"texture" : {"source" : "icon.tga", "srgb" : true},
-"uniforms" : [],
+shader "pipelines/editor_icon.shd"
+texture {source = "/models/editor/icon.dds", srgb = true }
 
-"color" : [1.00000000,
-1.00000000,
-1.00000000]}

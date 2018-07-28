@@ -1,4 +1,0 @@
-{
-	"shader" : "pipelines/rigid/rigid.shd",
-	"texture" : { "source" : "squirrel-head.dds", "srgb" : true },
-	"texture" : { "source" : "squirrel-head-norm.dds"}}

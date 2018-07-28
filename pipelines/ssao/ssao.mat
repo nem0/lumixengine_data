@@ -1,7 +1,0 @@
-{"shader" : "pipelines/ssao/ssao.shd",
-"defines" : [],
-
-"alpha_ref" : 0.30000000,
-"color" : [1.00000000,
-1.00000000,
-1.00000000]}

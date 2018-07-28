@@ -1,3 +1,0 @@
-texture_slot("Diffuse", "u_texColor")
-
-pass "DEFERRED"

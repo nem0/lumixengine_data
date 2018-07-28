@@ -1,6 +1,0 @@
-pass "BLUR_H"
-	fs { "NEAR" }
-pass "BLUR_V"
-	fs { "NEAR" }
- 
- 

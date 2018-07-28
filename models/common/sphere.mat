@@ -1,0 +1,5 @@
+shader "pipelines/standard.shd"
+texture "/models/common/white.tga"
+texture ""
+texture "/models/common/black.tga"
+texture "/models/common/black.tga"

@@ -1,0 +1,21 @@
+vertex_shader [[
+	uniform mat4 u_model;
+	layout(location = 0) in vec3 a_position;
+	layout(location = 1) in vec4 a_color;
+	
+	out vec4 v_color;
+	
+	void main() {
+		v_color = vec4(pow(a_color.rgb, vec3(2.2)), a_color.a);
+		gl_Position = u_camera_projection * u_camera_view * u_model * vec4(a_position, 1);
+	}
+]]
+
+
+fragment_shader [[
+	in vec4 v_color;
+	out vec4 o_color;
+	void main() {
+		o_color = v_color;
+	}
+]]

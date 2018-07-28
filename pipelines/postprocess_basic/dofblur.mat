@@ -1,3 +1,0 @@
-{"shader" : "pipelines/postprocess_basic/dofblur.shd",
-"backface_culling" : false,
-"uniforms" : []}

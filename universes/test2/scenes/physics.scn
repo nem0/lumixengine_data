@@ -1,0 +1,12 @@
+#version
+	5
+#layers_count
+	2
+#name
+	"Layer0"
+#collision_matrix
+	4294967295
+#name
+	"Layer1"
+#collision_matrix
+	4294967295

@@ -1,3 +1,0 @@
-{"shader" : "pipelines/postprocess_basic/bloom.shd",
-"backface_culling" : false,
-"uniforms" : []}

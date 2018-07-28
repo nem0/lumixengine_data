@@ -1,0 +1,114 @@
+local DEFAULT_RENDER_MASK = getLayerMask("default")
+local deferred_shader = preloadShader("pipelines/deferred.shd")
+local textured_quad_shader = preloadShader("pipelines/textured_quad.shd")
+local tonemap_shader = preloadShader("pipelines/tonemap.shd")
+
+function forwardPass(shadowmap)
+	beginBlock("forward")
+	local color_buffer = createRenderbuffer(1, 1, true, "rgba8")
+	local dsbuffer = createRenderbuffer(1, 1, true, "depth24stencil8");
+
+	setRenderTargets(CLEAR_ALL, color_buffer, dsbuffer)
+	local view_params = getCameraParams()
+	renderTerrains(view_params)
+	renderMeshes(DEFAULT_RENDER_MASK, "", view_params,
+		{ u_shadowmap = shadowmap }
+	)
+	endBlock()
+	return color_buffer
+end
+
+function geomPass()
+	beginBlock("geom_pass")
+	local gbuffer0 = createRenderbuffer(1, 1, true, "rgba8")
+	local gbuffer1 = createRenderbuffer(1, 1, true, "rgba16f")
+	local dsbuffer = createRenderbuffer(1, 1, true, "depth24stencil8")
+	
+	setRenderTargets(CLEAR_ALL, gbuffer0, gbuffer1, dsbuffer)
+	
+	local view_params = getCameraParams()
+	renderMeshes(DEFAULT_RENDER_MASK, "DEFERRED", view_params)
+	endBlock()
+	
+	return gbuffer0, gbuffer1, dsbuffer
+end
+
+function lightPass(gbuffer0, gbuffer1, gbuffer_depth, shadowmap)
+	beginBlock("light_pass")
+	local hdr_rb = createRenderbuffer(1, 1, true, "rgba16f")
+	setRenderTargets(CLEAR_ALL, hdr_rb)
+
+	drawArray(0, 4, deferred_shader,
+	{
+		u_gbuffer0 = gbuffer0,
+		u_gbuffer1 = gbuffer1,
+		u_gbuffer_depth = gbuffer_depth,
+		u_shadowmap = shadowmap
+	})
+	endBlock()
+	return hdr_rb
+end
+
+function debugRenderbuffer(rb, output)
+	setRenderTargets(0, output)
+	
+	drawArray(0, 4, textured_quad_shader
+		, { u_texture = rb }
+		, { u_offset_scale = { 0.5, 0.5, 0.5, 0.5 } });
+end
+
+function shadowPass()
+	beginBlock("shadows")
+	local rb = createRenderbuffer(4096, 1024, false, "depth24")
+	setRenderTargets(CLEAR_ALL, rb)
+	
+	for slice = 0, 3 do 
+		local view_params = getShadowCameraParams(slice, 4096)
+		viewport(slice * 1024, 0, 1024, 1024)
+		beginBlock("slice " .. tostring(slice + 1))
+		renderMeshes(DEFAULT_RENDER_MASK, "DEPTH", view_params)
+		endBlock()
+	end
+	endBlock()
+	return rb
+end
+
+function postprocess(hdr_buffer, gbuffer0, gbuffer1, gbuffer_depth, shadowmap)
+	local rb = createRenderbuffer(1, 1, true, "rgba8")
+	setRenderTargets(CLEAR_ALL, rb)
+	drawArray(0, 4, tonemap_shader
+		, { u_hdrbuffer = hdr_buffer }
+	)
+	
+	return rb
+end
+
+function main()
+	local use_deferred = false
+	local shadowmap = shadowPass()
+	if use_deferred then
+		local gbuffer0, gbuffer1, gbuffer_depth = geomPass()
+		local hdr_buffer = lightPass(gbuffer0, gbuffer1, gbuffer_depth, shadowmap)
+	
+		local res = postprocess(hdr_buffer, gbuffer0, gbuffer1, gbuffer_depth, shadowmap)
+	
+		--debugRenderbuffer(shadowmap, hdr_buffer)
+	
+		setOutput(hdr_buffer)
+	else 
+		local res = forwardPass(shadowmap)
+	
+		--debugRenderbuffer(shadowmap, res)
+		
+		renderGizmos()
+		render2D()
+		renderIcons()
+		renderDebugShapes()
+
+		setOutput(res)
+	end
+end
+
+function onGUI()
+	ImGui.Text("=================TODO====================")
+end

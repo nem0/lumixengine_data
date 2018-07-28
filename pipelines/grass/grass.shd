@@ -1,7 +1,0 @@
-pass "DEFERRED"
-	fs { "ALPHA_CUTOUT" }
-   
-texture_slot("Diffuse", "u_texColor")
-texture_slot("Noise", "u_texNoise")
-
-uniform("u_time", "time")

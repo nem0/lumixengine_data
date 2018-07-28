@@ -1,3 +1,0 @@
-{"shader" : "pipelines/rigid/rigid.shd",
-"texture" : {"source" : "default.tga", "srgb" : true},
-"uniforms" : []}

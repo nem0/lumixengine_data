@@ -1,4 +1,0 @@
-{
-	"shader" : "pipelines/rigid/rigid.shd",
-	"texture" : { "srgb" : true },
-	"texture" : {}}

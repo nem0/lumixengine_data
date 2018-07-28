@@ -1,5 +1,0 @@
-texture_slot("Diffuse", "u_texColor")
-
-pass "MAIN"
-
-depth_test(false)

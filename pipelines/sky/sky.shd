@@ -1,9 +1,0 @@
-pass "MAIN"
-
-depth_test(false)
-
-uniform("u_airColor", "color")
-uniform("u_brightness", "vec3")
-uniform("u_strength", "vec3")
-uniform("u_sunSize", "float")
-	

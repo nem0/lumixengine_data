@@ -1,5 +1,0 @@
-pass "MAIN"
-	fs { "FIXED_EXPOSURE" }
-uniform("midgray", "float") 
-depth_test(false)
- 

@@ -1,0 +1,5 @@
+shader "pipelines/standard.shd"
+texture {source = "/models/test/Cerberus_A.dds", srgb = true }
+texture ""
+texture "/models/test/Cerberus_R.dds"
+texture "/models/test/Cerberus_M.dds"

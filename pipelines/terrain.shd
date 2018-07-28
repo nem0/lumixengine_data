@@ -1,0 +1,237 @@
+include "pipelines/common.glsl"
+
+texture_slot {
+	name = "Heightmap",
+	uniform = "u_heightmap",
+	default_texture = "models/common/white.tga"
+}
+
+texture_slot {
+	name = "Splatmap",
+	uniform = "u_splatmap"
+}
+
+texture_slot {
+	name = "Colormap",
+	uniform = "u_colormap"
+}
+
+texture_slot {
+	name = "Satellite map",
+	uniform = "u_satellitemap"
+}
+
+texture_slot {
+	name = "Detail",
+	uniform = "u_detail_albedomap"
+}
+
+texture_slot {
+	name = "Normalmap",
+	uniform = "u_detail_normalmap"
+}
+
+
+vertex_shader [[
+	layout(location = 0) in vec3 a_position;
+	layout(location = 1) in vec2 a_uv;
+	layout(location = 2) in vec3 i_quad_min;
+	layout(location = 3) in float i_size;
+	layout(location = 4) in vec3 i_morph_consts;
+
+	uniform sampler2D u_heightmap;
+	uniform mat4 u_terrain_matrix;
+	uniform vec4 u_terrain_params;
+	uniform vec4 u_terrain_scale;
+
+	out vec3 v_wpos;
+	out vec2 v_uv;
+	
+	float computeWeight(vec3 pos, vec3 quad_min, vec2 morph_const)
+	{
+		float dist = distance(-u_terrain_matrix[3].xz, quad_min.xz + pos.xz);
+		float inner_r = i_morph_consts.y;
+		float outer_r = i_morph_consts.x;
+		float weight = (dist - inner_r) / (outer_r - inner_r);
+		
+		return saturate(weight);
+	}
+	
+	void main()
+	{
+		float m = i_size / 8.0;
+		vec3 v_wpos = a_position;  
+		v_wpos.xz *= i_size;
+		
+		vec2 fraction = fract(v_wpos.xz / m);
+
+		float weight = computeWeight(v_wpos, i_quad_min, i_morph_consts.xy);
+		
+		v_wpos.xz = v_wpos.xz - weight * fraction * m;
+		
+		v_wpos += i_quad_min;
+
+		float root_size = u_terrain_params.x;
+		v_uv = (v_wpos.xz + 0.5) / root_size;
+		
+		v_wpos.y = u_terrain_scale.y * textureLod(u_heightmap, v_uv, 0).x;
+		v_wpos.xz *= u_terrain_scale.xz;
+
+		#ifdef DEPTH
+			gl_Position = u_shadow_view_projection * u_terrain_matrix * vec4(v_wpos, 1);
+		#else
+			gl_Position = u_camera_view_projection * u_terrain_matrix * vec4(v_wpos, 1);
+		#endif
+	}
+]]
+
+
+fragment_shader [[
+	in vec3 v_wpos;
+	in vec2 v_uv;
+	uniform sampler2D u_heightmap;
+	uniform sampler2D u_satellitemap;
+	uniform sampler2D u_splatmap;
+	uniform sampler2DArray u_detail_albedomap;
+	uniform sampler2D u_shadowmap;
+	uniform vec4 u_terrain_params;
+	uniform vec4 u_terrain_scale;
+	
+	#ifdef DEFERRED
+		layout(location = 0) out vec4 o_gbuffer0;
+		layout(location = 1) out vec4 o_gbuffer1;
+		layout(location = 2) out vec4 o_gbuffer2;
+	#else
+		layout(location = 0) out vec4 o_color;
+	#endif
+
+	vec3 foo()
+	{
+		float splatmap_size = u_terrain_params.z;
+		vec2 uv = v_uv * splatmap_size - 1.0;
+		vec2 xy = floor(uv);
+		vec2 uv_ratio = uv - xy;
+		vec2 uv_opposite = 1.0 - uv_ratio;
+		float inv_splatmap_size = 1 / splatmap_size;
+		
+		vec4 splat_layer0 = textureGather(u_splatmap, xy * inv_splatmap_size, 0).wxzy * 256.0 + 0.5;
+		vec4 splat_layer1 = textureGather(u_splatmap, xy * inv_splatmap_size, 1).wxzy * 256.0 + 0.5;
+		vec4 splat_weight = textureGather(u_splatmap, xy * inv_splatmap_size, 2).wxzy;
+		
+		vec2 detail_uv = v_uv * u_terrain_params.x;
+		
+		vec4 layer0_00 = texture(u_detail_albedomap, vec3(detail_uv, splat_layer0.x));
+		vec4 layer0_01 = texture(u_detail_albedomap, vec3(detail_uv, splat_layer0.y));
+		vec4 layer0_10 = texture(u_detail_albedomap, vec3(detail_uv, splat_layer0.z));
+		vec4 layer0_11 = texture(u_detail_albedomap, vec3(detail_uv, splat_layer0.w));
+
+		vec4 layer1_00 = texture(u_detail_albedomap, vec3(detail_uv, splat_layer1.x));
+		vec4 layer1_01 = texture(u_detail_albedomap, vec3(detail_uv, splat_layer1.y));
+		vec4 layer1_10 = texture(u_detail_albedomap, vec3(detail_uv, splat_layer1.z));
+		vec4 layer1_11 = texture(u_detail_albedomap, vec3(detail_uv, splat_layer1.w));
+
+		//return vec3(xy, 0);
+		
+		//uv_ratio = pow(uv_ratio, vec2(16));
+		
+		vec4 xx0 = mix(layer0_00, layer0_10, uv_ratio.x);
+		vec4 xx1 = mix(layer0_01, layer0_11, uv_ratio.x);
+
+		vec4 xx = mix(xx0, xx1, uv_ratio.y);
+		
+		//return layer0_00.rgb;
+return xx.rgb;/**/
+		
+		vec4 detail_heights = vec4(layer0_00.a, layer0_01.a, layer0_10.a, layer0_11.a);
+		
+		vec4 bicoef_a = vec4(uv_opposite.x, uv_opposite.x, uv_ratio.x, uv_ratio.x);
+		vec4 bicoef_b = vec4(uv_opposite.y, uv_ratio.y, uv_opposite.y, uv_ratio.y);
+		
+		vec4 bicoef = bicoef_a * bicoef_b;
+		
+		vec4 a = splat_weight * detail_heights * bicoef;
+
+		float ma = max(a.x, a.y);
+		ma = max(ma, a.z);
+		ma = max(ma, a.w); 
+		ma = ma * 0.5;
+		
+		vec4 b = max(a - ma, vec4(0));
+		
+		float inv_b_sum = 1 / (b.x + b.y + b.z + b.w);
+		
+		return 
+			//texture2D(u_colormap, v_texcoord0) * 
+			vec3(
+				(layer0_00.rgb * b.x 
+					+ layer0_01.rgb * b.y 
+					+ layer0_10.rgb * b.z 
+					+ layer0_11.rgb * b.w
+				) 
+				* inv_b_sum
+			);		/**/
+	}
+	
+	
+	void getData()
+	{
+		float tex_size = u_terrain_params.x;
+		vec3 off = vec3(-0.5 / tex_size, 0.0, 0.5 / tex_size);
+		
+		vec2 detail_uv = v_uv * u_terrain_params.x;
+		
+		float h01 = texture2D(u_heightmap, v_uv + off.xy).x;
+		float h21 = texture2D(u_heightmap, v_uv + off.zy).x;
+		float h10 = texture2D(u_heightmap, v_uv + off.yx).x;
+		float h12 = texture2D(u_heightmap, v_uv + off.yz).x;
+		
+		vec3 va = normalize(vec3(1.0, (h21-h01) * u_terrain_scale.y, 0.0));
+		vec3 vb = normalize(vec3(0.0, (h12-h10) * u_terrain_scale.y, 1.0));
+		data.normal = cross(vb, va);
+		
+		data.albedo = texture(u_detail_albedomap, vec3(detail_uv, 0));
+		data.albedo.xyz = foo();
+		#ifdef ALPHA_CUTOUT
+			if(data.albedo.a < 0.5) discard;
+		#endif
+		data.wpos = v_wpos.xyz;
+		data.roughness = 0.9;
+		data.metallic  = 1;
+	}
+	
+	#ifdef DEPTH
+		void main()
+		{
+		}
+	#elif defined DEFERRED
+		void main()
+		{
+			getData();
+			o_gbuffer0 = vec4(data.albedo.rgb, data.roughness);
+			o_gbuffer1 = vec4(data.normal, data.metallic);
+		}
+
+	#else 
+		void main()
+		{
+			getData();
+			
+			vec3 V = normalize(u_camera_pos - data.wpos);
+			vec3 L = normalize(u_light_direction);
+		
+			float shadow = getShadow(u_shadowmap, data.wpos);
+		
+			o_color.rgb = pbr(data.albedo.rgb
+				, data.roughness
+				, data.metallic
+				, data.normal
+				, V
+				, L
+				, shadow
+				, u_light_color * u_light_intensity
+				, u_light_indirect_intensity);
+				
+			o_color.w = 1;
+		}
+	#endif
+]]

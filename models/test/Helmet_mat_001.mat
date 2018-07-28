@@ -1,0 +1,5 @@
+shader "pipelines/standard.shd"
+texture "/models/test/helmet_albedo.dds"
+texture "/models/test/helmet_normal.dds"
+texture "/models/test/helmet_roughness.dds"
+texture "/models/test/helmet_metallic.dds"

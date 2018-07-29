@@ -1,8 +1,8 @@
 local DEFAULT_RENDER_MASK = getLayerMask("default")
+local TRANSPARENT_RENDER_MASK = getLayerMask("transparent")
 local deferred_shader = preloadShader("pipelines/deferred.shd")
 local textured_quad_shader = preloadShader("pipelines/textured_quad.shd")
 local tonemap_shader = preloadShader("pipelines/tonemap.shd")
-local procedural_sky_shader = preloadShader("pipelines/procedural_sky.shd")
 
 function forwardPass(shadowmap)
 	beginBlock("forward")
@@ -19,6 +19,18 @@ function forwardPass(shadowmap)
 	)
 	endBlock()
 	return color_buffer
+end
+
+function transparentPass(colorbuffer, dsbuffer)
+	beginBlock("transparent_pass")
+	
+	setRenderTargets(0, colorbuffer, dsbuffer)
+	
+	local view_params = getCameraParams()
+	blending(1)
+	renderMeshes(TRANSPARENT_RENDER_MASK, "", view_params)
+	endBlock()
+
 end
 
 function geomPass()
@@ -79,22 +91,26 @@ function shadowPass()
 	return rb
 end
 
-function postprocess(hdr_buffer, gbuffer0, gbuffer1, gbuffer_depth, shadowmap)
+function postprocess(phase, hdr_buffer, gbuffer0, gbuffer1, gbuffer_depth, shadowmap)
+	local prev = hdr_buffer
+	if _G["postprocesses"] ~= nil then
+		for _, value in ipairs(_G["postprocesses"]) do
+			prev = value(getfenv(1), phase, prev, gbuffer0, gbuffer1, gbuffer_depth, shadowmap)
+		end
+	end
+	return prev
+end
+
+function tonemap(hdr_buffer)
+	beginBlock("tonemap")
 	local rb = createRenderbuffer(1, 1, true, "rgba8")
-	
-	setRenderTargets(0, hdr_buffer, gbuffer_depth)
-	setStencil(0x0, STENCIL_NOT_EQUAL, 1, 0xff, STENCIL_KEEP, STENCIL_KEEP, STENCIL_REPLACE);
-	drawArray(0, 4, procedural_sky_shader)
-	setStencil(0xff, STENCIL_DISABLE, 1, 0xff, STENCIL_KEEP, STENCIL_KEEP, STENCIL_KEEP);
-	
-	setRenderTargets(CLEAR_COLOR, rb)
+	setRenderTargets(0, rb)
 	drawArray(0, 4, tonemap_shader
 		, { u_hdrbuffer = hdr_buffer }
 	)
-	
+	endBlock()
 	return rb
 end
-
 
 
 function main()
@@ -104,19 +120,28 @@ function main()
 		local gbuffer0, gbuffer1, gbuffer_depth = geomPass()
 		local hdr_buffer = lightPass(gbuffer0, gbuffer1, gbuffer_depth, shadowmap)
 	
-		local res = postprocess(hdr_buffer, gbuffer0, gbuffer1, gbuffer_depth, shadowmap)
-	
+		local res = postprocess("pre", hdr_buffer, gbuffer0, gbuffer1, gbuffer_depth, shadowmap)
+		
+		transparentPass(res, gbuffer_depth)
+
+		res = postprocess("post", res, gbuffer0, gbuffer1, gbuffer_depth, shadowmap)
+		
+		local res = tonemap(res)
+
+		res = postprocess("post_tonemap", res, gbuffer0, gbuffer1, gbuffer_depth, shadowmap)
+		
 		--debugRenderbuffer(shadowmap, hdr_buffer)
 	
-		setRenderTargets(0, hdr_buffer)
+		setRenderTargets(0, res)
 		renderGizmos()
 		render2D()
 		renderIcons()
 		renderDebugShapes()
 	
-		setOutput(hdr_buffer)
+		setOutput(res)
 	else 
 		local res = forwardPass(shadowmap)
+	
 	
 		--debugRenderbuffer(shadowmap, res)
 		

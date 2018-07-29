@@ -1,0 +1,40 @@
+#name
+	""
+#transform (0.022151, 0.000000, -4.727000)  (0.000000, 0.000000, 0.000000, 1.000000)
+	1018525448
+	0
+	3231138710
+	0
+	0
+	0
+	1065353216
+#scale 1.000000
+	1065353216
+#parent
+	18446744073709551615
+#model_instance
+	2297094205
+#source
+	"models/tree/japanese_maple.msh"
+#flags
+	8
+#custom_materials
+	0
+#lua_script
+	4143584752
+#count
+	2
+#source
+	"pipelines/sky.lua"
+#flags
+	1
+#prop_count
+	0
+#source
+	"pipelines/film_grain.lua"
+#flags
+	1
+#prop_count
+	0
+#cmp_end
+	0

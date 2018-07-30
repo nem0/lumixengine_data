@@ -83,6 +83,7 @@ fragment_shader [[
 	uniform sampler2D u_roughnessmap;
 	uniform sampler2D u_metallicmap;
 	uniform sampler2D u_shadowmap;
+	uniform vec4 u_material_params;
 	uniform vec4 u_material_color;
 	in vec2 v_uv;
 	in vec3 v_normal;
@@ -106,6 +107,7 @@ fragment_shader [[
 		data.roughness = texture(u_roughnessmap, v_uv).r;
 		data.metallic  = texture(u_metallicmap, v_uv).r;
 		data.normal = normalize(v_normal);
+		data.emission = packEmission(u_material_params.z);
 	}
 	
 	#ifdef DEPTH
@@ -122,6 +124,7 @@ fragment_shader [[
 			getData();
 			o_gbuffer0 = vec4(data.albedo.rgb, data.roughness);
 			o_gbuffer1 = vec4(data.normal, data.metallic);
+			o_gbuffer2 = vec4(data.emission, 0, 0, 1);
 		}
 	#else 
 		void main()
@@ -136,13 +139,14 @@ fragment_shader [[
 			o_color.rgb = pbr(data.albedo.rgb
 				, data.roughness
 				, data.metallic
+				, data.emission
 				, data.normal
 				, V
 				, L
 				, shadow
 				, u_light_color * u_light_intensity
 				, u_light_indirect_intensity);
-				
+			
 			o_color.w = data.albedo.a;
 		}
 	#endif

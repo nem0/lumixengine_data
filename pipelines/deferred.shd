@@ -19,6 +19,7 @@ fragment_shader [[
 	out vec4 o_color;
 	uniform sampler2D u_gbuffer0;
 	uniform sampler2D u_gbuffer1;
+	uniform sampler2D u_gbuffer2;
 	uniform sampler2D u_gbuffer_depth;
 	uniform sampler2D u_shadowmap;
 	
@@ -26,12 +27,14 @@ fragment_shader [[
 	{
 		vec4 gb0 = texture(u_gbuffer0, v_uv);
 		vec4 gb1 = texture(u_gbuffer1, v_uv);
+		vec4 gb2 = texture(u_gbuffer2, v_uv);
 		float depth = texture(u_gbuffer_depth, v_uv).x;
 
 		vec3 albedo = gb0.rgb;
 		vec3 normal = gb1.rgb;
 		float roughness = gb0.w;
 		float metallic = gb1.w;
+		float emission = unpackEmission(gb2.x);
 
 		vec3 wpos = getViewPosition(u_gbuffer_depth, u_camera_inv_view_projection, v_uv);
 		vec3 V = normalize(u_camera_pos - wpos);
@@ -41,6 +44,7 @@ fragment_shader [[
 		o_color.rgb = pbr(albedo
 				, roughness
 				, metallic
+				, emission
 				, normal
 				, V
 				, L

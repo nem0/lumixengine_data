@@ -5,12 +5,25 @@ struct PixelData {
 	vec4 albedo;
 	float roughness;
 	float metallic;
+	float emission;
 	vec3 normal;
 	vec3 wpos;
 } data;
 
 
 float saturate(float a) { return clamp(a, 0, 1); }
+
+
+float packEmission(float emission)
+{
+	return log2(1 + emission / 64);
+}
+
+
+float unpackEmission(float emission)
+{
+	return (exp2(emission) - 1) * 64;
+}
 
 
 vec3 getViewPosition(sampler2D depth_buffer, mat4 inv_view_proj, vec2 tex_coord)
@@ -126,6 +139,7 @@ vec3 PBR_ComputeIndirectLight(vec3 albedo, float roughness, float metallic, vec3
 vec3 pbr(vec3 albedo
 	, float roughness
 	, float metallic
+	, float emission
 	, vec3 N
 	, vec3 V
 	, vec3 L
@@ -146,5 +160,6 @@ vec3 pbr(vec3 albedo
 	return 
 		+ direct * shadow
 		+ indirect * indirect_intensity
+		+ emission * albedo
 	;
 }

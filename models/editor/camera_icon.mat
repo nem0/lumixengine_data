@@ -1,4 +1,2 @@
-{
-	"shader" : "pipelines/editor/editorobjects.shd"
-,
-	"color" : [0.176662, 0.414470, 0.798995]}
+shader "pipelines/editor_icon.shd"
+texture ""

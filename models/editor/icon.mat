@@ -1,3 +1,2 @@
 shader "pipelines/editor_icon.shd"
-texture {source = "/models/editor/icon.dds", srgb = true }
-
+texture "/models/editor/icon.dds"

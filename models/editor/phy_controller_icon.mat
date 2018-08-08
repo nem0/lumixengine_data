@@ -1,4 +1,2 @@
-{"shader" : "pipelines/editor/editorobjects.shd",
-"backface_culling" : false,
-"texture" : {"source" : "phy_controller_icon.tga", "srgb" : true},
-"uniforms" : []}
+shader "pipelines/editor_icon.shd"
+texture "/models/editor/phy_controller_icon.tga"

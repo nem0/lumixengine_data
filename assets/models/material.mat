@@ -1,0 +1,8 @@
+shader "pipelines/standard.shd"
+metallic(0.000000000)
+roughness(1.000000000)
+defines {}
+texture "/models/common/noise.dds"
+texture "/"
+texture "/"
+texture "/"

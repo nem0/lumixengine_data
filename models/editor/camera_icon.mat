@@ -1,2 +1,3 @@
-shader "pipelines/editor_icon.shd"
+shader "pipelines/debug_shape.shd"
+texture ""
 texture ""

@@ -1,6 +1,7 @@
 texture_slot {
 	name = "Albedo",
-	uniform = "u_albedomap"
+	uniform = "u_albedomap",
+	default_texture = "models/common/white.tga"
 }
 
 attribute { name = "a_position", semantic = SEMANTICS_POSITION }

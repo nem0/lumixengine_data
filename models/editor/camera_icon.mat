@@ -1,3 +1,2 @@
 shader "pipelines/debug_shape.shd"
 texture ""
-texture ""

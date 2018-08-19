@@ -150,7 +150,7 @@ function main()
 		debugPass(res, shadowmap)
 			
 		if renderGizmos ~= nil then
-			setRenderTargets(0, res)
+			setRenderTargets(CLEAR_DEPTH, res)
 			renderGizmos()
 			render2D()
 			renderIcons()

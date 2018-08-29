@@ -1,0 +1,20 @@
+material "particles/test.mat"
+
+local x = newChannel()
+local y = newChannel()
+local z = newChannel()
+
+function update(dt)
+end
+
+function output(px, py, pz)
+	out(x)
+	out(y)
+	out(z)
+end
+
+function emit()
+	rand(z, -5, 5)
+	rand(x, -5, z)
+	rand(y, -5, z)
+end

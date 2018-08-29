@@ -1,0 +1,33 @@
+material "particles/test.mat"
+
+local t = newChannel()
+local radius = newChannel()
+local z = newChannel()
+local speed = newChannel()
+
+local r0 = newRegister()
+
+function update(dt)
+	mov(r0, dt)
+	mul(r0, r0, speed)
+	add(t, t, r0)
+end
+
+function output(px, py, pz)
+	cos(r0, t)
+	mul(r0, r0, radius)
+	out(r0)
+
+	sin(r0, t)
+	mul(r0, r0, radius)
+	out(r0)
+	
+	out(z)
+end
+
+function emit()
+	rand(speed, 0, 1)
+	rand(t, 0, 6.28)
+	rand(radius, 0, 5)
+	rand(z, 0, 5)
+end

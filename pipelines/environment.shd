@@ -5,6 +5,7 @@ include "pipelines/common.glsl"
 vertex_shader [[
 	in vec3 a_position;
 	out vec3 v_uv;
+	out float v_radius;
 	uniform vec4 u_pos_radius;
 	void main()
 	{
@@ -25,7 +26,8 @@ fragment_shader [[
 	uniform sampler2D u_gbuffer2;
 	uniform sampler2D u_gbuffer_depth;
 	uniform sampler2D u_shadowmap;
-	
+	uniform vec4 u_pos_radius;
+
 	void main()
 	{
 		vec2 screen_uv = gl_FragCoord.xy / u_framebuffer_size;
@@ -45,8 +47,9 @@ fragment_shader [[
 		vec3 L = normalize(u_light_direction);
 		
 		vec3 indirect = PBR_ComputeIndirectLight(albedo, roughness, metallic, normal, V);
-				
-		o_color = vec4(indirect, 1);
+		float alpha = 1 - saturate(length(wpos - u_pos_radius.xyz) / u_pos_radius.w);
+		//alpha *= alpha;
+		o_color = vec4(indirect * alpha, alpha);
 		//o_color = vec4(abs(u_camera_pos), 1);
 		//o_color = vec4(1, 0, 0, 1);
 	}

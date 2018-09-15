@@ -37,21 +37,20 @@ fragment_shader [[
 		float emission = unpackEmission(gb2.x);
 
 		vec3 wpos = getViewPosition(u_gbuffer_depth, u_camera_inv_view_projection, v_uv);
-		vec3 V = normalize(u_camera_pos - wpos);
+		vec3 V = normalize(-wpos);
 		vec3 L = normalize(u_light_direction);
 		
 		float shadow = getShadow(u_shadowmap, wpos);
-		o_color.rgb = pbr(albedo
-				, roughness
-				, metallic
-				, emission
-				, normal
-				, V
-				, L
-				, shadow
-				, u_light_color * u_light_intensity
-				, u_light_indirect_intensity);
+		vec3 direct = PBR_ComputeDirectLight(albedo
+			, normal
+			, L
+			, V
+			, u_light_color * u_light_intensity
+			, roughness
+			, metallic);
+		
+		o_color.rgb = direct;
 				
-		o_color.w = 1;
+		o_color.w = 0;
 	}
 ]]

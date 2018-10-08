@@ -123,7 +123,7 @@ fragment_shader [[
 		{
 			getData();
 			o_gbuffer0 = vec4(data.albedo.rgb, data.roughness);
-			o_gbuffer1 = vec4(data.normal, data.metallic);
+			o_gbuffer1 = vec4(data.normal * 0.5 + 0.5, data.metallic);
 			o_gbuffer2 = vec4(data.emission, 0, 0, 1);
 		}
 	#else 
@@ -131,7 +131,7 @@ fragment_shader [[
 		{
 			getData();
 			
-			vec3 V = normalize(u_camera_pos - data.wpos);
+			vec3 V = normalize(-data.wpos);
 			vec3 L = normalize(u_light_direction);
 		
 			float shadow = getShadow(u_shadowmap, data.wpos);

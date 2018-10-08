@@ -31,7 +31,7 @@ fragment_shader [[
 		float depth = texture(u_gbuffer_depth, v_uv).x;
 
 		vec3 albedo = gb0.rgb;
-		vec3 normal = gb1.rgb;
+		vec3 normal = gb1.rgb * 2 - 1;
 		float roughness = gb0.w;
 		float metallic = gb1.w;
 		float emission = unpackEmission(gb2.x);

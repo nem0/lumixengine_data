@@ -1,5 +1,3 @@
-local DEFAULT_RENDER_MASK = getLayerMask("default")
-local TRANSPARENT_RENDER_MASK = getLayerMask("transparent")
 local deferred_shader = preloadShader("pipelines/deferred.shd")
 local textured_quad_shader = preloadShader("pipelines/textured_quad.shd")
 local tonemap_shader = preloadShader("pipelines/tonemap.shd")
@@ -18,7 +16,7 @@ function forwardPass(shadowmap)
 	renderTerrains("", view_params,
 		{ u_shadowmap = shadowmap }
 	)
-	renderMeshes(DEFAULT_RENDER_MASK, "", view_params,
+	renderMeshes("", view_params,
 		{ u_shadowmap = shadowmap }
 	)
 	endBlock()
@@ -32,16 +30,16 @@ function transparentPass(colorbuffer, dsbuffer)
 	
 	local view_params = getCameraParams()
 	blending("add")
-	renderMeshes(TRANSPARENT_RENDER_MASK, "", view_params)
+	renderMeshes("", view_params)
 	renderParticles(view_params)
 	endBlock()
-
+	blending("")
 end
 
 function geomPass()
 	beginBlock("geom_pass")
 	local gbuffer0 = createRenderbuffer(1, 1, true, "rgba8")
-	local gbuffer1 = createRenderbuffer(1, 1, true, "rgba16f")
+	local gbuffer1 = createRenderbuffer(1, 1, true, "rgba16")
 	local gbuffer2 = createRenderbuffer(1, 1, true, "rgba8")
 	local dsbuffer = createRenderbuffer(1, 1, true, "depth24stencil8")
 	
@@ -51,7 +49,7 @@ function geomPass()
 	local view_params = getCameraParams()
 	setStencil(0xff, STENCIL_ALWAYS, 1, 0xff, STENCIL_REPLACE, STENCIL_REPLACE, STENCIL_REPLACE);
 	renderTerrains("DEFERRED", view_params)
-	renderMeshes(DEFAULT_RENDER_MASK, "DEFERRED", view_params)
+	renderMeshes("DEFERRED", view_params)
 	setStencil(0xff, STENCIL_DISABLE, 0, 0, STENCIL_KEEP, STENCIL_KEEP, STENCIL_KEEP);
 	endBlock()
 	
@@ -105,7 +103,7 @@ function shadowPass()
 		local view_params = getShadowCameraParams(slice, 4096)
 		viewport(slice * 1024, 0, 1024, 1024)
 		beginBlock("slice " .. tostring(slice + 1))
-		renderMeshes(DEFAULT_RENDER_MASK, "DEPTH", view_params)
+		renderMeshes("DEPTH", view_params)
 		endBlock()
 	end
 	endBlock()
@@ -142,7 +140,7 @@ end
 
 function main()
 	local use_deferred = true
-	local shadowmap = shadowPass()
+	local shadowmap = createRenderbuffer(4096, 1024, false, "depth24") --shadowPass()
 	if use_deferred then
 		local gbuffer0, gbuffer1, gbuffer2, gbuffer_depth = geomPass()
 		local hdr_buffer = lightPass(gbuffer0, gbuffer1, gbuffer2, gbuffer_depth, shadowmap)
@@ -152,7 +150,7 @@ function main()
 			res = postprocess("pre", hdr_buffer, gbuffer0, gbuffer1, gbuffer2, gbuffer_depth, shadowmap)
 		end
 		
-		transparentPass(res, gbuffer_depth)
+		--transparentPass(res, gbuffer_depth)
 
 		if PREVIEW == nil then
 			res = postprocess("post", res, gbuffer0, gbuffer1, gbuffer2, gbuffer_depth, shadowmap)
@@ -167,7 +165,7 @@ function main()
 		debugPass(res, shadowmap)
 			
 		if renderGizmos ~= nil then
-			setRenderTargets(res)
+			setRenderTargets(res, gbuffer_depth)
 			clear(CLEAR_DEPTH, 0, 0, 0, 1, 0)
 			renderGizmos()
 			render2D()

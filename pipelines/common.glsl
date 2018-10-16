@@ -136,6 +136,17 @@ vec3 PBR_ComputeIndirectLight(vec3 albedo, float roughness, float metallic, vec3
 }
 
 
+vec3 rotateByQuat(vec4 rot, vec3 pos)
+{
+	vec3 uv = cross(rot.xyz, pos);
+	vec3 uuv = cross(rot.xyz, uv);
+	uv *= (2.0 * rot.w);
+	uuv *= 2.0;
+
+	return pos + uv + uuv;
+}
+	
+
 vec3 pbr(vec3 albedo
 	, float roughness
 	, float metallic

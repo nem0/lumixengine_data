@@ -155,7 +155,7 @@ function main()
 		clear(CLEAR_DEPTH, 0, 0, 0, 1, 0)
 		renderGizmos()
 		render2D()
-		renderIcons()
+		--renderIcons()
 		renderDebugShapes()
 	end
 

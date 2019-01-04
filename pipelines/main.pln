@@ -29,6 +29,10 @@ local default_state = {
 	stencil_zpass = STENCIL_REPLACE,
 }
 
+local shadow_state = {
+	define = "DEPTH"
+}
+
 function transparentPass(transparent_set, colorbuffer, dsbuffer)
 	setRenderTargets(colorbuffer, dsbuffer)
 
@@ -40,10 +44,10 @@ end
 
 function geomPass(default_set, decal_set)
 	beginBlock("geom_pass")
-	local gbuffer0 = createRenderbuffer(1, 1, true, "rgba8")
-	local gbuffer1 = createRenderbuffer(1, 1, true, "rgba16")
-	local gbuffer2 = createRenderbuffer(1, 1, true, "rgba8")
-	local dsbuffer = createRenderbuffer(1, 1, true, "depth24stencil8")
+	local gbuffer0 = createRenderbuffer(1, 1, true, "rgba8", "gbuffer0")
+	local gbuffer1 = createRenderbuffer(1, 1, true, "rgba16", "gbuffer1")
+	local gbuffer2 = createRenderbuffer(1, 1, true, "rgba8", "gbuffer2")
+	local dsbuffer = createRenderbuffer(1, 1, true, "depth24stencil8", "gbuffer_ds")
 	
 	setRenderTargets(gbuffer0, gbuffer1, gbuffer2, dsbuffer)
 	clear(CLEAR_ALL, 0, 0, 0, 1, 0)
@@ -64,25 +68,25 @@ end
 
 function lightPass(gbuffer0, gbuffer1, gbuffer2, gbuffer_depth, shadowmap, local_light_set)
 	beginBlock("light_pass")
-	local hdr_rb = createRenderbuffer(1, 1, true, "rgba16f")
+	local hdr_rb = createRenderbuffer(1, 1, true, "rgba16f", "hdr")
 	setRenderTargets(hdr_rb, gbuffer_depth)
 	clear(CLEAR_COLOR, 0, 0, 0, 0, 0)
 	
 	drawArray(0, 4, deferred_shader,
 	{
-		u_gbuffer0 = gbuffer0,
-		u_gbuffer1 = gbuffer1,
-		u_gbuffer2 = gbuffer2,
-		u_gbuffer_depth = gbuffer_depth,
-		u_shadowmap = shadowmap
+		gbuffer0,
+		gbuffer1,
+		gbuffer2,
+		gbuffer_depth,
+		shadowmap
 	}, {}, {}, { depth_test = false })
 	local view_params = getCameraParams()
 	bindTextures({
-		u_gbuffer0 = gbuffer0,
-		u_gbuffer1 = gbuffer1,
-		u_gbuffer2 = gbuffer2,
-		u_gbuffer_depth = gbuffer_depth,
-		u_shadowmap = shadowmap
+		gbuffer0,
+		gbuffer1,
+		gbuffer2,
+		gbuffer_depth,
+		shadowmap
 	}, 2)
 	renderEnvProbeVolumes(environment_shader, view_params)
 	
@@ -90,11 +94,11 @@ function lightPass(gbuffer0, gbuffer1, gbuffer2, gbuffer_depth, shadowmap, local
 	
 	beginBlock("local_lights")
 	bindTextures({
-		u_gbuffer0 = gbuffer0,
-		u_gbuffer1 = gbuffer1,
-		u_gbuffer2 = gbuffer2,
-		u_gbuffer_depth = gbuffer_depth,
-		u_shadowmap = shadowmap
+		gbuffer0,
+		gbuffer1,
+		gbuffer2,
+		gbuffer_depth,
+		shadowmap
 	}, 0)
 	renderLocalLights("", local_light_shader, local_light_set)
 	endBlock()
@@ -106,7 +110,7 @@ function debugRenderbuffer(rb, output)
 	setRenderTargets(output)
 	
 	drawArray(0, 4, textured_quad_shader
-		, { u_texture = rb }
+		, { rb }
 		, { u_offset_scale = { 0.5, 0.5, 0.5, 0.5 } }
 		, {}
 		, { depth_test = false });
@@ -114,15 +118,17 @@ end
 
 function shadowPass()
 	beginBlock("shadows")
-	local rb = createRenderbuffer(4096, 1024, false, "depth24")
+	local rb = createRenderbuffer(4096, 1024, false, "depth24", "shadowmap")
 	setRenderTargets(rb)
 	clear(CLEAR_DEPTH, 0, 0, 0, 1, 0)
 	
 	for slice = 0, 3 do 
 		local view_params = getShadowCameraParams(slice, 4096)
+		local shadow_set = prepareCommands(view_params, { { layers = { "default" } } })
+		
 		viewport(slice * 1024, 0, 1024, 1024)
 		beginBlock("slice " .. tostring(slice + 1))
-		--renderMeshes("DEPTH", view_params)
+		renderBucket(shadow_set, shadow_state)
 		endBlock()
 	end
 	endBlock()
@@ -141,10 +147,10 @@ end
 
 function tonemap(hdr_buffer)
 	beginBlock("tonemap")
-	local rb = createRenderbuffer(1, 1, true, "rgba8")
+	local rb = createRenderbuffer(1, 1, true, "rgba8", "tonemap")
 	setRenderTargets(rb)
 	drawArray(0, 4, tonemap_shader
-		, { u_hdrbuffer = hdr_buffer }
+		, { hdr_buffer }
 		, {}
 		, {}
 		, { depth_test = false }
@@ -161,14 +167,14 @@ end
 
 
 function renderSelectionOutline(output)
-	local selection_mask = createRenderbuffer(1, 1, true, "rgba8")
+	local selection_mask = createRenderbuffer(1, 1, true, "rgba8", "selection outline")
 	setRenderTargets(selection_mask)
 	clear(CLEAR_COLOR, 0, 0, 0, 0, 0)
 	renderSelection()
 	
 	setRenderTargets(output)
 	drawArray(0, 4, selection_outline_shader
-		, { u_mask = selection_mask }
+		, { selection_mask }
 		, {}
 		, {}
 		, { depth_test = false }
@@ -189,7 +195,7 @@ function main()
 	)
 
 	
-	local shadowmap = createRenderbuffer(4096, 1024, false, "depth24") --shadowPass()
+	local shadowmap = shadowPass()
 	local gbuffer0, gbuffer1, gbuffer2, gbuffer_depth = geomPass(default_set, decal_set, transparent_set)
 	local hdr_buffer = lightPass(gbuffer0, gbuffer1, gbuffer2, gbuffer_depth, shadowmap, local_light_set)
 	

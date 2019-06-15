@@ -6,7 +6,6 @@ unit_tests/render_tests/*_res.tga
 metadata.bin
 minidump.dmp
 fulldump.dmp
-imgui.ini
 error.log
 studio.ini
 universes/__test_result__*

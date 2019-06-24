@@ -223,7 +223,7 @@ function main()
 	)
 
 	
-	local shadowmap = shadowPass()
+	--local shadowmap = shadowPass()
 	local gbuffer0, gbuffer1, gbuffer2, gbuffer_depth = geomPass(default_set, decal_set, transparent_set)
 	local hdr_buffer = lightPass(gbuffer0, gbuffer1, gbuffer2, gbuffer_depth, shadowmap, local_light_set)
 	
@@ -254,7 +254,7 @@ function main()
 		clear(CLEAR_DEPTH, 0, 0, 0, 1, 0)
 		renderGizmos()
 		render2D()
-		--renderIcons()
+		renderIcons()
 		renderDebugShapes()
 		renderSelectionOutline(res)
 	end

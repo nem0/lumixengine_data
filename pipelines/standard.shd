@@ -26,6 +26,7 @@ attribute { name = "a_indices", semantic = SEMANTICS_INDICES }
 attribute { name = "a_weights", semantic = SEMANTICS_WEIGHTS }
 attribute { name = "i_rot_quat", semantic = SEMANTICS_INSTANCE0 }
 attribute { name = "i_pos_scale", semantic = SEMANTICS_INSTANCE1 }
+attribute { name = "i_grass_normal", semantic = SEMANTICS_INSTANCE2 }
 
 include "pipelines/common.glsl"
 
@@ -35,10 +36,16 @@ vertex_shader [[
 	layout(location = 0) in vec3 a_position;
 	layout(location = 1) in vec2 a_uv;
 	layout(location = 2) in vec3 a_normal;
-	#ifdef SKINNED
+	#ifdef GRASS
+		layout(location = 3) in vec4 i_rot_quat;
+		layout(location = 4) in vec4 i_pos_scale;
+		layout(location = 5) in vec4 i_grass_normal;
+	#elif defined SKINNED
 		layout(location = 3) in vec4 a_indices;
 		layout(location = 4) in vec4 a_weights;
-		uniform mat4 u_bones[196];
+		layout(std140) uniform Bones {
+			mat4 u_bones[256];
+		};
 	#elif defined INSTANCED
 		layout(location = 3) in vec4 i_rot_quat;
 		layout(location = 4) in vec4 i_pos_scale;
@@ -50,7 +57,10 @@ vertex_shader [[
 	
 	void main() {
 		v_uv = a_uv;
-		#ifdef INSTANCED
+		#ifdef GRASS
+			v_normal = rotateByQuat(i_rot_quat, a_normal * 2 - 1);
+			v_wpos = u_model * vec4(i_pos_scale.xyz + rotateByQuat(i_rot_quat, a_position * i_pos_scale.w), 1);
+		#elif defined INSTANCED
 			v_normal = rotateByQuat(i_rot_quat, a_normal * 2 - 1);
 			v_wpos = vec4(i_pos_scale.xyz + rotateByQuat(i_rot_quat, a_position * i_pos_scale.w), 1);
 
@@ -67,11 +77,7 @@ vertex_shader [[
 			v_wpos = model_mtx * vec4(a_position,  1);
 		#endif
 		
-		#ifdef DEPTH
-			gl_Position = u_shadow_view_projection * v_wpos;		
-		#else
-			gl_Position = u_camera_view_projection * v_wpos;
-		#endif
+		gl_Position = u_pass_view_projection * v_wpos;		
 	}
 ]]
 
@@ -117,6 +123,7 @@ fragment_shader [[
 				data.albedo = texture(u_albedomap, v_uv);
 				if(data.albedo.a < 0.5) discard;
 			#endif
+			o_color = vec4(gl_FragCoord.z);
 		}
 	#elif defined DEFERRED
 		void main()

@@ -1,3 +1,5 @@
+**This is data for LumixEngine v1, do not use with the latest Lumix**
+
 LumixEngine Data
 ================
 
